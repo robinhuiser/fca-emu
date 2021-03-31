@@ -1,0 +1,42 @@
+version: "3"
+
+dotenv: ['.env']
+
+# includes:
+
+output: "prefixed"
+silent: true
+
+vars:
+  FINITE_PACKAGE_NAME: finite
+
+tasks:
+  open-api:
+    desc: Generate OpenAPI Golang boilerplate code
+    cmds:
+      - |
+        openapi-generator generate \
+          --git-repo-id $GIT_REPO_ID \
+          --git-user-id $GIT_USER_ID \
+          --git-host $GIT_HOST \
+          --input-spec $FINITE_SPEC \
+          --generator-name go-server \
+          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}" \
+          --output .
+
+  patch:
+    desc: Patch the generated code
+    cmds:
+      - |
+        for file in $(ls go/api_*.go | grep -v _service.go); do
+          echo $file
+          sed -i '' 's/mask := query.Get("mask")/mask, _ := strconv.ParseBool(query.Get("mask"))/g' $file
+          sed -i '' 's/enhance := query.Get("enhance")/enhance, _ := strconv.ParseBool(query.Get("enhance"))/g' $file
+          sed -i '' 's/inline := query.Get("inline")/inline, _ := strconv.ParseBool(query.Get("inline"))/g' $file
+          sed -i '' 's/reversedInRunning := query.Get("reversedInRunning")/reversedInRunning, _ := strconv.ParseBool(query.Get("reversedInRunning"))/g' $file
+
+          sed -i '' 's/status := query.Get("status")/status := TransactionStatus(query.Get("status"))/g' $file
+          sed -i '' 's/finiteType := params\["finiteType"\]/finiteType := FiniteType(params\["finiteType"\])/g' $file
+
+          goimports -w $file
+        done

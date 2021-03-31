@@ -14,40 +14,40 @@ import (
 	"log"
 	"net/http"
 
-	openapi "github.com/robinhuiser/finite-api-mock/go"
+	finite "github.com/robinhuiser/finite-mock-server/go"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	AccountsApiService := openapi.NewAccountsApiService()
-	AccountsApiController := openapi.NewAccountsApiController(AccountsApiService)
+	AccountsApiService := finite.NewAccountsApiService()
+	AccountsApiController := finite.NewAccountsApiController(AccountsApiService)
 
-	CacheApiService := openapi.NewCacheApiService()
-	CacheApiController := openapi.NewCacheApiController(CacheApiService)
+	CacheApiService := finite.NewCacheApiService()
+	CacheApiController := finite.NewCacheApiController(CacheApiService)
 
-	CardsApiService := openapi.NewCardsApiService()
-	CardsApiController := openapi.NewCardsApiController(CardsApiService)
+	CardsApiService := finite.NewCardsApiService()
+	CardsApiController := finite.NewCardsApiController(CardsApiService)
 
-	EntityApiService := openapi.NewEntityApiService()
-	EntityApiController := openapi.NewEntityApiController(EntityApiService)
+	EntityApiService := finite.NewEntityApiService()
+	EntityApiController := finite.NewEntityApiController(EntityApiService)
 
-	ExchangeApiService := openapi.NewExchangeApiService()
-	ExchangeApiController := openapi.NewExchangeApiController(ExchangeApiService)
+	ExchangeApiService := finite.NewExchangeApiService()
+	ExchangeApiController := finite.NewExchangeApiController(ExchangeApiService)
 
-	ProductsApiService := openapi.NewProductsApiService()
-	ProductsApiController := openapi.NewProductsApiController(ProductsApiService)
+	ProductsApiService := finite.NewProductsApiService()
+	ProductsApiController := finite.NewProductsApiController(ProductsApiService)
 
-	StatementApiService := openapi.NewStatementApiService()
-	StatementApiController := openapi.NewStatementApiController(StatementApiService)
+	StatementApiService := finite.NewStatementApiService()
+	StatementApiController := finite.NewStatementApiController(StatementApiService)
 
-	StatementsApiService := openapi.NewStatementsApiService()
-	StatementsApiController := openapi.NewStatementsApiController(StatementsApiService)
+	StatementsApiService := finite.NewStatementsApiService()
+	StatementsApiController := finite.NewStatementsApiController(StatementsApiService)
 
-	TransactionsApiService := openapi.NewTransactionsApiService()
-	TransactionsApiController := openapi.NewTransactionsApiController(TransactionsApiService)
+	TransactionsApiService := finite.NewTransactionsApiService()
+	TransactionsApiController := finite.NewTransactionsApiController(TransactionsApiService)
 
-	router := openapi.NewRouter(AccountsApiController, CacheApiController, CardsApiController, EntityApiController, ExchangeApiController, ProductsApiController, StatementApiController, StatementsApiController, TransactionsApiController)
+	router := finite.NewRouter(AccountsApiController, CacheApiController, CardsApiController, EntityApiController, ExchangeApiController, ProductsApiController, StatementApiController, StatementsApiController, TransactionsApiController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

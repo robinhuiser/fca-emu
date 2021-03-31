@@ -1,4 +1,4 @@
-module github.com/robinhuiser/finite-api-mock
+module github.com/robinhuiser/finite-mock-server
 
 go 1.13
 
