@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // EntityApiService is a service that implents the logic for the EntityApiServicer
-// This service should implement the business logic for every endpoint for the EntityApi API. 
+// This service should implement the business logic for every endpoint for the EntityApi API.
 // Include any external packages or services that will be required by this service.
 type EntityApiService struct {
 }
@@ -138,4 +138,3 @@ func (s *EntityApiService) SearchEntities(ctx context.Context, limit int32, curs
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchEntities method not implemented")
 }
-

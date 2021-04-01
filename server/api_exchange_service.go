@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // ExchangeApiService is a service that implents the logic for the ExchangeApiServicer
-// This service should implement the business logic for every endpoint for the ExchangeApi API. 
+// This service should implement the business logic for every endpoint for the ExchangeApi API.
 // Include any external packages or services that will be required by this service.
 type ExchangeApiService struct {
 }
@@ -149,4 +149,3 @@ func (s *ExchangeApiService) UpdateExchangeTransaction(ctx context.Context, exch
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateExchangeTransaction method not implemented")
 }
-

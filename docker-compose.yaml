@@ -18,7 +18,8 @@ services:
       - ./mssql/Data/Account.sql:/docker-entrypoint-initdb.d/2.sql
 
   mock:
-    build: .
+    build:
+      context: .
     environment:
       MYSQL_HOST: db:3306 
       MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}

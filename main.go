@@ -14,7 +14,7 @@ import (
 	"log"
 	"net/http"
 
-	finite "github.com/robinhuiser/finite-mock-server/go"
+	finite "github.com/robinhuiser/finite-mock-server/server"
 )
 
 func main() {

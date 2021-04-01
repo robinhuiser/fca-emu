@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // ProductsApiService is a service that implents the logic for the ProductsApiServicer
-// This service should implement the business logic for every endpoint for the ProductsApi API. 
+// This service should implement the business logic for every endpoint for the ProductsApi API.
 // Include any external packages or services that will be required by this service.
 type ProductsApiService struct {
 }
@@ -49,4 +49,3 @@ func (s *ProductsApiService) GetProducts(ctx context.Context, productType string
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetProducts method not implemented")
 }
-

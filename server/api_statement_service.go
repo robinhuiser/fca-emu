@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // StatementApiService is a service that implents the logic for the StatementApiServicer
-// This service should implement the business logic for every endpoint for the StatementApi API. 
+// This service should implement the business logic for every endpoint for the StatementApi API.
 // Include any external packages or services that will be required by this service.
 type StatementApiService struct {
 }
@@ -118,4 +118,3 @@ func (s *StatementApiService) GetStatementItems(ctx context.Context, statementId
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetStatementItems method not implemented")
 }
-

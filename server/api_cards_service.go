@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // CardsApiService is a service that implents the logic for the CardsApiServicer
-// This service should implement the business logic for every endpoint for the CardsApi API. 
+// This service should implement the business logic for every endpoint for the CardsApi API.
 // Include any external packages or services that will be required by this service.
 type CardsApiService struct {
 }
@@ -49,4 +49,3 @@ func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string,
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountCards method not implemented")
 }
-

@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // CacheApiService is a service that implents the logic for the CacheApiServicer
-// This service should implement the business logic for every endpoint for the CacheApi API. 
+// This service should implement the business logic for every endpoint for the CacheApi API.
 // Include any external packages or services that will be required by this service.
 type CacheApiService struct {
 }
@@ -126,4 +126,3 @@ func (s *CacheApiService) RenewCache(ctx context.Context, finiteType FiniteType,
 
 	return Response(http.StatusNotImplemented, nil), errors.New("RenewCache method not implemented")
 }
-

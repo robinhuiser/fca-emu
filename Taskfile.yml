@@ -9,6 +9,7 @@ silent: true
 
 vars:
   FINITE_PACKAGE_NAME: finite
+  MOCK_SERVER_SOURCE_FOLDER: server
 
 tasks:
   generate:
@@ -40,13 +41,13 @@ tasks:
           --input-spec $FINITE_SPEC \
           --generator-name go-server \
           --enable-post-process-file \
-          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}" \
+          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}" \
           --output .
 
   generate:patch:
     cmds:
       - |
-        for file in $(ls go/api_*.go | grep -v _service.go); do
+        for file in $(ls {{.MOCK_SERVER_SOURCE_FOLDER}}/api_*.go | grep -v _service.go); do
           echo $file
           sed -i '' 's/mask := query.Get("mask")/mask, _ := strconv.ParseBool(query.Get("mask"))/g' $file
           sed -i '' 's/enhance := query.Get("enhance")/enhance, _ := strconv.ParseBool(query.Get("enhance"))/g' $file

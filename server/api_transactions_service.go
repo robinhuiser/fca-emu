@@ -12,12 +12,12 @@ package finite
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // TransactionsApiService is a service that implents the logic for the TransactionsApiServicer
-// This service should implement the business logic for every endpoint for the TransactionsApi API. 
+// This service should implement the business logic for every endpoint for the TransactionsApi API.
 // Include any external packages or services that will be required by this service.
 type TransactionsApiService struct {
 }
@@ -138,4 +138,3 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit i
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchTransactions method not implemented")
 }
-

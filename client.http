@@ -1,12 +1,15 @@
+#
+# Environment setup
+@base_url = http://localhost:8080/cloud
 
 #
-# Set Digital Channel environment
-# @log_processor_url = http://localhost:4195/post
-
+# Test account ID
+@account_url = v1/account
+@account_id = e14f44ea-5380-4368-9631-45c1d6a3bf6c
 
 ### 
 
 # Get account details
 # @name account
-GET http://localhost:8080/cloud/v1/account/123
+GET {{base_url}}/{{account_url}}/{{account_id}}
 Accept: application/json
