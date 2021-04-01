@@ -1,4 +1,3 @@
-Dockerfile
 api/openapi.yaml
 go.mod
 go/api.go
