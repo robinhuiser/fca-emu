@@ -18,6 +18,7 @@ For more information, please visit [https://www.trexis.net](https://www.trexis.n
 * [Taskfile](https://taskfile.dev) 3.x - `brew install go-task/tap/go-task`
 * [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 5.1.x - `brew install openapi-generator`
 * [Golang](https://golang.org/) 1.16.x - `brew install go`
+* [ent.](https://entgo.io/) - `go get entgo.io/ent/cmd/ent`
 
 ## Configuration
 

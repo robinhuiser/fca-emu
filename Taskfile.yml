@@ -40,7 +40,7 @@ tasks:
           --input-spec $FINITE_SPEC \
           --generator-name go-server \
           --enable-post-process-file \
-          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}",serverPort=$MOCK_SERVER_PORT \
+          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}",serverPort=$MOCK_SERVER_LISTEN_PORT \
           --output .
 
   generate:patch:

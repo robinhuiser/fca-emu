@@ -11,14 +11,56 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
+	"github.com/robinhuiser/finite-mock-server/ent"
 	finite "github.com/robinhuiser/finite-mock-server/server"
+
+	_ "github.com/lib/pq"
+)
+
+const (
+	DbHost = "localhost"
+	DbPort = "5432"
+	DbName = "postgres"
+
+	AppListenAddress = "0.0.0.0"
+	AppListenPort    = "8080"
 )
 
 func main() {
-	log.Printf("Server started")
+	// We can ignore if there is no .dotenv (container runtime)
+	godotenv.Load()
+
+	dbHost := getenv("POSTGRES_HOST", DbHost)
+	dbPort := getenv("POSTGRES_PORT", DbPort)
+	dbName := getenv("POSTGRES_DATABASE_NAME", DbName)
+	dbUser := getenv("POSTGRES_USER_NAME", "")
+	dbPass := getenv("POSTGRES_USER_PASSWORD", "")
+
+	appListenAddress := getenv("MOCK_SERVER_LISTEN_ADDRESS", AppListenAddress)
+	appListenPort := getenv("MOCK_SERVER_LISTEN_PORT", AppListenPort)
+
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", dbHost, dbPort, dbUser, dbName, dbPass)
+
+	client, err := ent.Open("postgres", dbConn)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	log.Printf("connected to database %s", dbName)
+
+	defer client.Close()
+
+	// Run the migration tool
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
+	}
+	log.Printf("database migration run successfully")
 
 	AccountsApiService := finite.NewAccountsApiService()
 	AccountsApiController := finite.NewAccountsApiController(AccountsApiService)
@@ -47,7 +89,28 @@ func main() {
 	TransactionsApiService := finite.NewTransactionsApiService()
 	TransactionsApiController := finite.NewTransactionsApiController(TransactionsApiService)
 
-	router := finite.NewRouter(AccountsApiController, CacheApiController, CardsApiController, EntityApiController, ExchangeApiController, ProductsApiController, StatementApiController, StatementsApiController, TransactionsApiController)
+	router := finite.NewRouter(AccountsApiController,
+		CacheApiController,
+		CardsApiController,
+		EntityApiController,
+		ExchangeApiController,
+		ProductsApiController,
+		StatementApiController,
+		StatementsApiController,
+		TransactionsApiController)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Printf("mock server started")
+	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		if len(fallback) > 0 {
+			return fallback
+		} else {
+			log.Fatalf("mandatory environment variable missing: %s", key)
+		}
+	}
+	return value
 }
