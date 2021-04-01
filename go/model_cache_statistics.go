@@ -12,7 +12,6 @@ package finite
 
 // CacheStatistics - A summary of the caches for a given finite item type
 type CacheStatistics struct {
-
 	FiniteType FiniteType `json:"finiteType,omitempty"`
 
 	// List of attributes identifying the cache referenced

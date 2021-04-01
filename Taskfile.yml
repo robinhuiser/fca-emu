@@ -11,8 +11,26 @@ vars:
   FINITE_PACKAGE_NAME: finite
 
 tasks:
-  open-api:
+  generate:
     desc: Generate OpenAPI Golang boilerplate code
+    cmds: 
+      - task: generate:open-api
+      - task: generate:patch
+      - task: generate:ddl
+
+  clean:
+    desc: Removes build and container artifacts
+    cmds:
+      - task: clean:docker
+
+  clean:docker:
+    cmds:
+      - cmd: docker-compose down
+      - cmd: docker-compose rm
+      - cmd: docker volume rm finite-mock-server_finite_mock_db
+        ignore_error: true
+
+  generate:open-api:
     cmds:
       - |
         openapi-generator generate \
@@ -21,11 +39,11 @@ tasks:
           --git-host $GIT_HOST \
           --input-spec $FINITE_SPEC \
           --generator-name go-server \
+          --enable-post-process-file \
           --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}" \
           --output .
 
-  patch:
-    desc: Patch the generated code
+  generate:patch:
     cmds:
       - |
         for file in $(ls go/api_*.go | grep -v _service.go); do
@@ -40,3 +58,12 @@ tasks:
 
           goimports -w $file
         done
+
+  generate:ddl:
+    cmds:
+      - |
+        openapi-generator generate \
+          --input-spec $FINITE_SPEC \
+          --generator-name mysql-schema \
+          --additional-properties defaultDatabaseName="{{.MYSQL_DATABASE_NAME}}" \
+          --output mssql

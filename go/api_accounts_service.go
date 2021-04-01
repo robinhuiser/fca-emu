@@ -33,7 +33,7 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	//TODO: Uncomment the next line to return response Response(200, Account{}) or use other options such as http.Ok ...
-	//return Response(200, Account{}), nil
+	return Response(200, Account{}), nil
 
 	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
 	//return Response(401, ErrorResponse{}), nil
@@ -47,7 +47,7 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
 	//return Response(500, ErrorResponse{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccount method not implemented")
+	// return Response(http.StatusNotImplemented, nil), errors.New("GetAccount method not implemented")
 }
 
 // GetAccountBalances - Return a accounts balances

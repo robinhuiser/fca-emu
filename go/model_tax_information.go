@@ -12,7 +12,6 @@ package finite
 
 // TaxInformation - Tax information
 type TaxInformation struct {
-
 	Type string `json:"type,omitempty"`
 
 	// Tax identification value

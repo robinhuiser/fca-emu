@@ -1,0 +1,12 @@
+
+#
+# Set Digital Channel environment
+# @log_processor_url = http://localhost:4195/post
+
+
+### 
+
+# Get account details
+# @name account
+GET http://localhost:8080/cloud/v1/account/123
+Accept: application/json

@@ -9,19 +9,20 @@
  */
 
 package finite
+
 // FiniteType : Type of schemas supported by Finite
 type FiniteType string
 
 // List of FiniteType
 const (
-	ACCOUNT FiniteType = "ACCOUNT"
-	BALANCE FiniteType = "BALANCE"
-	BANK FiniteType = "BANK"
-	CARD FiniteType = "CARD"
-	ENTITY FiniteType = "ENTITY"
-	EXCHANGE FiniteType = "EXCHANGE"
-	FILE FiniteType = "FILE"
-	PRODUCT FiniteType = "PRODUCT"
-	STATEMENT FiniteType = "STATEMENT"
+	ACCOUNT     FiniteType = "ACCOUNT"
+	BALANCE     FiniteType = "BALANCE"
+	BANK        FiniteType = "BANK"
+	CARD        FiniteType = "CARD"
+	ENTITY      FiniteType = "ENTITY"
+	EXCHANGE    FiniteType = "EXCHANGE"
+	FILE        FiniteType = "FILE"
+	PRODUCT     FiniteType = "PRODUCT"
+	STATEMENT   FiniteType = "STATEMENT"
 	TRANSACTION FiniteType = "TRANSACTION"
 )

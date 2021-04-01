@@ -9,6 +9,7 @@
  */
 
 package finite
+
 // FiniteEvent : Type of events supported by Finite
 type FiniteEvent string
 
@@ -16,9 +17,9 @@ type FiniteEvent string
 const (
 	CACHE_DELETE FiniteEvent = "CacheDelete"
 	CACHE_UPDATE FiniteEvent = "CacheUpdate"
-	CACHE_READ FiniteEvent = "CacheRead"
-	ITEM_UPDATE FiniteEvent = "ItemUpdate"
-	ITEM_READ FiniteEvent = "ItemRead"
-	ITEM_DELETE FiniteEvent = "ItemDelete"
-	LIST_READ FiniteEvent = "ListRead"
+	CACHE_READ   FiniteEvent = "CacheRead"
+	ITEM_UPDATE  FiniteEvent = "ItemUpdate"
+	ITEM_READ    FiniteEvent = "ItemRead"
+	ITEM_DELETE  FiniteEvent = "ItemDelete"
+	LIST_READ    FiniteEvent = "ListRead"
 )

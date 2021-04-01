@@ -12,7 +12,6 @@ package finite
 
 // Address - Address object
 type Address struct {
-
 	Type string `json:"type,omitempty"`
 
 	// Address line

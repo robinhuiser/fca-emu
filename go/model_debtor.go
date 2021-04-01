@@ -12,6 +12,5 @@ package finite
 
 // Debtor - Account or Entity that originates an exchange
 type Debtor struct {
-
 	DebtorType string `json:"debtorType"`
 }

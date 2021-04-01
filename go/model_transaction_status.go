@@ -9,11 +9,12 @@
  */
 
 package finite
+
 // TransactionStatus : The status of the transaction
 type TransactionStatus string
 
 // List of TransactionStatus
 const (
 	PENDING TransactionStatus = "PENDING"
-	POSTED TransactionStatus = "POSTED"
+	POSTED  TransactionStatus = "POSTED"
 )

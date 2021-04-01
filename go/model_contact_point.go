@@ -12,7 +12,6 @@ package finite
 
 // ContactPoint - Contact Point object
 type ContactPoint struct {
-
 	Type string `json:"type,omitempty"`
 
 	// Name of the contact point
