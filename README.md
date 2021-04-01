@@ -43,11 +43,11 @@ $ go run main.go
 To run the server in a docker container
 
 ~~~bash
-$ docker build --network=host -t finite .
+$ docker build --network=host -t finite-mock-server .
 ~~~
 
 Once image is built use:
 
 ~~~bash
-$ docker run --rm --name finite-mock -p 8080:8080 finite 
+$ docker run --rm --name finite-mock-server -p 8080:8080 finite-mock-server 
 ~~~
