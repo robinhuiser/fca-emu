@@ -27,7 +27,7 @@ tasks:
     cmds:
       - cmd: docker-compose down
       - cmd: docker-compose rm
-      - cmd: docker volume rm finite-mock-server_finite_mock_db
+      - cmd: docker volume rm finite-mock-server_finite-mock-db
         ignore_error: true
 
   generate:open-api:

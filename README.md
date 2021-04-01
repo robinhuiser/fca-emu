@@ -30,7 +30,7 @@ All environment specific configuration is defined in the file `.env`.
 $ task generate
 
 # Bring the database up with deployed DDL and data
-$ docker-compose up -d
+$ docker-compose up -d db 
 ~~~
 ## Running the server
 
@@ -40,14 +40,14 @@ To run the server, follow these simple steps:
 $ go run main.go
 ~~~
 
-To run the server in a docker container
+To run the server in a docker container:
 
 ~~~bash
-$ docker build --network=host -t finite-mock-server .
+$ docker-compose build mock
 ~~~
 
 Once image is built use:
 
 ~~~bash
-$ docker run --rm --name finite-mock-server -p 8080:8080 finite-mock-server 
+$ docker-compose up mock 
 ~~~
