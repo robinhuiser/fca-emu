@@ -18,7 +18,6 @@ For more information, please visit [https://www.trexis.net](https://www.trexis.n
 * [Taskfile](https://taskfile.dev) 3.x - `brew install go-task/tap/go-task`
 * [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 5.1.x - `brew install openapi-generator`
 * [Golang](https://golang.org/) 1.16.x - `brew install go`
-* [SQLBoiler](https://github.com/volatiletech/sqlboiler) 4.x - `go install github.com/volatiletech/sqlboiler/v4@latest`
 
 ## Configuration
 
@@ -26,10 +25,10 @@ All environment specific configuration is defined in the file `.env`.
 ## Generating / updating specs
 
 ~~~bash
-# (Re-)generate API definitions, API models and database DDL
+# (Re-)generate API definitions, API models
 $ task generate
 
-# Bring the database up with deployed DDL and data
+# Bring the database up
 $ docker-compose up -d db 
 ~~~
 ## Running the server

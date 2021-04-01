@@ -1,5 +1,4 @@
 api/openapi.yaml
-go.mod
 main.go
 server/api.go
 server/api_accounts.go

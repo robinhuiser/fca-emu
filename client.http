@@ -1,6 +1,6 @@
 #
 # Environment setup
-@base_url = http://localhost:8080/cloud
+@base_url = http://localhost:{{$dotenv MOCK_SERVER_PORT}}/cloud
 
 #
 # Test account ID

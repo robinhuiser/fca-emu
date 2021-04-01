@@ -14,19 +14,19 @@ services:
       - '3306'
     volumes:
       - finite-mock-db:/var/lib/mysql
-      - ./mssql/mysql_schema-mock.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./mssql/Data/Account.sql:/docker-entrypoint-initdb.d/2.sql
 
   mock:
     build:
       context: .
+      args:
+        - mock_server_port=${MOCK_SERVER_PORT}
     environment:
       MYSQL_HOST: db:3306 
       MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
       MYSQL_USER: ${MYSQL_USER_NAME}
       MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
     ports:
-      - '8080:8080'    
+      - ${MOCK_SERVER_PORT}:${MOCK_SERVER_PORT}   
 
 volumes:
   finite-mock-db:

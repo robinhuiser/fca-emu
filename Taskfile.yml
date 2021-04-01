@@ -17,7 +17,6 @@ tasks:
     cmds: 
       - task: generate:open-api
       - task: generate:patch
-      - task: generate:ddl
 
   clean:
     desc: Removes build and container artifacts
@@ -41,7 +40,7 @@ tasks:
           --input-spec $FINITE_SPEC \
           --generator-name go-server \
           --enable-post-process-file \
-          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}" \
+          --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}",serverPort=$MOCK_SERVER_PORT \
           --output .
 
   generate:patch:
@@ -59,12 +58,3 @@ tasks:
 
           goimports -w $file
         done
-
-  generate:ddl:
-    cmds:
-      - |
-        openapi-generator generate \
-          --input-spec $FINITE_SPEC \
-          --generator-name mysql-schema \
-          --additional-properties defaultDatabaseName="{{.MYSQL_DATABASE_NAME}}" \
-          --output mssql

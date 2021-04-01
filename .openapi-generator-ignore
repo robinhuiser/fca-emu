@@ -25,3 +25,4 @@
 README.md
 go/*_service.go
 Dockerfile
+go.mod

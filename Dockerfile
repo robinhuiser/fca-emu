@@ -12,6 +12,8 @@ RUN go get -d -v ./...
 RUN go build -a -installsuffix cgo -o finite-mock-server .
 
 FROM scratch AS runtime
+ARG mock_server_port
+
 COPY --from=build /go/src/finite-mock-server ./
-EXPOSE 8080/tcp
+EXPOSE ${mock_server_port}/tcp
 ENTRYPOINT ["./finite-mock-server"]
