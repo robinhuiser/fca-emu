@@ -15,11 +15,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/robinhuiser/finite-mock-server/ent"
 	finite "github.com/robinhuiser/finite-mock-server/server"
+	"github.com/robinhuiser/finite-mock-server/util"
 
 	_ "github.com/lib/pq"
 )
@@ -37,14 +37,14 @@ func main() {
 	// We can ignore if there is no .dotenv (container runtime)
 	godotenv.Load()
 
-	dbHost := getenv("POSTGRES_HOST", DbHost)
-	dbPort := getenv("POSTGRES_PORT", DbPort)
-	dbName := getenv("POSTGRES_DATABASE_NAME", DbName)
-	dbUser := getenv("POSTGRES_USER_NAME", "")
-	dbPass := getenv("POSTGRES_USER_PASSWORD", "")
+	dbHost := util.GetEnv("POSTGRES_HOST", DbHost)
+	dbPort := util.GetEnv("POSTGRES_PORT", DbPort)
+	dbName := util.GetEnv("POSTGRES_DATABASE_NAME", DbName)
+	dbUser := util.GetEnv("POSTGRES_USER_NAME", "")
+	dbPass := util.GetEnv("POSTGRES_USER_PASSWORD", "")
 
-	appListenAddress := getenv("MOCK_SERVER_LISTEN_ADDRESS", AppListenAddress)
-	appListenPort := getenv("MOCK_SERVER_LISTEN_PORT", AppListenPort)
+	appListenAddress := util.GetEnv("MOCK_SERVER_LISTEN_ADDRESS", AppListenAddress)
+	appListenPort := util.GetEnv("MOCK_SERVER_LISTEN_PORT", AppListenPort)
 
 	dbConn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", dbHost, dbPort, dbUser, dbName, dbPass)
 
@@ -62,14 +62,7 @@ func main() {
 	}
 	log.Printf("database migration run successfully")
 
-	// // Create an account
-	// a, err := glue.CreateAccount(context.Background(), client)
-	// if err != nil {
-	// 	log.Fatalf("%v", err)
-	// }
-	// log.Println("created account: ", a.ID)
-
-	AccountsApiService := finite.NewAccountsApiService(context.Background(), client)
+	AccountsApiService := finite.NewAccountsApiService(client)
 	AccountsApiController := finite.NewAccountsApiController(AccountsApiService)
 
 	CacheApiService := finite.NewCacheApiService()
@@ -108,16 +101,4 @@ func main() {
 
 	log.Printf("mock server started")
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
-}
-
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		if len(fallback) > 0 {
-			return fallback
-		} else {
-			log.Fatalf("mandatory environment variable missing: %s", key)
-		}
-	}
-	return value
 }

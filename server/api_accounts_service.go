@@ -21,8 +21,7 @@ import (
 	"github.com/robinhuiser/finite-mock-server/ent/account"
 )
 
-var Client *ent.Client
-var Context context.Context
+var clt *ent.Client
 
 const (
 	FiniteDateFormat = "2006-01-02T15:04:05"
@@ -35,9 +34,8 @@ type AccountsApiService struct {
 }
 
 // NewAccountsApiService creates a default api service
-func NewAccountsApiService(cc context.Context, ec *ent.Client) AccountsApiServicer {
-	Client = ec
-	Context = cc
+func NewAccountsApiService(client *ent.Client) AccountsApiServicer {
+	clt = client
 	return &AccountsApiService{}
 }
 
@@ -49,7 +47,7 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		return Response(500, ErrorResponse{}), fmt.Errorf("%w", err)
 	}
 
-	rs, err := Client.Account.
+	rs, err := clt.Account.
 		Query().
 		Where(account.ID(u)).
 		Only(ctx)

@@ -1,4 +1,4 @@
-package glue
+package generator
 
 import (
 	"context"
@@ -8,6 +8,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent"
 )
+
+// // Create an account
+// a, err := glue.CreateAccount(context.Background(), client)
+// if err != nil {
+// 	log.Fatalf("%v", err)
+// }
+// log.Println("created account: ", a.ID)
 
 func CreateAccount(ctx context.Context, client *ent.Client) (*ent.Account, error) {
 	a, err := client.Account.
