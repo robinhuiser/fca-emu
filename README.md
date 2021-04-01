@@ -49,5 +49,5 @@ $ docker build --network=host -t finite .
 Once image is built use:
 
 ~~~bash
-$ docker run --rm -it finite 
+$ docker run --rm --name finite-mock -p 8080:8080 finite 
 ~~~
