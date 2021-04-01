@@ -1126,6 +1126,20 @@ func DateClosedLTE(v time.Time) predicate.Account {
 	})
 }
 
+// DateClosedIsNil applies the IsNil predicate on the "dateClosed" field.
+func DateClosedIsNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDateClosed)))
+	})
+}
+
+// DateClosedNotNil applies the NotNil predicate on the "dateClosed" field.
+func DateClosedNotNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDateClosed)))
+	})
+}
+
 // CurrencyCodeEQ applies the EQ predicate on the "currencyCode" field.
 func CurrencyCodeEQ(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

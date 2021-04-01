@@ -88,6 +88,20 @@ func (au *AccountUpdate) SetDateClosed(t time.Time) *AccountUpdate {
 	return au
 }
 
+// SetNillableDateClosed sets the "dateClosed" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableDateClosed(t *time.Time) *AccountUpdate {
+	if t != nil {
+		au.SetDateClosed(*t)
+	}
+	return au
+}
+
+// ClearDateClosed clears the value of the "dateClosed" field.
+func (au *AccountUpdate) ClearDateClosed() *AccountUpdate {
+	au.mutation.ClearDateClosed()
+	return au
+}
+
 // SetCurrencyCode sets the "currencyCode" field.
 func (au *AccountUpdate) SetCurrencyCode(s string) *AccountUpdate {
 	au.mutation.SetCurrencyCode(s)
@@ -256,6 +270,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldDateClosed,
 		})
 	}
+	if au.mutation.DateClosedCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: account.FieldDateClosed,
+		})
+	}
 	if value, ok := au.mutation.CurrencyCode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -359,6 +379,20 @@ func (auo *AccountUpdateOne) SetDateLastUpdated(t time.Time) *AccountUpdateOne {
 // SetDateClosed sets the "dateClosed" field.
 func (auo *AccountUpdateOne) SetDateClosed(t time.Time) *AccountUpdateOne {
 	auo.mutation.SetDateClosed(t)
+	return auo
+}
+
+// SetNillableDateClosed sets the "dateClosed" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableDateClosed(t *time.Time) *AccountUpdateOne {
+	if t != nil {
+		auo.SetDateClosed(*t)
+	}
+	return auo
+}
+
+// ClearDateClosed clears the value of the "dateClosed" field.
+func (auo *AccountUpdateOne) ClearDateClosed() *AccountUpdateOne {
+	auo.mutation.ClearDateClosed()
 	return auo
 }
 
@@ -532,6 +566,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: account.FieldDateClosed,
+		})
+	}
+	if auo.mutation.DateClosedCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: account.FieldDateClosed,
 		})
 	}

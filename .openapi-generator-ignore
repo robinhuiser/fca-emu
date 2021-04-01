@@ -23,7 +23,7 @@
 #!docs/README.md
 
 README.md
-go/*_service.go
+server/*_service.go
 Dockerfile
 go.mod
 main.go

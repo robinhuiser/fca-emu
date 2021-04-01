@@ -81,6 +81,14 @@ func (ac *AccountCreate) SetDateClosed(t time.Time) *AccountCreate {
 	return ac
 }
 
+// SetNillableDateClosed sets the "dateClosed" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableDateClosed(t *time.Time) *AccountCreate {
+	if t != nil {
+		ac.SetDateClosed(*t)
+	}
+	return ac
+}
+
 // SetCurrencyCode sets the "currencyCode" field.
 func (ac *AccountCreate) SetCurrencyCode(s string) *AccountCreate {
 	ac.mutation.SetCurrencyCode(s)
@@ -197,9 +205,6 @@ func (ac *AccountCreate) check() error {
 	}
 	if _, ok := ac.mutation.DateLastUpdated(); !ok {
 		return &ValidationError{Name: "dateLastUpdated", err: errors.New("ent: missing required field \"dateLastUpdated\"")}
-	}
-	if _, ok := ac.mutation.DateClosed(); !ok {
-		return &ValidationError{Name: "dateClosed", err: errors.New("ent: missing required field \"dateClosed\"")}
 	}
 	if _, ok := ac.mutation.CurrencyCode(); !ok {
 		return &ValidationError{Name: "currencyCode", err: errors.New("ent: missing required field \"currencyCode\"")}

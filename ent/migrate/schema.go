@@ -20,7 +20,7 @@ var (
 		{Name: "date_created", Type: field.TypeTime},
 		{Name: "date_opened", Type: field.TypeTime},
 		{Name: "date_last_updated", Type: field.TypeTime},
-		{Name: "date_closed", Type: field.TypeTime},
+		{Name: "date_closed", Type: field.TypeTime, Nullable: true},
 		{Name: "currency_code", Type: field.TypeString},
 		{Name: "status", Type: field.TypeString},
 		{Name: "source", Type: field.TypeString},

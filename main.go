@@ -1,7 +1,7 @@
 /*
  * Cloud API
  *
- * The public facing API through which connectors are exposed as a single abtract API
+ * The public facing API through which connectors are exposed as a single abstract API
  *
  * API version: v1.5
  * Contact: support@trexis.net
@@ -62,7 +62,14 @@ func main() {
 	}
 	log.Printf("database migration run successfully")
 
-	AccountsApiService := finite.NewAccountsApiService()
+	// // Create an account
+	// a, err := glue.CreateAccount(context.Background(), client)
+	// if err != nil {
+	// 	log.Fatalf("%v", err)
+	// }
+	// log.Println("created account: ", a.ID)
+
+	AccountsApiService := finite.NewAccountsApiService(context.Background(), client)
 	AccountsApiController := finite.NewAccountsApiController(AccountsApiService)
 
 	CacheApiService := finite.NewCacheApiService()

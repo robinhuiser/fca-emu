@@ -493,9 +493,22 @@ func (m *AccountMutation) OldDateClosed(ctx context.Context) (v time.Time, err e
 	return oldValue.DateClosed, nil
 }
 
+// ClearDateClosed clears the value of the "dateClosed" field.
+func (m *AccountMutation) ClearDateClosed() {
+	m.dateClosed = nil
+	m.clearedFields[account.FieldDateClosed] = struct{}{}
+}
+
+// DateClosedCleared returns if the "dateClosed" field was cleared in this mutation.
+func (m *AccountMutation) DateClosedCleared() bool {
+	_, ok := m.clearedFields[account.FieldDateClosed]
+	return ok
+}
+
 // ResetDateClosed resets all changes to the "dateClosed" field.
 func (m *AccountMutation) ResetDateClosed() {
 	m.dateClosed = nil
+	delete(m.clearedFields, account.FieldDateClosed)
 }
 
 // SetCurrencyCode sets the "currencyCode" field.
@@ -908,7 +921,11 @@ func (m *AccountMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AccountMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(account.FieldDateClosed) {
+		fields = append(fields, account.FieldDateClosed)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -921,6 +938,11 @@ func (m *AccountMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AccountMutation) ClearField(name string) error {
+	switch name {
+	case account.FieldDateClosed:
+		m.ClearDateClosed()
+		return nil
+	}
 	return fmt.Errorf("unknown Account nullable field %s", name)
 }
 

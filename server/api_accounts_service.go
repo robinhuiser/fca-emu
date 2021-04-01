@@ -13,7 +13,19 @@ package finite
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/finite-mock-server/ent/account"
+)
+
+var Client *ent.Client
+var Context context.Context
+
+const (
+	FiniteDateFormat = "2006-01-02T15:04:05"
 )
 
 // AccountsApiService is a service that implents the logic for the AccountsApiServicer
@@ -23,31 +35,49 @@ type AccountsApiService struct {
 }
 
 // NewAccountsApiService creates a default api service
-func NewAccountsApiService() AccountsApiServicer {
+func NewAccountsApiService(cc context.Context, ec *ent.Client) AccountsApiServicer {
+	Client = ec
+	Context = cc
 	return &AccountsApiService{}
 }
 
 // GetAccount - Return a account
 func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccount with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Account{}) or use other options such as http.Ok ...
-	//return Response(200, Account{}), nil
+	u, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, ErrorResponse{}), fmt.Errorf("%w", err)
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	rs, err := Client.Account.
+		Query().
+		Where(account.ID(u)).
+		Only(ctx)
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	if err != nil {
+		return Response(404, ErrorResponse{}), fmt.Errorf("%w", err)
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	a := Account{
+		Id:                rs.ID.String(),
+		Type:              rs.Type,
+		Number:            rs.Number,
+		ParentId:          rs.ParentId.String(),
+		Name:              rs.Name,
+		Title:             rs.Title,
+		Iban:              rs.Iban,
+		DateCreated:       rs.DateCreated.Format(FiniteDateFormat),
+		DateOpened:        rs.DateOpened.Format(FiniteDateFormat),
+		DateLastUpdated:   rs.DateLastUpdated.Format(FiniteDateFormat),
+		DateClosed:        rs.DateClosed.Format(FiniteDateFormat),
+		CurrencyCode:      rs.CurrencyCode,
+		Status:            rs.Status,
+		Source:            rs.Source,
+		InterestReporting: rs.InterestReporting,
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	return Response(200, a), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccount method not implemented")
 }
 
 // GetAccountBalances - Return a accounts balances
