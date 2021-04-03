@@ -29,8 +29,8 @@ All environment specific configuration is defined in the file `.env`.
 # (Re-)generate API definitions, API models
 $ task generate
 
-# Bring the database up
-$ docker-compose up -d db 
+# Bring the database up (postgres or mysql)
+$ docker-compose up -d postgres
 ~~~
 ## Running the server
 
@@ -49,5 +49,6 @@ $ docker-compose build mock
 Once image is built use:
 
 ~~~bash
+# Configure the DB_VENDOR and DB_HOST settings in docker-compose
 $ docker-compose up mock 
 ~~~
