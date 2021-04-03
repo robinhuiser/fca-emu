@@ -3,6 +3,8 @@ FROM golang:1.16 AS build
 WORKDIR /go/src
 COPY server ./server
 COPY ent ./ent
+COPY util ./util
+COPY generator ./generator
 
 COPY main.go .
 COPY go.mod .
@@ -14,8 +16,7 @@ RUN go get -d -v ./...
 RUN go build -a -installsuffix cgo -o finite-mock-server .
 
 FROM scratch AS runtime
-ARG port
 
 COPY --from=build /go/src/finite-mock-server ./
-EXPOSE ${port}/tcp
+EXPOSE 8080/tcp
 ENTRYPOINT ["./finite-mock-server"]

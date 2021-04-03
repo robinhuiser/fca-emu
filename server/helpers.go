@@ -10,8 +10,22 @@
 
 package finite
 
+import "github.com/robinhuiser/finite-mock-server/util"
+
 //Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
 	return ImplResponse{Code: code, Body: body}
 }
 
+func isValidSecret(s string) bool {
+	e := util.GetEnvString("MOCK_SERVER_SECRET", "")
+	return e == s
+}
+
+func setErrorResponse(e string) ErrorResponse {
+	m := []string{e}
+	return ErrorResponse{
+		Status:   false,
+		Messages: m,
+	}
+}

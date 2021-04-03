@@ -19,13 +19,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/util"
 )
 
 var clt *ent.Client
-
-const (
-	FiniteDateFormat = "2006-01-02T15:04:05"
-)
 
 // AccountsApiService is a service that implents the logic for the AccountsApiServicer
 // This service should implement the business logic for every endpoint for the AccountsApi API.
@@ -42,18 +39,26 @@ func NewAccountsApiService(client *ent.Client) AccountsApiServicer {
 // GetAccount - Return a account
 func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 
-	u, err := uuid.Parse(accountId)
-	if err != nil {
-		return Response(500, ErrorResponse{}), fmt.Errorf("%w", err)
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
 	}
 
+	// Parse and verify UUID
+	u, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Perform the search
 	rs, err := clt.Account.
 		Query().
 		Where(account.ID(u)).
 		Only(ctx)
 
+	// Error if none or more than one results are returned
 	if err != nil {
-		return Response(404, ErrorResponse{}), fmt.Errorf("%w", err)
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	a := Account{
@@ -64,10 +69,10 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		Name:              rs.Name,
 		Title:             rs.Title,
 		Iban:              rs.Iban,
-		DateCreated:       rs.DateCreated.Format(FiniteDateFormat),
-		DateOpened:        rs.DateOpened.Format(FiniteDateFormat),
-		DateLastUpdated:   rs.DateLastUpdated.Format(FiniteDateFormat),
-		DateClosed:        rs.DateClosed.Format(FiniteDateFormat),
+		DateCreated:       rs.DateCreated.Format(util.APIDateFormat),
+		DateOpened:        rs.DateOpened.Format(util.APIDateFormat),
+		DateLastUpdated:   rs.DateLastUpdated.Format(util.APIDateFormat),
+		DateClosed:        rs.DateClosed.Format(util.APIDateFormat),
 		CurrencyCode:      rs.CurrencyCode,
 		Status:            rs.Status,
 		Source:            rs.Source,
