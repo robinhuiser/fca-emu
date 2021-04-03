@@ -9,7 +9,6 @@ server/api_products.go
 server/api_statement.go
 server/api_statements.go
 server/api_transactions.go
-server/helpers.go
 server/impl.go
 server/logger.go
 server/model_account.go
