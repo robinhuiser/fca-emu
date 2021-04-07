@@ -18,7 +18,7 @@ func Response(code int, body interface{}) ImplResponse {
 }
 
 func isValidSecret(s string) bool {
-	e := util.GetEnvString("MOCK_SERVER_SECRET", "")
+	e := util.GetEnvString("MOCK_SERVER_SECRET", "123456789")
 	return e == s
 }
 
