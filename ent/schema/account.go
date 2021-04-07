@@ -25,7 +25,7 @@ func (Account) Fields() []ent.Field {
 		field.Time("dateCreated"),
 		field.Time("dateOpened"),
 		field.Time("dateLastUpdated"),
-		field.Time("dateClosed"),
+		field.Time("dateClosed").Optional(),
 		field.String("currencyCode"),
 		field.String("status"),
 		field.String("source"),

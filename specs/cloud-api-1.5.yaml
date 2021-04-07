@@ -1,16 +1,13 @@
 openapi: 3.0.3
 info:
   title: Cloud API
-  description: The public facing API through which connectors are exposed as a single abtract API
+  description: The public facing API through which connectors are exposed as a single abstract API
   contact:
     name: treXis LLC
     url: https://www.trexis.net
     email: support@trexis.net
   version: v1.5
   termsOfService: http://www.trexis.net/termsofservices
-servers:
-  - url: 'https://api.trexis.cloud'
-    description: treXis cloud API host URL
 security:
   - cloudAPI: []
   - connectorToken: []

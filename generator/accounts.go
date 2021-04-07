@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent"
 )
 
-func generateRandomAccount(ctx context.Context, client *ent.Client) (*ent.Account, error) {
+func generateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (*ent.Account, error) {
 	a, err := client.Account.
 		Create().
 		SetType("DDA").

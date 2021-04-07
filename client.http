@@ -6,13 +6,13 @@
 #
 # Test account ID
 @account_url = v1/account
-@account_id = e4c5b5b7-3b55-4718-8631-869d4b11c7db
+@account_id = c6c2ac70-1668-4109-b7e8-fcd4efd09e9e
 
 ### 
 
 # Get account details
 # @name account
-GET {{base_url}}/{{account_url}}/{{account_id}}
+GET {{base_url}}/{{account_url}}/{{account_id}}?mask=true&enhance=false
 Accept: application/json
 X-TOKEN: {{access_token}}
 X-TRACE-ID: {{$guid}}

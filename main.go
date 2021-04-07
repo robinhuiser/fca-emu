@@ -13,6 +13,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 	"net/http"
 
@@ -26,7 +27,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+//go:embed swagger-ui/* api/openapi.yaml
+var staticFiles embed.FS
+
 const (
+	// Defaults
 	DB_VENDOR             = "sqlite3"
 	APP_LISTEN_ADDRESS    = "0.0.0.0"
 	APP_LISTEN_PORT       = "8080"
@@ -97,6 +102,10 @@ func main() {
 		StatementsApiController,
 		TransactionsApiController)
 
-	log.Printf("mock server started")
+	// Embed the Swagger UI within Go binary
+	router.PathPrefix("/").Handler(http.FileServer(http.FS(staticFiles)))
+
+	log.Printf("mock server started on %s:%s", appListenAddress, appListenPort)
+	log.Printf("specs available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
 }

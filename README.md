@@ -26,7 +26,7 @@ All environment specific configuration is defined in the file `.env`.
 ## Generating / updating specs
 
 ~~~bash
-# (Re-)generate API definitions, API models
+# (Re-)generate API definitions, API models & ORM (ent)
 $ task generate
 
 # Bring the database up (postgres or mysql)

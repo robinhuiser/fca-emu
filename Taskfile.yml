@@ -10,13 +10,15 @@ silent: true
 vars:
   FINITE_PACKAGE_NAME: finite
   MOCK_SERVER_SOURCE_FOLDER: server
+  SWAGGER_UI_DIST_DIR: ./swagger-ui
 
 tasks:
   generate:
-    desc: Generate OpenAPI Golang boilerplate code
+    desc: Generate OpenAPI & Ent (ORM) boilerplate code
     cmds: 
       - task: generate:open-api
-      - task: generate:patch
+      - task: generate:patch-open-api
+      - task: generate:ent
 
   clean:
     desc: Removes build and container artifacts
@@ -45,7 +47,7 @@ tasks:
           --additional-properties packageName="{{.FINITE_PACKAGE_NAME}}",sourceFolder="{{.MOCK_SERVER_SOURCE_FOLDER}}",serverPort=$MOCK_SERVER_LISTEN_PORT \
           --output .
 
-  generate:patch:
+  generate:patch-open-api:
     cmds:
       - |
         for file in $(ls {{.MOCK_SERVER_SOURCE_FOLDER}}/api_*.go | grep -v _service.go); do
@@ -60,3 +62,18 @@ tasks:
 
           goimports -w $file
         done
+
+  generate:ent:
+    cmds:
+      - go generate ./ent
+
+  swagger-ui:
+    desc: Update the Swagger UI with a new version
+    cmds:
+      - rm -Rf {{.SWAGGER_UI_DIST_DIR}} && mkdir -p {{.SWAGGER_UI_DIST_DIR}}
+      - |
+        curl -sL https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${SWAGGER_UI_VERSION}.tar.gz | \
+          tar -xvz --strip-components=2 \
+            -C {{.SWAGGER_UI_DIST_DIR}} \
+            swagger-ui-${SWAGGER_UI_VERSION}/dist
+      - sed -i '' 's/https:\/\/petstore.swagger.io\/v2\/swagger.json/\/api\/openapi.yaml/g' {{.SWAGGER_UI_DIST_DIR}}/index.html

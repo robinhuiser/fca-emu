@@ -5,13 +5,12 @@ info:
     name: treXis LLC
     url: https://www.trexis.net
   description: The public facing API through which connectors are exposed as a single
-    abtract API
+    abstract API
   termsOfService: http://www.trexis.net/termsofservices
   title: Cloud API
   version: v1.5
 servers:
-- description: treXis cloud API host URL
-  url: https://api.trexis.cloud
+- url: /
 security:
 - cloudAPI: []
 - connectorToken: []
