@@ -65,7 +65,7 @@ tasks:
 
   generate:ent:
     cmds:
-      - go generate ./ent
+      - go generate -v ./ent
 
   swagger-ui:
     desc: Update the Swagger UI with a new version
