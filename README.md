@@ -19,6 +19,7 @@ For more information, please visit [https://www.trexis.net](https://www.trexis.n
 * [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 5.1.x - `brew install openapi-generator`
 * [Golang](https://golang.org/) 1.16.x - `brew install go`
 * [ent.](https://entgo.io/) - `go get entgo.io/ent/cmd/ent`
+* [GoReleaser](https://github.com/goreleaser/goreleaser) - `brew install goreleaser/tap/goreleaser && brew install goreleaser`
 
 ## Configuration
 
@@ -51,4 +52,19 @@ Once image is built use:
 ~~~bash
 # Configure the DB_VENDOR and DB_HOST settings in docker-compose
 $ docker-compose up mock 
+~~~
+
+## Release
+
+To create a new release:
+
+~~~bash
+# Set the token for the Github repository - see: https://github.com/settings/tokens/new
+$ export GITHUB_TOKEN=""
+
+# Test
+$ goreleaser --skip-publish --rm-dist
+
+# Publish
+$ 
 ~~~

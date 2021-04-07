@@ -30,6 +30,13 @@ import (
 //go:embed swagger-ui/* api/openapi.yaml
 var staticFiles embed.FS
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
+
 const (
 	// Defaults
 	DB_VENDOR             = "sqlite3"
@@ -41,6 +48,8 @@ const (
 func main() {
 	// We can ignore if there is no .dotenv (container runtime)
 	godotenv.Load()
+
+	log.Printf("version %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 
 	// Set application variables
 	appListenAddress := util.GetEnvString("MOCK_SERVER_LISTEN_ADDRESS", APP_LISTEN_ADDRESS)

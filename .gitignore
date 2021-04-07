@@ -1,2 +1,3 @@
 *.log
-finite-mock-server
+finite-mock-serverdist/
+dist
