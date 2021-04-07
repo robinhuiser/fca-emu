@@ -2,6 +2,7 @@
 # Environment setup
 @base_url = http://localhost:{{$dotenv MOCK_SERVER_LISTEN_PORT}}/cloud
 @access_token = {{$dotenv MOCK_SERVER_SECRET}}
+# @access_token = 123456789
 
 #
 # Test account ID
