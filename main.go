@@ -12,11 +12,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"embed"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/dimiro1/banner"
 	"github.com/joho/godotenv"
 	"github.com/robinhuiser/finite-mock-server/generator"
 	finite "github.com/robinhuiser/finite-mock-server/server"
@@ -29,6 +32,9 @@ import (
 
 //go:embed swagger-ui/* api/openapi.yaml
 var staticFiles embed.FS
+
+//go:embed banner.txt
+var appBanner string
 
 var (
 	version = "dev"
@@ -48,6 +54,9 @@ const (
 func main() {
 	// We can ignore if there is no .dotenv (container runtime)
 	godotenv.Load()
+
+	// Display the banner
+	banner.Init(os.Stdout, true, true, bytes.NewBufferString(appBanner))
 
 	log.Printf("version %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 
@@ -116,5 +125,6 @@ func main() {
 
 	log.Printf("mock server started on %s:%s", appListenAddress, appListenPort)
 	log.Printf("specs available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
+
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
 }
