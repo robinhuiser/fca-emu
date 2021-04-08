@@ -30,6 +30,16 @@ $ curl -H "Accept: application/json" \
     http://0.0.0.0:8080/cloud/v1/account/d4234ac6-c550-4503-b21b-a13557c48cbb
 ~~~
 
+## Limitations
+
+Currently the build (using `goreleaser`) is not able to cross-compile a binary for `linux-amd64` with support for sqlite3; the error message upon start is:
+
+~~~log
+failed creating schema resources: Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+~~~
+
+As a workaround, use an external database (Postgres / Mysql) as described below.
+
 ## Configuration options
 
 The server can be configured using environment variables:
