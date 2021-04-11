@@ -61,26 +61,51 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
+	// Retrieve the branch of the account
+	qbr, err := rs.QueryBranch().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Retrieve the bank of the branch
+	qba, err := rs.QueryBranch().QueryBranchOwner().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
 	a := Account{
 		Id:                rs.ID.String(),
 		Type:              rs.Type,
-		Number:            rs.Number,
-		ParentId:          rs.ParentId.String(),
+		Number:            isMasked(mask, rs.Number),
+		ParentId:          isValidUUID(rs.ParentId.String()),
 		Name:              rs.Name,
 		Title:             rs.Title,
-		Iban:              rs.Iban,
-		DateCreated:       rs.DateCreated.Format(util.APIDateFormat),
-		DateOpened:        rs.DateOpened.Format(util.APIDateFormat),
-		DateLastUpdated:   rs.DateLastUpdated.Format(util.APIDateFormat),
-		DateClosed:        rs.DateClosed.Format(util.APIDateFormat),
+		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
+		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),
+		DateLastUpdated:   isValidBankDate(rs.DateLastUpdated.Format(util.APIDateFormat)),
+		DateClosed:        isValidBankDate(rs.DateClosed.Format(util.APIDateFormat)),
 		CurrencyCode:      rs.CurrencyCode,
 		Status:            rs.Status,
 		Source:            rs.Source,
 		InterestReporting: rs.InterestReporting,
+		Balances: Balances{
+			AvailableBalance: rs.AvailableBalance,
+			CurrentBalance:   rs.CurrentBalance,
+		},
+		URI: FiniteUri{
+			URL: rs.URL,
+		},
+		Bank: Bank{
+			BranchCode: qbr.BranchCode,
+			BankName:   qba.BankName,
+			Swift:      qba.Swift,
+			URI: FiniteUri{
+				URL: qba.URL,
+			},
+		},
 	}
 
 	return Response(200, a), nil
-
 }
 
 // GetAccountBalances - Return a accounts balances

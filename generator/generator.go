@@ -13,12 +13,26 @@ func Accounts(n int, client *ent.Client) error {
 
 	faker := gofakeit.New(0)
 
+	// Skip bank and branches generation if db already contains records
+	b, err := client.Bank.
+		Query().
+		Limit(1).
+		All(context.Background())
+	if err != nil {
+		return fmt.Errorf("could not get banks: %w", err)
+	}
+
+	if len(b) == 0 {
+		if err := populateBanks(context.Background(), client, faker); err != nil {
+			return err
+		}
+	}
+
 	// Skip account generation if db already contains records
 	a, err := client.Account.
 		Query().
 		Limit(1).
 		All(context.Background())
-
 	if err != nil {
 		return fmt.Errorf("could not get accounts: %w", err)
 	}
@@ -32,5 +46,6 @@ func Accounts(n int, client *ent.Client) error {
 			log.Printf("created account with Id %s", a.ID)
 		}
 	}
+
 	return nil
 }

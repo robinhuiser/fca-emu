@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 	"github.com/robinhuiser/finite-mock-server/ent/predicate"
 )
 
@@ -24,6 +25,9 @@ type AccountQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Account
+	// eager-loading edges.
+	withBranch *BranchQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -51,6 +55,28 @@ func (aq *AccountQuery) Offset(offset int) *AccountQuery {
 func (aq *AccountQuery) Order(o ...OrderFunc) *AccountQuery {
 	aq.order = append(aq.order, o...)
 	return aq
+}
+
+// QueryBranch chains the current query on the "branch" edge.
+func (aq *AccountQuery) QueryBranch() *BranchQuery {
+	query := &BranchQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(branch.Table, branch.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, account.BranchTable, account.BranchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Account entity from the query.
@@ -234,10 +260,22 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		offset:     aq.offset,
 		order:      append([]OrderFunc{}, aq.order...),
 		predicates: append([]predicate.Account{}, aq.predicates...),
+		withBranch: aq.withBranch.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
+}
+
+// WithBranch tells the query-builder to eager-load the nodes that are connected to
+// the "branch" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithBranch(opts ...func(*BranchQuery)) *AccountQuery {
+	query := &BranchQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withBranch = query
+	return aq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -303,9 +341,19 @@ func (aq *AccountQuery) prepareQuery(ctx context.Context) error {
 
 func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 	var (
-		nodes = []*Account{}
-		_spec = aq.querySpec()
+		nodes       = []*Account{}
+		withFKs     = aq.withFKs
+		_spec       = aq.querySpec()
+		loadedTypes = [1]bool{
+			aq.withBranch != nil,
+		}
 	)
+	if aq.withBranch != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, account.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Account{config: aq.config}
 		nodes = append(nodes, node)
@@ -316,6 +364,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, aq.driver, _spec); err != nil {
@@ -324,6 +373,33 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := aq.withBranch; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Account)
+		for i := range nodes {
+			fk := nodes[i].account_branch
+			if fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(branch.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_branch" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Branch = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 

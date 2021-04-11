@@ -14,6 +14,10 @@ type Tx struct {
 	config
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// Bank is the client for interacting with the Bank builders.
+	Bank *BankClient
+	// Branch is the client for interacting with the Branch builders.
+	Branch *BranchClient
 
 	// lazily loaded.
 	client     *Client
@@ -150,6 +154,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
+	tx.Bank = NewBankClient(tx.config)
+	tx.Branch = NewBranchClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

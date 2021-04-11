@@ -21,8 +21,6 @@ const (
 	FieldName = "name"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
-	// FieldIban holds the string denoting the iban field in the database.
-	FieldIban = "iban"
 	// FieldDateCreated holds the string denoting the datecreated field in the database.
 	FieldDateCreated = "date_created"
 	// FieldDateOpened holds the string denoting the dateopened field in the database.
@@ -39,8 +37,23 @@ const (
 	FieldSource = "source"
 	// FieldInterestReporting holds the string denoting the interestreporting field in the database.
 	FieldInterestReporting = "interest_reporting"
+	// FieldCurrentBalance holds the string denoting the currentbalance field in the database.
+	FieldCurrentBalance = "current_balance"
+	// FieldAvailableBalance holds the string denoting the availablebalance field in the database.
+	FieldAvailableBalance = "available_balance"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
+	// EdgeBranch holds the string denoting the branch edge name in mutations.
+	EdgeBranch = "branch"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
+	// BranchTable is the table the holds the branch relation/edge.
+	BranchTable = "accounts"
+	// BranchInverseTable is the table name for the Branch entity.
+	// It exists in this package in order to avoid circular dependency with the "branch" package.
+	BranchInverseTable = "branches"
+	// BranchColumn is the table column denoting the branch relation/edge.
+	BranchColumn = "account_branch"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -51,7 +64,6 @@ var Columns = []string{
 	FieldParentId,
 	FieldName,
 	FieldTitle,
-	FieldIban,
 	FieldDateCreated,
 	FieldDateOpened,
 	FieldDateLastUpdated,
@@ -60,12 +72,26 @@ var Columns = []string{
 	FieldStatus,
 	FieldSource,
 	FieldInterestReporting,
+	FieldCurrentBalance,
+	FieldAvailableBalance,
+	FieldURL,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "accounts"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"account_branch",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

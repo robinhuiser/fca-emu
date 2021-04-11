@@ -22,6 +22,32 @@ func (f AccountFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The BankFunc type is an adapter to allow the use of ordinary
+// function as Bank mutator.
+type BankFunc func(context.Context, *ent.BankMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BankFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BankMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BankMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The BranchFunc type is an adapter to allow the use of ordinary
+// function as Branch mutator.
+type BranchFunc func(context.Context, *ent.BranchMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BranchFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BranchMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BranchMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

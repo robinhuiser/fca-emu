@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -18,22 +19,30 @@ func (Account) Fields() []ent.Field {
 			Default(uuid.New),
 		field.String("type"),
 		field.String("number"),
-		field.UUID("parentId", uuid.UUID{}),
+		field.UUID("parentId", uuid.UUID{}).
+			Optional(),
 		field.String("name"),
 		field.String("title"),
-		field.String("iban"),
 		field.Time("dateCreated"),
 		field.Time("dateOpened"),
 		field.Time("dateLastUpdated"),
-		field.Time("dateClosed").Optional(),
+		field.Time("dateClosed").
+			Optional(),
 		field.String("currencyCode"),
 		field.String("status"),
 		field.String("source"),
 		field.Bool("interestReporting"),
+		field.Float32("currentBalance"),
+		field.Float32("availableBalance"),
+		field.String("url").
+			Optional(),
 	}
 }
 
 // Edges of the Account.
 func (Account) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("branch", Branch.Type).
+			Unique(),
+	}
 }

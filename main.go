@@ -120,7 +120,7 @@ func main() {
 		StatementsApiController,
 		TransactionsApiController)
 
-	// Embed the Swagger UI within Go binary
+	// Embed the Swagger UI within the Go binary
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(staticFiles)))
 
 	log.Printf("mock server started on %s:%s", appListenAddress, appListenPort)

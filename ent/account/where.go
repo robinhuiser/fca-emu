@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/predicate"
 )
@@ -128,13 +129,6 @@ func Title(v string) predicate.Account {
 	})
 }
 
-// Iban applies equality check predicate on the "iban" field. It's identical to IbanEQ.
-func Iban(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIban), v))
-	})
-}
-
 // DateCreated applies equality check predicate on the "dateCreated" field. It's identical to DateCreatedEQ.
 func DateCreated(v time.Time) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
@@ -188,6 +182,27 @@ func Source(v string) predicate.Account {
 func InterestReporting(v bool) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldInterestReporting), v))
+	})
+}
+
+// CurrentBalance applies equality check predicate on the "currentBalance" field. It's identical to CurrentBalanceEQ.
+func CurrentBalance(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// AvailableBalance applies equality check predicate on the "availableBalance" field. It's identical to AvailableBalanceEQ.
+func AvailableBalance(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldURL), v))
 	})
 }
 
@@ -489,6 +504,20 @@ func ParentIdLTE(v uuid.UUID) predicate.Account {
 	})
 }
 
+// ParentIdIsNil applies the IsNil predicate on the "parentId" field.
+func ParentIdIsNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldParentId)))
+	})
+}
+
+// ParentIdNotNil applies the NotNil predicate on the "parentId" field.
+func ParentIdNotNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldParentId)))
+	})
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
@@ -708,117 +737,6 @@ func TitleEqualFold(v string) predicate.Account {
 func TitleContainsFold(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldTitle), v))
-	})
-}
-
-// IbanEQ applies the EQ predicate on the "iban" field.
-func IbanEQ(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIban), v))
-	})
-}
-
-// IbanNEQ applies the NEQ predicate on the "iban" field.
-func IbanNEQ(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIban), v))
-	})
-}
-
-// IbanIn applies the In predicate on the "iban" field.
-func IbanIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Account(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldIban), v...))
-	})
-}
-
-// IbanNotIn applies the NotIn predicate on the "iban" field.
-func IbanNotIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Account(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldIban), v...))
-	})
-}
-
-// IbanGT applies the GT predicate on the "iban" field.
-func IbanGT(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldIban), v))
-	})
-}
-
-// IbanGTE applies the GTE predicate on the "iban" field.
-func IbanGTE(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldIban), v))
-	})
-}
-
-// IbanLT applies the LT predicate on the "iban" field.
-func IbanLT(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldIban), v))
-	})
-}
-
-// IbanLTE applies the LTE predicate on the "iban" field.
-func IbanLTE(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldIban), v))
-	})
-}
-
-// IbanContains applies the Contains predicate on the "iban" field.
-func IbanContains(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldIban), v))
-	})
-}
-
-// IbanHasPrefix applies the HasPrefix predicate on the "iban" field.
-func IbanHasPrefix(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldIban), v))
-	})
-}
-
-// IbanHasSuffix applies the HasSuffix predicate on the "iban" field.
-func IbanHasSuffix(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldIban), v))
-	})
-}
-
-// IbanEqualFold applies the EqualFold predicate on the "iban" field.
-func IbanEqualFold(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldIban), v))
-	})
-}
-
-// IbanContainsFold applies the ContainsFold predicate on the "iban" field.
-func IbanContainsFold(v string) predicate.Account {
-	return predicate.Account(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldIban), v))
 	})
 }
 
@@ -1484,6 +1402,311 @@ func InterestReportingEQ(v bool) predicate.Account {
 func InterestReportingNEQ(v bool) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldInterestReporting), v))
+	})
+}
+
+// CurrentBalanceEQ applies the EQ predicate on the "currentBalance" field.
+func CurrentBalanceEQ(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// CurrentBalanceNEQ applies the NEQ predicate on the "currentBalance" field.
+func CurrentBalanceNEQ(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// CurrentBalanceIn applies the In predicate on the "currentBalance" field.
+func CurrentBalanceIn(vs ...float32) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCurrentBalance), v...))
+	})
+}
+
+// CurrentBalanceNotIn applies the NotIn predicate on the "currentBalance" field.
+func CurrentBalanceNotIn(vs ...float32) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCurrentBalance), v...))
+	})
+}
+
+// CurrentBalanceGT applies the GT predicate on the "currentBalance" field.
+func CurrentBalanceGT(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// CurrentBalanceGTE applies the GTE predicate on the "currentBalance" field.
+func CurrentBalanceGTE(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// CurrentBalanceLT applies the LT predicate on the "currentBalance" field.
+func CurrentBalanceLT(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// CurrentBalanceLTE applies the LTE predicate on the "currentBalance" field.
+func CurrentBalanceLTE(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCurrentBalance), v))
+	})
+}
+
+// AvailableBalanceEQ applies the EQ predicate on the "availableBalance" field.
+func AvailableBalanceEQ(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// AvailableBalanceNEQ applies the NEQ predicate on the "availableBalance" field.
+func AvailableBalanceNEQ(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// AvailableBalanceIn applies the In predicate on the "availableBalance" field.
+func AvailableBalanceIn(vs ...float32) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldAvailableBalance), v...))
+	})
+}
+
+// AvailableBalanceNotIn applies the NotIn predicate on the "availableBalance" field.
+func AvailableBalanceNotIn(vs ...float32) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldAvailableBalance), v...))
+	})
+}
+
+// AvailableBalanceGT applies the GT predicate on the "availableBalance" field.
+func AvailableBalanceGT(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// AvailableBalanceGTE applies the GTE predicate on the "availableBalance" field.
+func AvailableBalanceGTE(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// AvailableBalanceLT applies the LT predicate on the "availableBalance" field.
+func AvailableBalanceLT(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// AvailableBalanceLTE applies the LTE predicate on the "availableBalance" field.
+func AvailableBalanceLTE(v float32) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldAvailableBalance), v))
+	})
+}
+
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldURL), v))
+	})
+}
+
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldURL), v))
+	})
+}
+
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldURL), v...))
+	})
+}
+
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldURL), v...))
+	})
+}
+
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldURL), v))
+	})
+}
+
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldURL), v))
+	})
+}
+
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldURL), v))
+	})
+}
+
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldURL), v))
+	})
+}
+
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldURL), v))
+	})
+}
+
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldURL), v))
+	})
+}
+
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldURL), v))
+	})
+}
+
+// URLIsNil applies the IsNil predicate on the "url" field.
+func URLIsNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldURL)))
+	})
+}
+
+// URLNotNil applies the NotNil predicate on the "url" field.
+func URLNotNil() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldURL)))
+	})
+}
+
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldURL), v))
+	})
+}
+
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldURL), v))
+	})
+}
+
+// HasBranch applies the HasEdge predicate on the "branch" edge.
+func HasBranch() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BranchTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, BranchTable, BranchColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBranchWith applies the HasEdge predicate on the "branch" edge with a given conditions (other predicates).
+func HasBranchWith(preds ...predicate.Branch) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BranchInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, BranchTable, BranchColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

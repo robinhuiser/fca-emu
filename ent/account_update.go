@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 	"github.com/robinhuiser/finite-mock-server/ent/predicate"
 )
 
@@ -46,6 +47,12 @@ func (au *AccountUpdate) SetParentId(u uuid.UUID) *AccountUpdate {
 	return au
 }
 
+// ClearParentId clears the value of the "parentId" field.
+func (au *AccountUpdate) ClearParentId() *AccountUpdate {
+	au.mutation.ClearParentId()
+	return au
+}
+
 // SetName sets the "name" field.
 func (au *AccountUpdate) SetName(s string) *AccountUpdate {
 	au.mutation.SetName(s)
@@ -55,12 +62,6 @@ func (au *AccountUpdate) SetName(s string) *AccountUpdate {
 // SetTitle sets the "title" field.
 func (au *AccountUpdate) SetTitle(s string) *AccountUpdate {
 	au.mutation.SetTitle(s)
-	return au
-}
-
-// SetIban sets the "iban" field.
-func (au *AccountUpdate) SetIban(s string) *AccountUpdate {
-	au.mutation.SetIban(s)
 	return au
 }
 
@@ -126,9 +127,80 @@ func (au *AccountUpdate) SetInterestReporting(b bool) *AccountUpdate {
 	return au
 }
 
+// SetCurrentBalance sets the "currentBalance" field.
+func (au *AccountUpdate) SetCurrentBalance(f float32) *AccountUpdate {
+	au.mutation.ResetCurrentBalance()
+	au.mutation.SetCurrentBalance(f)
+	return au
+}
+
+// AddCurrentBalance adds f to the "currentBalance" field.
+func (au *AccountUpdate) AddCurrentBalance(f float32) *AccountUpdate {
+	au.mutation.AddCurrentBalance(f)
+	return au
+}
+
+// SetAvailableBalance sets the "availableBalance" field.
+func (au *AccountUpdate) SetAvailableBalance(f float32) *AccountUpdate {
+	au.mutation.ResetAvailableBalance()
+	au.mutation.SetAvailableBalance(f)
+	return au
+}
+
+// AddAvailableBalance adds f to the "availableBalance" field.
+func (au *AccountUpdate) AddAvailableBalance(f float32) *AccountUpdate {
+	au.mutation.AddAvailableBalance(f)
+	return au
+}
+
+// SetURL sets the "url" field.
+func (au *AccountUpdate) SetURL(s string) *AccountUpdate {
+	au.mutation.SetURL(s)
+	return au
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableURL(s *string) *AccountUpdate {
+	if s != nil {
+		au.SetURL(*s)
+	}
+	return au
+}
+
+// ClearURL clears the value of the "url" field.
+func (au *AccountUpdate) ClearURL() *AccountUpdate {
+	au.mutation.ClearURL()
+	return au
+}
+
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (au *AccountUpdate) SetBranchID(id int) *AccountUpdate {
+	au.mutation.SetBranchID(id)
+	return au
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (au *AccountUpdate) SetNillableBranchID(id *int) *AccountUpdate {
+	if id != nil {
+		au = au.SetBranchID(*id)
+	}
+	return au
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (au *AccountUpdate) SetBranch(b *Branch) *AccountUpdate {
+	return au.SetBranchID(b.ID)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
+}
+
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (au *AccountUpdate) ClearBranch() *AccountUpdate {
+	au.mutation.ClearBranch()
+	return au
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -221,6 +293,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldParentId,
 		})
 	}
+	if au.mutation.ParentIdCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: account.FieldParentId,
+		})
+	}
 	if value, ok := au.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -233,13 +311,6 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: account.FieldTitle,
-		})
-	}
-	if value, ok := au.mutation.Iban(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldIban,
 		})
 	}
 	if value, ok := au.mutation.DateCreated(); ok {
@@ -304,6 +375,82 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldInterestReporting,
 		})
 	}
+	if value, ok := au.mutation.CurrentBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldCurrentBalance,
+		})
+	}
+	if value, ok := au.mutation.AddedCurrentBalance(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldCurrentBalance,
+		})
+	}
+	if value, ok := au.mutation.AvailableBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldAvailableBalance,
+		})
+	}
+	if value, ok := au.mutation.AddedAvailableBalance(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldAvailableBalance,
+		})
+	}
+	if value, ok := au.mutation.URL(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldURL,
+		})
+	}
+	if au.mutation.URLCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: account.FieldURL,
+		})
+	}
+	if au.mutation.BranchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.BranchTable,
+			Columns: []string{account.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: branch.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.BranchTable,
+			Columns: []string{account.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: branch.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -340,6 +487,12 @@ func (auo *AccountUpdateOne) SetParentId(u uuid.UUID) *AccountUpdateOne {
 	return auo
 }
 
+// ClearParentId clears the value of the "parentId" field.
+func (auo *AccountUpdateOne) ClearParentId() *AccountUpdateOne {
+	auo.mutation.ClearParentId()
+	return auo
+}
+
 // SetName sets the "name" field.
 func (auo *AccountUpdateOne) SetName(s string) *AccountUpdateOne {
 	auo.mutation.SetName(s)
@@ -349,12 +502,6 @@ func (auo *AccountUpdateOne) SetName(s string) *AccountUpdateOne {
 // SetTitle sets the "title" field.
 func (auo *AccountUpdateOne) SetTitle(s string) *AccountUpdateOne {
 	auo.mutation.SetTitle(s)
-	return auo
-}
-
-// SetIban sets the "iban" field.
-func (auo *AccountUpdateOne) SetIban(s string) *AccountUpdateOne {
-	auo.mutation.SetIban(s)
 	return auo
 }
 
@@ -420,9 +567,80 @@ func (auo *AccountUpdateOne) SetInterestReporting(b bool) *AccountUpdateOne {
 	return auo
 }
 
+// SetCurrentBalance sets the "currentBalance" field.
+func (auo *AccountUpdateOne) SetCurrentBalance(f float32) *AccountUpdateOne {
+	auo.mutation.ResetCurrentBalance()
+	auo.mutation.SetCurrentBalance(f)
+	return auo
+}
+
+// AddCurrentBalance adds f to the "currentBalance" field.
+func (auo *AccountUpdateOne) AddCurrentBalance(f float32) *AccountUpdateOne {
+	auo.mutation.AddCurrentBalance(f)
+	return auo
+}
+
+// SetAvailableBalance sets the "availableBalance" field.
+func (auo *AccountUpdateOne) SetAvailableBalance(f float32) *AccountUpdateOne {
+	auo.mutation.ResetAvailableBalance()
+	auo.mutation.SetAvailableBalance(f)
+	return auo
+}
+
+// AddAvailableBalance adds f to the "availableBalance" field.
+func (auo *AccountUpdateOne) AddAvailableBalance(f float32) *AccountUpdateOne {
+	auo.mutation.AddAvailableBalance(f)
+	return auo
+}
+
+// SetURL sets the "url" field.
+func (auo *AccountUpdateOne) SetURL(s string) *AccountUpdateOne {
+	auo.mutation.SetURL(s)
+	return auo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableURL(s *string) *AccountUpdateOne {
+	if s != nil {
+		auo.SetURL(*s)
+	}
+	return auo
+}
+
+// ClearURL clears the value of the "url" field.
+func (auo *AccountUpdateOne) ClearURL() *AccountUpdateOne {
+	auo.mutation.ClearURL()
+	return auo
+}
+
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (auo *AccountUpdateOne) SetBranchID(id int) *AccountUpdateOne {
+	auo.mutation.SetBranchID(id)
+	return auo
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableBranchID(id *int) *AccountUpdateOne {
+	if id != nil {
+		auo = auo.SetBranchID(*id)
+	}
+	return auo
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (auo *AccountUpdateOne) SetBranch(b *Branch) *AccountUpdateOne {
+	return auo.SetBranchID(b.ID)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
+}
+
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (auo *AccountUpdateOne) ClearBranch() *AccountUpdateOne {
+	auo.mutation.ClearBranch()
+	return auo
 }
 
 // Save executes the query and returns the updated Account entity.
@@ -520,6 +738,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Column: account.FieldParentId,
 		})
 	}
+	if auo.mutation.ParentIdCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Column: account.FieldParentId,
+		})
+	}
 	if value, ok := auo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -532,13 +756,6 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: account.FieldTitle,
-		})
-	}
-	if value, ok := auo.mutation.Iban(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldIban,
 		})
 	}
 	if value, ok := auo.mutation.DateCreated(); ok {
@@ -602,6 +819,82 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Value:  value,
 			Column: account.FieldInterestReporting,
 		})
+	}
+	if value, ok := auo.mutation.CurrentBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldCurrentBalance,
+		})
+	}
+	if value, ok := auo.mutation.AddedCurrentBalance(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldCurrentBalance,
+		})
+	}
+	if value, ok := auo.mutation.AvailableBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldAvailableBalance,
+		})
+	}
+	if value, ok := auo.mutation.AddedAvailableBalance(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldAvailableBalance,
+		})
+	}
+	if value, ok := auo.mutation.URL(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldURL,
+		})
+	}
+	if auo.mutation.URLCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: account.FieldURL,
+		})
+	}
+	if auo.mutation.BranchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.BranchTable,
+			Columns: []string{account.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: branch.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.BranchTable,
+			Columns: []string{account.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: branch.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Account{config: auo.config}
 	_spec.Assign = _node.assignValues

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -48,12 +49,6 @@ func (ac *AccountCreate) SetName(s string) *AccountCreate {
 // SetTitle sets the "title" field.
 func (ac *AccountCreate) SetTitle(s string) *AccountCreate {
 	ac.mutation.SetTitle(s)
-	return ac
-}
-
-// SetIban sets the "iban" field.
-func (ac *AccountCreate) SetIban(s string) *AccountCreate {
-	ac.mutation.SetIban(s)
 	return ac
 }
 
@@ -113,10 +108,55 @@ func (ac *AccountCreate) SetInterestReporting(b bool) *AccountCreate {
 	return ac
 }
 
+// SetCurrentBalance sets the "currentBalance" field.
+func (ac *AccountCreate) SetCurrentBalance(f float32) *AccountCreate {
+	ac.mutation.SetCurrentBalance(f)
+	return ac
+}
+
+// SetAvailableBalance sets the "availableBalance" field.
+func (ac *AccountCreate) SetAvailableBalance(f float32) *AccountCreate {
+	ac.mutation.SetAvailableBalance(f)
+	return ac
+}
+
+// SetURL sets the "url" field.
+func (ac *AccountCreate) SetURL(s string) *AccountCreate {
+	ac.mutation.SetURL(s)
+	return ac
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableURL(s *string) *AccountCreate {
+	if s != nil {
+		ac.SetURL(*s)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AccountCreate) SetID(u uuid.UUID) *AccountCreate {
 	ac.mutation.SetID(u)
 	return ac
+}
+
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (ac *AccountCreate) SetBranchID(id int) *AccountCreate {
+	ac.mutation.SetBranchID(id)
+	return ac
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (ac *AccountCreate) SetNillableBranchID(id *int) *AccountCreate {
+	if id != nil {
+		ac = ac.SetBranchID(*id)
+	}
+	return ac
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (ac *AccountCreate) SetBranch(b *Branch) *AccountCreate {
+	return ac.SetBranchID(b.ID)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -185,17 +225,11 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.Number(); !ok {
 		return &ValidationError{Name: "number", err: errors.New("ent: missing required field \"number\"")}
 	}
-	if _, ok := ac.mutation.ParentId(); !ok {
-		return &ValidationError{Name: "parentId", err: errors.New("ent: missing required field \"parentId\"")}
-	}
 	if _, ok := ac.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New("ent: missing required field \"name\"")}
 	}
 	if _, ok := ac.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New("ent: missing required field \"title\"")}
-	}
-	if _, ok := ac.mutation.Iban(); !ok {
-		return &ValidationError{Name: "iban", err: errors.New("ent: missing required field \"iban\"")}
 	}
 	if _, ok := ac.mutation.DateCreated(); !ok {
 		return &ValidationError{Name: "dateCreated", err: errors.New("ent: missing required field \"dateCreated\"")}
@@ -217,6 +251,12 @@ func (ac *AccountCreate) check() error {
 	}
 	if _, ok := ac.mutation.InterestReporting(); !ok {
 		return &ValidationError{Name: "interestReporting", err: errors.New("ent: missing required field \"interestReporting\"")}
+	}
+	if _, ok := ac.mutation.CurrentBalance(); !ok {
+		return &ValidationError{Name: "currentBalance", err: errors.New("ent: missing required field \"currentBalance\"")}
+	}
+	if _, ok := ac.mutation.AvailableBalance(); !ok {
+		return &ValidationError{Name: "availableBalance", err: errors.New("ent: missing required field \"availableBalance\"")}
 	}
 	return nil
 }
@@ -287,14 +327,6 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		})
 		_node.Title = value
 	}
-	if value, ok := ac.mutation.Iban(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldIban,
-		})
-		_node.Iban = value
-	}
 	if value, ok := ac.mutation.DateCreated(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -358,6 +390,50 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Column: account.FieldInterestReporting,
 		})
 		_node.InterestReporting = value
+	}
+	if value, ok := ac.mutation.CurrentBalance(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldCurrentBalance,
+		})
+		_node.CurrentBalance = value
+	}
+	if value, ok := ac.mutation.AvailableBalance(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: account.FieldAvailableBalance,
+		})
+		_node.AvailableBalance = value
+	}
+	if value, ok := ac.mutation.URL(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldURL,
+		})
+		_node.URL = value
+	}
+	if nodes := ac.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.BranchTable,
+			Columns: []string{account.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: branch.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.account_branch = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

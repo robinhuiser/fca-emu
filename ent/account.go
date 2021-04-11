@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 )
 
 // Account is the model entity for the Account schema.
@@ -27,8 +28,6 @@ type Account struct {
 	Name string `json:"name,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
-	// Iban holds the value of the "iban" field.
-	Iban string `json:"iban,omitempty"`
 	// DateCreated holds the value of the "dateCreated" field.
 	DateCreated time.Time `json:"dateCreated,omitempty"`
 	// DateOpened holds the value of the "dateOpened" field.
@@ -45,6 +44,39 @@ type Account struct {
 	Source string `json:"source,omitempty"`
 	// InterestReporting holds the value of the "interestReporting" field.
 	InterestReporting bool `json:"interestReporting,omitempty"`
+	// CurrentBalance holds the value of the "currentBalance" field.
+	CurrentBalance float32 `json:"currentBalance,omitempty"`
+	// AvailableBalance holds the value of the "availableBalance" field.
+	AvailableBalance float32 `json:"availableBalance,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AccountQuery when eager-loading is set.
+	Edges          AccountEdges `json:"edges"`
+	account_branch *int
+}
+
+// AccountEdges holds the relations/edges for other nodes in the graph.
+type AccountEdges struct {
+	// Branch holds the value of the branch edge.
+	Branch *Branch `json:"branch,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// BranchOrErr returns the Branch value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AccountEdges) BranchOrErr() (*Branch, error) {
+	if e.loadedTypes[0] {
+		if e.Branch == nil {
+			// The edge branch was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: branch.Label}
+		}
+		return e.Branch, nil
+	}
+	return nil, &NotLoadedError{edge: "branch"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -54,12 +86,16 @@ func (*Account) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case account.FieldInterestReporting:
 			values[i] = &sql.NullBool{}
-		case account.FieldType, account.FieldNumber, account.FieldName, account.FieldTitle, account.FieldIban, account.FieldCurrencyCode, account.FieldStatus, account.FieldSource:
+		case account.FieldCurrentBalance, account.FieldAvailableBalance:
+			values[i] = &sql.NullFloat64{}
+		case account.FieldType, account.FieldNumber, account.FieldName, account.FieldTitle, account.FieldCurrencyCode, account.FieldStatus, account.FieldSource, account.FieldURL:
 			values[i] = &sql.NullString{}
 		case account.FieldDateCreated, account.FieldDateOpened, account.FieldDateLastUpdated, account.FieldDateClosed:
 			values[i] = &sql.NullTime{}
 		case account.FieldID, account.FieldParentId:
 			values[i] = &uuid.UUID{}
+		case account.ForeignKeys[0]: // account_branch
+			values[i] = &sql.NullInt64{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Account", columns[i])
 		}
@@ -111,12 +147,6 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				a.Title = value.String
 			}
-		case account.FieldIban:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field iban", values[i])
-			} else if value.Valid {
-				a.Iban = value.String
-			}
 		case account.FieldDateCreated:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field dateCreated", values[i])
@@ -165,9 +195,39 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				a.InterestReporting = value.Bool
 			}
+		case account.FieldCurrentBalance:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field currentBalance", values[i])
+			} else if value.Valid {
+				a.CurrentBalance = float32(value.Float64)
+			}
+		case account.FieldAvailableBalance:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field availableBalance", values[i])
+			} else if value.Valid {
+				a.AvailableBalance = float32(value.Float64)
+			}
+		case account.FieldURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[i])
+			} else if value.Valid {
+				a.URL = value.String
+			}
+		case account.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field account_branch", value)
+			} else if value.Valid {
+				a.account_branch = new(int)
+				*a.account_branch = int(value.Int64)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryBranch queries the "branch" edge of the Account entity.
+func (a *Account) QueryBranch() *BranchQuery {
+	return (&AccountClient{config: a.config}).QueryBranch(a)
 }
 
 // Update returns a builder for updating this Account.
@@ -203,8 +263,6 @@ func (a *Account) String() string {
 	builder.WriteString(a.Name)
 	builder.WriteString(", title=")
 	builder.WriteString(a.Title)
-	builder.WriteString(", iban=")
-	builder.WriteString(a.Iban)
 	builder.WriteString(", dateCreated=")
 	builder.WriteString(a.DateCreated.Format(time.ANSIC))
 	builder.WriteString(", dateOpened=")
@@ -221,6 +279,12 @@ func (a *Account) String() string {
 	builder.WriteString(a.Source)
 	builder.WriteString(", interestReporting=")
 	builder.WriteString(fmt.Sprintf("%v", a.InterestReporting))
+	builder.WriteString(", currentBalance=")
+	builder.WriteString(fmt.Sprintf("%v", a.CurrentBalance))
+	builder.WriteString(", availableBalance=")
+	builder.WriteString(fmt.Sprintf("%v", a.AvailableBalance))
+	builder.WriteString(", url=")
+	builder.WriteString(a.URL)
 	builder.WriteByte(')')
 	return builder.String()
 }

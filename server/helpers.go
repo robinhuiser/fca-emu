@@ -10,7 +10,18 @@
 
 package finite
 
-import "github.com/robinhuiser/finite-mock-server/util"
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/robinhuiser/finite-mock-server/util"
+)
+
+const (
+	MOCK_SERVER_SECRET = "123456789"
+	MASK_SYMBOL        = "x"
+)
 
 //Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
@@ -18,14 +29,41 @@ func Response(code int, body interface{}) ImplResponse {
 }
 
 func isValidSecret(s string) bool {
-	e := util.GetEnvString("MOCK_SERVER_SECRET", "123456789")
+	e := util.GetEnvString("MOCK_SERVER_SECRET", MOCK_SERVER_SECRET)
 	return e == s
 }
 
 func setErrorResponse(e string) ErrorResponse {
 	m := []string{e}
 	return ErrorResponse{
-		Status:   false,
+		Status:   true,
 		Messages: m,
 	}
+}
+
+func isMasked(b bool, s string) string {
+	if b {
+		head := s[:len(s)-4]
+		tail := s[len(s)-4:]
+		mask := strings.Repeat(MASK_SYMBOL, len(head))
+		return fmt.Sprintf("%v%v", mask, tail)
+	} else {
+		return s
+	}
+}
+
+func isValidBankDate(d string) string {
+	b, _ := time.Parse(util.APIDateFormat, "1974-01-01T00:00:00")
+	t, err := time.Parse(util.APIDateFormat, d)
+	if err != nil || t.Before(b) {
+		return ""
+	}
+	return d
+}
+
+func isValidUUID(u string) string {
+	if u == "00000000-0000-0000-0000-000000000000" {
+		return ""
+	}
+	return u
 }

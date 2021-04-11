@@ -13,10 +13,9 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "type", Type: field.TypeString},
 		{Name: "number", Type: field.TypeString},
-		{Name: "parent_id", Type: field.TypeUUID},
+		{Name: "parent_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
-		{Name: "iban", Type: field.TypeString},
 		{Name: "date_created", Type: field.TypeTime},
 		{Name: "date_opened", Type: field.TypeTime},
 		{Name: "date_last_updated", Type: field.TypeTime},
@@ -25,19 +24,76 @@ var (
 		{Name: "status", Type: field.TypeString},
 		{Name: "source", Type: field.TypeString},
 		{Name: "interest_reporting", Type: field.TypeBool},
+		{Name: "current_balance", Type: field.TypeFloat32},
+		{Name: "available_balance", Type: field.TypeFloat32},
+		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "account_branch", Type: field.TypeInt, Nullable: true},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
 	AccountsTable = &schema.Table{
-		Name:        "accounts",
-		Columns:     AccountsColumns,
-		PrimaryKey:  []*schema.Column{AccountsColumns[0]},
+		Name:       "accounts",
+		Columns:    AccountsColumns,
+		PrimaryKey: []*schema.Column{AccountsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "accounts_branches_branch",
+				Columns:    []*schema.Column{AccountsColumns[17]},
+				RefColumns: []*schema.Column{BranchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// BanksColumns holds the columns for the "banks" table.
+	BanksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "bank_code", Type: field.TypeString},
+		{Name: "bank_name", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
+		{Name: "swift", Type: field.TypeString},
+	}
+	// BanksTable holds the schema information for the "banks" table.
+	BanksTable = &schema.Table{
+		Name:        "banks",
+		Columns:     BanksColumns,
+		PrimaryKey:  []*schema.Column{BanksColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// BranchesColumns holds the columns for the "branches" table.
+	BranchesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "branch_code", Type: field.TypeString},
+		{Name: "street_number", Type: field.TypeString},
+		{Name: "street_name", Type: field.TypeString},
+		{Name: "city", Type: field.TypeString},
+		{Name: "state", Type: field.TypeString, Size: 2},
+		{Name: "zip", Type: field.TypeString},
+		{Name: "latitude", Type: field.TypeFloat64},
+		{Name: "longitude", Type: field.TypeFloat64},
+		{Name: "bank_branches", Type: field.TypeInt, Nullable: true},
+	}
+	// BranchesTable holds the schema information for the "branches" table.
+	BranchesTable = &schema.Table{
+		Name:       "branches",
+		Columns:    BranchesColumns,
+		PrimaryKey: []*schema.Column{BranchesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "branches_banks_branches",
+				Columns:    []*schema.Column{BranchesColumns[9]},
+				RefColumns: []*schema.Column{BanksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
+		BanksTable,
+		BranchesTable,
 	}
 )
 
 func init() {
+	AccountsTable.ForeignKeys[0].RefTable = BranchesTable
+	BranchesTable.ForeignKeys[0].RefTable = BanksTable
 }

@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 	"github.com/robinhuiser/finite-mock-server/ent/schema"
 )
 
@@ -18,4 +19,10 @@ func init() {
 	accountDescID := accountFields[0].Descriptor()
 	// account.DefaultID holds the default value on creation for the id field.
 	account.DefaultID = accountDescID.Default.(func() uuid.UUID)
+	branchFields := schema.Branch{}.Fields()
+	_ = branchFields
+	// branchDescState is the schema descriptor for state field.
+	branchDescState := branchFields[4].Descriptor()
+	// branch.StateValidator is a validator for the "state" field. It is called by the builders before save.
+	branch.StateValidator = branchDescState.Validators[0].(func(string) error)
 }

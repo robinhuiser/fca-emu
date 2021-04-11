@@ -11,9 +11,12 @@ import (
 	"github.com/robinhuiser/finite-mock-server/ent/migrate"
 
 	"github.com/robinhuiser/finite-mock-server/ent/account"
+	"github.com/robinhuiser/finite-mock-server/ent/bank"
+	"github.com/robinhuiser/finite-mock-server/ent/branch"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -23,6 +26,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// Bank is the client for interacting with the Bank builders.
+	Bank *BankClient
+	// Branch is the client for interacting with the Branch builders.
+	Branch *BranchClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,6 +44,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
+	c.Bank = NewBankClient(c.config)
+	c.Branch = NewBranchClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -71,6 +80,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:     ctx,
 		config:  cfg,
 		Account: NewAccountClient(cfg),
+		Bank:    NewBankClient(cfg),
+		Branch:  NewBranchClient(cfg),
 	}, nil
 }
 
@@ -90,6 +101,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		config:  cfg,
 		Account: NewAccountClient(cfg),
+		Bank:    NewBankClient(cfg),
+		Branch:  NewBranchClient(cfg),
 	}, nil
 }
 
@@ -120,6 +133,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Account.Use(hooks...)
+	c.Bank.Use(hooks...)
+	c.Branch.Use(hooks...)
 }
 
 // AccountClient is a client for the Account schema.
@@ -205,7 +220,231 @@ func (c *AccountClient) GetX(ctx context.Context, id uuid.UUID) *Account {
 	return obj
 }
 
+// QueryBranch queries the branch edge of a Account.
+func (c *AccountClient) QueryBranch(a *Account) *BranchQuery {
+	query := &BranchQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(branch.Table, branch.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, account.BranchTable, account.BranchColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
+}
+
+// BankClient is a client for the Bank schema.
+type BankClient struct {
+	config
+}
+
+// NewBankClient returns a client for the Bank from the given config.
+func NewBankClient(c config) *BankClient {
+	return &BankClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bank.Hooks(f(g(h())))`.
+func (c *BankClient) Use(hooks ...Hook) {
+	c.hooks.Bank = append(c.hooks.Bank, hooks...)
+}
+
+// Create returns a create builder for Bank.
+func (c *BankClient) Create() *BankCreate {
+	mutation := newBankMutation(c.config, OpCreate)
+	return &BankCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Bank entities.
+func (c *BankClient) CreateBulk(builders ...*BankCreate) *BankCreateBulk {
+	return &BankCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Bank.
+func (c *BankClient) Update() *BankUpdate {
+	mutation := newBankMutation(c.config, OpUpdate)
+	return &BankUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BankClient) UpdateOne(b *Bank) *BankUpdateOne {
+	mutation := newBankMutation(c.config, OpUpdateOne, withBank(b))
+	return &BankUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BankClient) UpdateOneID(id int) *BankUpdateOne {
+	mutation := newBankMutation(c.config, OpUpdateOne, withBankID(id))
+	return &BankUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Bank.
+func (c *BankClient) Delete() *BankDelete {
+	mutation := newBankMutation(c.config, OpDelete)
+	return &BankDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BankClient) DeleteOne(b *Bank) *BankDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BankClient) DeleteOneID(id int) *BankDeleteOne {
+	builder := c.Delete().Where(bank.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BankDeleteOne{builder}
+}
+
+// Query returns a query builder for Bank.
+func (c *BankClient) Query() *BankQuery {
+	return &BankQuery{config: c.config}
+}
+
+// Get returns a Bank entity by its id.
+func (c *BankClient) Get(ctx context.Context, id int) (*Bank, error) {
+	return c.Query().Where(bank.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BankClient) GetX(ctx context.Context, id int) *Bank {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBranches queries the branches edge of a Bank.
+func (c *BankClient) QueryBranches(b *Bank) *BranchQuery {
+	query := &BranchQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bank.Table, bank.FieldID, id),
+			sqlgraph.To(branch.Table, branch.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bank.BranchesTable, bank.BranchesColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BankClient) Hooks() []Hook {
+	return c.hooks.Bank
+}
+
+// BranchClient is a client for the Branch schema.
+type BranchClient struct {
+	config
+}
+
+// NewBranchClient returns a client for the Branch from the given config.
+func NewBranchClient(c config) *BranchClient {
+	return &BranchClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `branch.Hooks(f(g(h())))`.
+func (c *BranchClient) Use(hooks ...Hook) {
+	c.hooks.Branch = append(c.hooks.Branch, hooks...)
+}
+
+// Create returns a create builder for Branch.
+func (c *BranchClient) Create() *BranchCreate {
+	mutation := newBranchMutation(c.config, OpCreate)
+	return &BranchCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Branch entities.
+func (c *BranchClient) CreateBulk(builders ...*BranchCreate) *BranchCreateBulk {
+	return &BranchCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Branch.
+func (c *BranchClient) Update() *BranchUpdate {
+	mutation := newBranchMutation(c.config, OpUpdate)
+	return &BranchUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BranchClient) UpdateOne(b *Branch) *BranchUpdateOne {
+	mutation := newBranchMutation(c.config, OpUpdateOne, withBranch(b))
+	return &BranchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BranchClient) UpdateOneID(id int) *BranchUpdateOne {
+	mutation := newBranchMutation(c.config, OpUpdateOne, withBranchID(id))
+	return &BranchUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Branch.
+func (c *BranchClient) Delete() *BranchDelete {
+	mutation := newBranchMutation(c.config, OpDelete)
+	return &BranchDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BranchClient) DeleteOne(b *Branch) *BranchDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BranchClient) DeleteOneID(id int) *BranchDeleteOne {
+	builder := c.Delete().Where(branch.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BranchDeleteOne{builder}
+}
+
+// Query returns a query builder for Branch.
+func (c *BranchClient) Query() *BranchQuery {
+	return &BranchQuery{config: c.config}
+}
+
+// Get returns a Branch entity by its id.
+func (c *BranchClient) Get(ctx context.Context, id int) (*Branch, error) {
+	return c.Query().Where(branch.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BranchClient) GetX(ctx context.Context, id int) *Branch {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBranchOwner queries the branch_owner edge of a Branch.
+func (c *BranchClient) QueryBranchOwner(b *Branch) *BankQuery {
+	query := &BankQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(branch.Table, branch.FieldID, id),
+			sqlgraph.To(bank.Table, bank.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, branch.BranchOwnerTable, branch.BranchOwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BranchClient) Hooks() []Hook {
+	return c.hooks.Branch
 }

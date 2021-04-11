@@ -8,3 +8,9 @@ import (
 
 // Account is the predicate function for account builders.
 type Account func(*sql.Selector)
+
+// Bank is the predicate function for bank builders.
+type Bank func(*sql.Selector)
+
+// Branch is the predicate function for branch builders.
+type Branch func(*sql.Selector)
