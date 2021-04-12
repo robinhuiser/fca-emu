@@ -85,15 +85,241 @@ var (
 			},
 		},
 	}
+	// CardsColumns holds the columns for the "cards" table.
+	CardsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"CREDIT", "DEBIT"}},
+		{Name: "number", Type: field.TypeString},
+		{Name: "start_date", Type: field.TypeTime},
+		{Name: "expiry_date", Type: field.TypeTime},
+		{Name: "holder_name", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"LOCKED", "BLOCKED", "OK"}},
+		{Name: "url", Type: field.TypeString},
+		{Name: "card_network", Type: field.TypeInt, Nullable: true},
+	}
+	// CardsTable holds the schema information for the "cards" table.
+	CardsTable = &schema.Table{
+		Name:       "cards",
+		Columns:    CardsColumns,
+		PrimaryKey: []*schema.Column{CardsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "cards_card_networks_network",
+				Columns:    []*schema.Column{CardsColumns[8]},
+				RefColumns: []*schema.Column{CardNetworksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// CardNetworksColumns holds the columns for the "card_networks" table.
+	CardNetworksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "code", Type: field.TypeString},
+	}
+	// CardNetworksTable holds the schema information for the "card_networks" table.
+	CardNetworksTable = &schema.Table{
+		Name:        "card_networks",
+		Columns:     CardNetworksColumns,
+		PrimaryKey:  []*schema.Column{CardNetworksColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// EntitiesColumns holds the columns for the "entities" table.
+	EntitiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "date_created", Type: field.TypeTime},
+		{Name: "firstname", Type: field.TypeString, Nullable: true},
+		{Name: "lastname", Type: field.TypeString, Nullable: true},
+		{Name: "fullname", Type: field.TypeString, Nullable: true},
+		{Name: "date_of_birth", Type: field.TypeTime},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"PERSON", "ORGANIZATION", "CORPORATE"}},
+		{Name: "last_login_date", Type: field.TypeTime},
+		{Name: "username", Type: field.TypeString},
+		{Name: "token", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
+	}
+	// EntitiesTable holds the schema information for the "entities" table.
+	EntitiesTable = &schema.Table{
+		Name:        "entities",
+		Columns:     EntitiesColumns,
+		PrimaryKey:  []*schema.Column{EntitiesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// EntityAddressesColumns holds the columns for the "entity_addresses" table.
+	EntityAddressesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "country", Type: field.TypeString},
+		{Name: "city", Type: field.TypeString},
+		{Name: "postal_code", Type: field.TypeString},
+		{Name: "state", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"BUSINESS", "PRIVATE", "MAILBOX"}},
+		{Name: "line1", Type: field.TypeString},
+		{Name: "line2", Type: field.TypeString, Nullable: true},
+		{Name: "line3", Type: field.TypeString, Nullable: true},
+		{Name: "primary", Type: field.TypeBool},
+		{Name: "entity_entity_addresses", Type: field.TypeUUID, Nullable: true},
+	}
+	// EntityAddressesTable holds the schema information for the "entity_addresses" table.
+	EntityAddressesTable = &schema.Table{
+		Name:       "entity_addresses",
+		Columns:    EntityAddressesColumns,
+		PrimaryKey: []*schema.Column{EntityAddressesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "entity_addresses_entities_entityAddresses",
+				Columns:    []*schema.Column{EntityAddressesColumns[10]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EntityContactPointsColumns holds the columns for the "entity_contact_points" table.
+	EntityContactPointsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "prefix", Type: field.TypeInt, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"}},
+		{Name: "suffix", Type: field.TypeInt, Nullable: true},
+		{Name: "value", Type: field.TypeString},
+		{Name: "entity_entity_contact_points", Type: field.TypeUUID, Nullable: true},
+	}
+	// EntityContactPointsTable holds the schema information for the "entity_contact_points" table.
+	EntityContactPointsTable = &schema.Table{
+		Name:       "entity_contact_points",
+		Columns:    EntityContactPointsColumns,
+		PrimaryKey: []*schema.Column{EntityContactPointsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "entity_contact_points_entities_entityContactPoints",
+				Columns:    []*schema.Column{EntityContactPointsColumns[6]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EntityPreferencesColumns holds the columns for the "entity_preferences" table.
+	EntityPreferencesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "value", Type: field.TypeString},
+		{Name: "entity_entity_preferences", Type: field.TypeUUID, Nullable: true},
+	}
+	// EntityPreferencesTable holds the schema information for the "entity_preferences" table.
+	EntityPreferencesTable = &schema.Table{
+		Name:       "entity_preferences",
+		Columns:    EntityPreferencesColumns,
+		PrimaryKey: []*schema.Column{EntityPreferencesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "entity_preferences_entities_entityPreferences",
+				Columns:    []*schema.Column{EntityPreferencesColumns[3]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EntityTaxInformationsColumns holds the columns for the "entity_tax_informations" table.
+	EntityTaxInformationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SSN"}},
+		{Name: "tax_id", Type: field.TypeString},
+		{Name: "entity_entity_tax_information", Type: field.TypeUUID, Nullable: true},
+	}
+	// EntityTaxInformationsTable holds the schema information for the "entity_tax_informations" table.
+	EntityTaxInformationsTable = &schema.Table{
+		Name:       "entity_tax_informations",
+		Columns:    EntityTaxInformationsColumns,
+		PrimaryKey: []*schema.Column{EntityTaxInformationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "entity_tax_informations_entities_entityTaxInformation",
+				Columns:    []*schema.Column{EntityTaxInformationsColumns[3]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ProductsColumns holds the columns for the "products" table.
+	ProductsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"INVESTMENT", "LOAN", "DEPOSIT", "CARD"}},
+		{Name: "type_name", Type: field.TypeString},
+		{Name: "sub_type", Type: field.TypeString},
+		{Name: "sub_type_name", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
+	}
+	// ProductsTable holds the schema information for the "products" table.
+	ProductsTable = &schema.Table{
+		Name:        "products",
+		Columns:     ProductsColumns,
+		PrimaryKey:  []*schema.Column{ProductsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// RoutingNumbersColumns holds the columns for the "routing_numbers" table.
+	RoutingNumbersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "number", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"WIRE", "ABA"}},
+	}
+	// RoutingNumbersTable holds the schema information for the "routing_numbers" table.
+	RoutingNumbersTable = &schema.Table{
+		Name:        "routing_numbers",
+		Columns:     RoutingNumbersColumns,
+		PrimaryKey:  []*schema.Column{RoutingNumbersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// AccountOwnerColumns holds the columns for the "account_owner" table.
+	AccountOwnerColumns = []*schema.Column{
+		{Name: "account_id", Type: field.TypeUUID},
+		{Name: "entity_id", Type: field.TypeUUID},
+	}
+	// AccountOwnerTable holds the schema information for the "account_owner" table.
+	AccountOwnerTable = &schema.Table{
+		Name:       "account_owner",
+		Columns:    AccountOwnerColumns,
+		PrimaryKey: []*schema.Column{AccountOwnerColumns[0], AccountOwnerColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "account_owner_account_id",
+				Columns:    []*schema.Column{AccountOwnerColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "account_owner_entity_id",
+				Columns:    []*schema.Column{AccountOwnerColumns[1]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
 		BanksTable,
 		BranchesTable,
+		CardsTable,
+		CardNetworksTable,
+		EntitiesTable,
+		EntityAddressesTable,
+		EntityContactPointsTable,
+		EntityPreferencesTable,
+		EntityTaxInformationsTable,
+		ProductsTable,
+		RoutingNumbersTable,
+		AccountOwnerTable,
 	}
 )
 
 func init() {
 	AccountsTable.ForeignKeys[0].RefTable = BranchesTable
 	BranchesTable.ForeignKeys[0].RefTable = BanksTable
+	CardsTable.ForeignKeys[0].RefTable = CardNetworksTable
+	EntityAddressesTable.ForeignKeys[0].RefTable = EntitiesTable
+	EntityContactPointsTable.ForeignKeys[0].RefTable = EntitiesTable
+	EntityPreferencesTable.ForeignKeys[0].RefTable = EntitiesTable
+	EntityTaxInformationsTable.ForeignKeys[0].RefTable = EntitiesTable
+	AccountOwnerTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountOwnerTable.ForeignKeys[1].RefTable = EntitiesTable
 }

@@ -48,7 +48,9 @@ const (
 	DB_VENDOR             = "sqlite3"
 	APP_LISTEN_ADDRESS    = "0.0.0.0"
 	APP_LISTEN_PORT       = "8080"
-	NR_GENERATED_ACCOUNTS = 5
+	NR_GENERATED_ENTITIES = 10
+	NR_GENERATED_ACCOUNTS = 2
+	NR_BRANCHES_PER_BANK  = 10
 )
 
 func main() {
@@ -79,7 +81,11 @@ func main() {
 	log.Printf("database migration run successfully")
 
 	// Generate Mock data
-	if err := generator.Accounts(util.GetEnvInt("TEST_DATA_ACCOUNTS", NR_GENERATED_ACCOUNTS), client); err != nil {
+	if err := generator.Generate(
+		util.GetEnvInt("NUMBER_OF_ENTITIES", NR_GENERATED_ENTITIES),
+		util.GetEnvInt("ACCOUNTS_PER_ENTITY", NR_GENERATED_ACCOUNTS),
+		util.GetEnvInt("BRANCHES_PER_BANK", NR_BRANCHES_PER_BANK),
+		client); err != nil {
 		log.Fatalf("failed creating testdata: %v", err)
 	}
 

@@ -48,6 +48,123 @@ func (f BranchFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return f(ctx, mv)
 }
 
+// The CardFunc type is an adapter to allow the use of ordinary
+// function as Card mutator.
+type CardFunc func(context.Context, *ent.CardMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CardMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CardMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The CardNetworkFunc type is an adapter to allow the use of ordinary
+// function as CardNetwork mutator.
+type CardNetworkFunc func(context.Context, *ent.CardNetworkMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CardNetworkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CardNetworkMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CardNetworkMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EntityFunc type is an adapter to allow the use of ordinary
+// function as Entity mutator.
+type EntityFunc func(context.Context, *ent.EntityMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntityFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EntityMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EntityAddressFunc type is an adapter to allow the use of ordinary
+// function as EntityAddress mutator.
+type EntityAddressFunc func(context.Context, *ent.EntityAddressMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntityAddressFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EntityAddressMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityAddressMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EntityContactPointFunc type is an adapter to allow the use of ordinary
+// function as EntityContactPoint mutator.
+type EntityContactPointFunc func(context.Context, *ent.EntityContactPointMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntityContactPointFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EntityContactPointMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityContactPointMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EntityPreferenceFunc type is an adapter to allow the use of ordinary
+// function as EntityPreference mutator.
+type EntityPreferenceFunc func(context.Context, *ent.EntityPreferenceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntityPreferenceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EntityPreferenceMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityPreferenceMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The EntityTaxInformationFunc type is an adapter to allow the use of ordinary
+// function as EntityTaxInformation mutator.
+type EntityTaxInformationFunc func(context.Context, *ent.EntityTaxInformationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntityTaxInformationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EntityTaxInformationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityTaxInformationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ProductFunc type is an adapter to allow the use of ordinary
+// function as Product mutator.
+type ProductFunc func(context.Context, *ent.ProductMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProductFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ProductMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The RoutingNumberFunc type is an adapter to allow the use of ordinary
+// function as RoutingNumber mutator.
+type RoutingNumberFunc func(context.Context, *ent.RoutingNumberMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RoutingNumberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.RoutingNumberMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RoutingNumberMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

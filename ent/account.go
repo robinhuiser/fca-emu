@@ -60,9 +60,11 @@ type Account struct {
 type AccountEdges struct {
 	// Branch holds the value of the branch edge.
 	Branch *Branch `json:"branch,omitempty"`
+	// Owner holds the value of the owner edge.
+	Owner []*Entity `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // BranchOrErr returns the Branch value or an error if the edge
@@ -77,6 +79,15 @@ func (e AccountEdges) BranchOrErr() (*Branch, error) {
 		return e.Branch, nil
 	}
 	return nil, &NotLoadedError{edge: "branch"}
+}
+
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) OwnerOrErr() ([]*Entity, error) {
+	if e.loadedTypes[1] {
+		return e.Owner, nil
+	}
+	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -228,6 +239,11 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 // QueryBranch queries the "branch" edge of the Account entity.
 func (a *Account) QueryBranch() *BranchQuery {
 	return (&AccountClient{config: a.config}).QueryBranch(a)
+}
+
+// QueryOwner queries the "owner" edge of the Account entity.
+func (a *Account) QueryOwner() *EntityQuery {
+	return (&AccountClient{config: a.config}).QueryOwner(a)
 }
 
 // Update returns a builder for updating this Account.

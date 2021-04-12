@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
 	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/finite-mock-server/ent/entity"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -157,6 +158,21 @@ func (ac *AccountCreate) SetNillableBranchID(id *int) *AccountCreate {
 // SetBranch sets the "branch" edge to the Branch entity.
 func (ac *AccountCreate) SetBranch(b *Branch) *AccountCreate {
 	return ac.SetBranchID(b.ID)
+}
+
+// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+func (ac *AccountCreate) AddOwnerIDs(ids ...uuid.UUID) *AccountCreate {
+	ac.mutation.AddOwnerIDs(ids...)
+	return ac
+}
+
+// AddOwner adds the "owner" edges to the Entity entity.
+func (ac *AccountCreate) AddOwner(e ...*Entity) *AccountCreate {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddOwnerIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -433,6 +449,25 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.account_branch = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

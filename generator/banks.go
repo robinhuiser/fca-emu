@@ -8,7 +8,7 @@ import (
 	"github.com/robinhuiser/finite-mock-server/ent"
 )
 
-func populateBanks(ctx context.Context, client *ent.Client, f *gofakeit.Faker) error {
+func populateBanks(br int, ctx context.Context, client *ent.Client, f *gofakeit.Faker) error {
 
 	b := map[string]string{
 		"BOFAUS3NXXX": "Bank of America",
@@ -37,7 +37,7 @@ func populateBanks(ctx context.Context, client *ent.Client, f *gofakeit.Faker) e
 		}
 
 		// Generate x number of branches per bank
-		for i := 0; i < f.Number(3, 50); i++ {
+		for i := 0; i < br; i++ {
 			branch, err := client.Branch.
 				Create().
 				SetBranchCode(fmt.Sprintf("%s-%03d", swiftcode[0:4], i)).

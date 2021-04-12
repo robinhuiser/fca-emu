@@ -44,5 +44,6 @@ func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("branch", Branch.Type).
 			Unique(),
+		edge.To("owner", Entity.Type),
 	}
 }

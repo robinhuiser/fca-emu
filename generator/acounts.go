@@ -10,7 +10,7 @@ import (
 	"github.com/robinhuiser/finite-mock-server/ent"
 )
 
-func generateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (*ent.Account, error) {
+func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker, e *ent.Entity) (*ent.Account, error) {
 
 	dco := f.DateRange(time.Now().AddDate(-5, 0, -1), time.Now()) // random date create open
 	dlc := f.DateRange(dco, time.Now())                           // random date lastupdated, closed
@@ -49,6 +49,8 @@ func generateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 	if as == "CLOSED" {
 		a.Update().SetDateClosed(dlc).Save(ctx)
 	}
+
+	a.Update().AddOwner(e).Save(ctx)
 
 	return a, nil
 }

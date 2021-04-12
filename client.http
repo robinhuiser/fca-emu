@@ -2,18 +2,19 @@
 # Environment setup
 @base_url = http://localhost:{{$dotenv MOCK_SERVER_LISTEN_PORT}}/cloud
 @access_token = {{$dotenv MOCK_SERVER_SECRET}}
-# @access_token = 123456789
+@mask = true
+@enhance = false
 
 #
 # Test account ID
 @account_url = v1/account
-@account_id = bcb43c65-d9bc-46c0-ab6f-9c1b7c31df75
+@account_id = 5ed96c27-731f-46ef-8a75-26f417fcbfd4
 
 ### 
 
 # Get account details
 # @name account
-GET {{base_url}}/{{account_url}}/{{account_id}}?mask=true&enhance=false
+GET {{base_url}}/{{account_url}}/{{account_id}}?mask={{mask}}&enhance={{enhance}}
 Accept: application/json
 X-TOKEN: {{access_token}}
 X-TRACE-ID: {{$guid}}

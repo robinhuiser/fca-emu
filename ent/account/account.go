@@ -45,6 +45,8 @@ const (
 	FieldURL = "url"
 	// EdgeBranch holds the string denoting the branch edge name in mutations.
 	EdgeBranch = "branch"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// BranchTable is the table the holds the branch relation/edge.
@@ -54,6 +56,11 @@ const (
 	BranchInverseTable = "branches"
 	// BranchColumn is the table column denoting the branch relation/edge.
 	BranchColumn = "account_branch"
+	// OwnerTable is the table the holds the owner relation/edge. The primary key declared below.
+	OwnerTable = "account_owner"
+	// OwnerInverseTable is the table name for the Entity entity.
+	// It exists in this package in order to avoid circular dependency with the "entity" package.
+	OwnerInverseTable = "entities"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -82,6 +89,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"account_branch",
 }
+
+var (
+	// OwnerPrimaryKey and OwnerColumn2 are the table columns denoting the
+	// primary key for the owner relation (M2M).
+	OwnerPrimaryKey = []string{"account_id", "entity_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

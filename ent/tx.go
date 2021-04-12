@@ -18,6 +18,24 @@ type Tx struct {
 	Bank *BankClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
+	// Card is the client for interacting with the Card builders.
+	Card *CardClient
+	// CardNetwork is the client for interacting with the CardNetwork builders.
+	CardNetwork *CardNetworkClient
+	// Entity is the client for interacting with the Entity builders.
+	Entity *EntityClient
+	// EntityAddress is the client for interacting with the EntityAddress builders.
+	EntityAddress *EntityAddressClient
+	// EntityContactPoint is the client for interacting with the EntityContactPoint builders.
+	EntityContactPoint *EntityContactPointClient
+	// EntityPreference is the client for interacting with the EntityPreference builders.
+	EntityPreference *EntityPreferenceClient
+	// EntityTaxInformation is the client for interacting with the EntityTaxInformation builders.
+	EntityTaxInformation *EntityTaxInformationClient
+	// Product is the client for interacting with the Product builders.
+	Product *ProductClient
+	// RoutingNumber is the client for interacting with the RoutingNumber builders.
+	RoutingNumber *RoutingNumberClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,6 +174,15 @@ func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
 	tx.Bank = NewBankClient(tx.config)
 	tx.Branch = NewBranchClient(tx.config)
+	tx.Card = NewCardClient(tx.config)
+	tx.CardNetwork = NewCardNetworkClient(tx.config)
+	tx.Entity = NewEntityClient(tx.config)
+	tx.EntityAddress = NewEntityAddressClient(tx.config)
+	tx.EntityContactPoint = NewEntityContactPointClient(tx.config)
+	tx.EntityPreference = NewEntityPreferenceClient(tx.config)
+	tx.EntityTaxInformation = NewEntityTaxInformationClient(tx.config)
+	tx.Product = NewProductClient(tx.config)
+	tx.RoutingNumber = NewRoutingNumberClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

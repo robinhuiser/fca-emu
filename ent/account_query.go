@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -14,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
 	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/finite-mock-server/ent/entity"
 	"github.com/robinhuiser/finite-mock-server/ent/predicate"
 )
 
@@ -27,6 +29,7 @@ type AccountQuery struct {
 	predicates []predicate.Account
 	// eager-loading edges.
 	withBranch *BranchQuery
+	withOwner  *EntityQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -72,6 +75,28 @@ func (aq *AccountQuery) QueryBranch() *BranchQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(branch.Table, branch.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, account.BranchTable, account.BranchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOwner chains the current query on the "owner" edge.
+func (aq *AccountQuery) QueryOwner() *EntityQuery {
+	query := &EntityQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(entity.Table, entity.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -261,6 +286,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		order:      append([]OrderFunc{}, aq.order...),
 		predicates: append([]predicate.Account{}, aq.predicates...),
 		withBranch: aq.withBranch.Clone(),
+		withOwner:  aq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -275,6 +301,17 @@ func (aq *AccountQuery) WithBranch(opts ...func(*BranchQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withBranch = query
+	return aq
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithOwner(opts ...func(*EntityQuery)) *AccountQuery {
+	query := &EntityQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withOwner = query
 	return aq
 }
 
@@ -344,8 +381,9 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		nodes       = []*Account{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			aq.withBranch != nil,
+			aq.withOwner != nil,
 		}
 	)
 	if aq.withBranch != nil {
@@ -396,6 +434,70 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 			}
 			for i := range nodes {
 				nodes[i].Edges.Branch = n
+			}
+		}
+	}
+
+	if query := aq.withOwner; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[uuid.UUID]*Account, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Owner = []*Entity{}
+		}
+		var (
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Account)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: false,
+				Table:   account.OwnerTable,
+				Columns: account.OwnerPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(account.OwnerPrimaryKey[0], fks...))
+			},
+
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{&uuid.UUID{}, &uuid.UUID{}}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*uuid.UUID)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*uuid.UUID)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := *eout
+				inValue := *ein
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				edgeids = append(edgeids, inValue)
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, aq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "owner": %w`, err)
+		}
+		query.Where(entity.IDIn(edgeids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := edges[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected "owner" node returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Owner = append(nodes[i].Edges.Owner, n)
 			}
 		}
 	}

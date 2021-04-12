@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/finite-mock-server/ent/account"
 	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/finite-mock-server/ent/entity"
 	"github.com/robinhuiser/finite-mock-server/ent/predicate"
 )
 
@@ -192,6 +193,21 @@ func (au *AccountUpdate) SetBranch(b *Branch) *AccountUpdate {
 	return au.SetBranchID(b.ID)
 }
 
+// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+func (au *AccountUpdate) AddOwnerIDs(ids ...uuid.UUID) *AccountUpdate {
+	au.mutation.AddOwnerIDs(ids...)
+	return au
+}
+
+// AddOwner adds the "owner" edges to the Entity entity.
+func (au *AccountUpdate) AddOwner(e ...*Entity) *AccountUpdate {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddOwnerIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -201,6 +217,27 @@ func (au *AccountUpdate) Mutation() *AccountMutation {
 func (au *AccountUpdate) ClearBranch() *AccountUpdate {
 	au.mutation.ClearBranch()
 	return au
+}
+
+// ClearOwner clears all "owner" edges to the Entity entity.
+func (au *AccountUpdate) ClearOwner() *AccountUpdate {
+	au.mutation.ClearOwner()
+	return au
+}
+
+// RemoveOwnerIDs removes the "owner" edge to Entity entities by IDs.
+func (au *AccountUpdate) RemoveOwnerIDs(ids ...uuid.UUID) *AccountUpdate {
+	au.mutation.RemoveOwnerIDs(ids...)
+	return au
+}
+
+// RemoveOwner removes "owner" edges to Entity entities.
+func (au *AccountUpdate) RemoveOwner(e ...*Entity) *AccountUpdate {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveOwnerIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -451,6 +488,60 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !au.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -632,6 +723,21 @@ func (auo *AccountUpdateOne) SetBranch(b *Branch) *AccountUpdateOne {
 	return auo.SetBranchID(b.ID)
 }
 
+// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+func (auo *AccountUpdateOne) AddOwnerIDs(ids ...uuid.UUID) *AccountUpdateOne {
+	auo.mutation.AddOwnerIDs(ids...)
+	return auo
+}
+
+// AddOwner adds the "owner" edges to the Entity entity.
+func (auo *AccountUpdateOne) AddOwner(e ...*Entity) *AccountUpdateOne {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddOwnerIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -641,6 +747,27 @@ func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 func (auo *AccountUpdateOne) ClearBranch() *AccountUpdateOne {
 	auo.mutation.ClearBranch()
 	return auo
+}
+
+// ClearOwner clears all "owner" edges to the Entity entity.
+func (auo *AccountUpdateOne) ClearOwner() *AccountUpdateOne {
+	auo.mutation.ClearOwner()
+	return auo
+}
+
+// RemoveOwnerIDs removes the "owner" edge to Entity entities by IDs.
+func (auo *AccountUpdateOne) RemoveOwnerIDs(ids ...uuid.UUID) *AccountUpdateOne {
+	auo.mutation.RemoveOwnerIDs(ids...)
+	return auo
+}
+
+// RemoveOwner removes "owner" edges to Entity entities.
+func (auo *AccountUpdateOne) RemoveOwner(e ...*Entity) *AccountUpdateOne {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveOwnerIDs(ids...)
 }
 
 // Save executes the query and returns the updated Account entity.
@@ -888,6 +1015,60 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: branch.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !auo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.OwnerTable,
+			Columns: account.OwnerPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: entity.FieldID,
 				},
 			},
 		}

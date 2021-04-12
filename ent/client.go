@@ -13,6 +13,15 @@ import (
 	"github.com/robinhuiser/finite-mock-server/ent/account"
 	"github.com/robinhuiser/finite-mock-server/ent/bank"
 	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/finite-mock-server/ent/card"
+	"github.com/robinhuiser/finite-mock-server/ent/cardnetwork"
+	"github.com/robinhuiser/finite-mock-server/ent/entity"
+	"github.com/robinhuiser/finite-mock-server/ent/entityaddress"
+	"github.com/robinhuiser/finite-mock-server/ent/entitycontactpoint"
+	"github.com/robinhuiser/finite-mock-server/ent/entitypreference"
+	"github.com/robinhuiser/finite-mock-server/ent/entitytaxinformation"
+	"github.com/robinhuiser/finite-mock-server/ent/product"
+	"github.com/robinhuiser/finite-mock-server/ent/routingnumber"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -30,6 +39,24 @@ type Client struct {
 	Bank *BankClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
+	// Card is the client for interacting with the Card builders.
+	Card *CardClient
+	// CardNetwork is the client for interacting with the CardNetwork builders.
+	CardNetwork *CardNetworkClient
+	// Entity is the client for interacting with the Entity builders.
+	Entity *EntityClient
+	// EntityAddress is the client for interacting with the EntityAddress builders.
+	EntityAddress *EntityAddressClient
+	// EntityContactPoint is the client for interacting with the EntityContactPoint builders.
+	EntityContactPoint *EntityContactPointClient
+	// EntityPreference is the client for interacting with the EntityPreference builders.
+	EntityPreference *EntityPreferenceClient
+	// EntityTaxInformation is the client for interacting with the EntityTaxInformation builders.
+	EntityTaxInformation *EntityTaxInformationClient
+	// Product is the client for interacting with the Product builders.
+	Product *ProductClient
+	// RoutingNumber is the client for interacting with the RoutingNumber builders.
+	RoutingNumber *RoutingNumberClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -46,6 +73,15 @@ func (c *Client) init() {
 	c.Account = NewAccountClient(c.config)
 	c.Bank = NewBankClient(c.config)
 	c.Branch = NewBranchClient(c.config)
+	c.Card = NewCardClient(c.config)
+	c.CardNetwork = NewCardNetworkClient(c.config)
+	c.Entity = NewEntityClient(c.config)
+	c.EntityAddress = NewEntityAddressClient(c.config)
+	c.EntityContactPoint = NewEntityContactPointClient(c.config)
+	c.EntityPreference = NewEntityPreferenceClient(c.config)
+	c.EntityTaxInformation = NewEntityTaxInformationClient(c.config)
+	c.Product = NewProductClient(c.config)
+	c.RoutingNumber = NewRoutingNumberClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -77,11 +113,20 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Account: NewAccountClient(cfg),
-		Bank:    NewBankClient(cfg),
-		Branch:  NewBranchClient(cfg),
+		ctx:                  ctx,
+		config:               cfg,
+		Account:              NewAccountClient(cfg),
+		Bank:                 NewBankClient(cfg),
+		Branch:               NewBranchClient(cfg),
+		Card:                 NewCardClient(cfg),
+		CardNetwork:          NewCardNetworkClient(cfg),
+		Entity:               NewEntityClient(cfg),
+		EntityAddress:        NewEntityAddressClient(cfg),
+		EntityContactPoint:   NewEntityContactPointClient(cfg),
+		EntityPreference:     NewEntityPreferenceClient(cfg),
+		EntityTaxInformation: NewEntityTaxInformationClient(cfg),
+		Product:              NewProductClient(cfg),
+		RoutingNumber:        NewRoutingNumberClient(cfg),
 	}, nil
 }
 
@@ -99,10 +144,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:  cfg,
-		Account: NewAccountClient(cfg),
-		Bank:    NewBankClient(cfg),
-		Branch:  NewBranchClient(cfg),
+		config:               cfg,
+		Account:              NewAccountClient(cfg),
+		Bank:                 NewBankClient(cfg),
+		Branch:               NewBranchClient(cfg),
+		Card:                 NewCardClient(cfg),
+		CardNetwork:          NewCardNetworkClient(cfg),
+		Entity:               NewEntityClient(cfg),
+		EntityAddress:        NewEntityAddressClient(cfg),
+		EntityContactPoint:   NewEntityContactPointClient(cfg),
+		EntityPreference:     NewEntityPreferenceClient(cfg),
+		EntityTaxInformation: NewEntityTaxInformationClient(cfg),
+		Product:              NewProductClient(cfg),
+		RoutingNumber:        NewRoutingNumberClient(cfg),
 	}, nil
 }
 
@@ -135,6 +189,15 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Account.Use(hooks...)
 	c.Bank.Use(hooks...)
 	c.Branch.Use(hooks...)
+	c.Card.Use(hooks...)
+	c.CardNetwork.Use(hooks...)
+	c.Entity.Use(hooks...)
+	c.EntityAddress.Use(hooks...)
+	c.EntityContactPoint.Use(hooks...)
+	c.EntityPreference.Use(hooks...)
+	c.EntityTaxInformation.Use(hooks...)
+	c.Product.Use(hooks...)
+	c.RoutingNumber.Use(hooks...)
 }
 
 // AccountClient is a client for the Account schema.
@@ -229,6 +292,22 @@ func (c *AccountClient) QueryBranch(a *Account) *BranchQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(branch.Table, branch.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, account.BranchTable, account.BranchColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOwner queries the owner edge of a Account.
+func (c *AccountClient) QueryOwner(a *Account) *EntityQuery {
+	query := &EntityQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(entity.Table, entity.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -447,4 +526,892 @@ func (c *BranchClient) QueryBranchOwner(b *Branch) *BankQuery {
 // Hooks returns the client hooks.
 func (c *BranchClient) Hooks() []Hook {
 	return c.hooks.Branch
+}
+
+// CardClient is a client for the Card schema.
+type CardClient struct {
+	config
+}
+
+// NewCardClient returns a client for the Card from the given config.
+func NewCardClient(c config) *CardClient {
+	return &CardClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `card.Hooks(f(g(h())))`.
+func (c *CardClient) Use(hooks ...Hook) {
+	c.hooks.Card = append(c.hooks.Card, hooks...)
+}
+
+// Create returns a create builder for Card.
+func (c *CardClient) Create() *CardCreate {
+	mutation := newCardMutation(c.config, OpCreate)
+	return &CardCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Card entities.
+func (c *CardClient) CreateBulk(builders ...*CardCreate) *CardCreateBulk {
+	return &CardCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Card.
+func (c *CardClient) Update() *CardUpdate {
+	mutation := newCardMutation(c.config, OpUpdate)
+	return &CardUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CardClient) UpdateOne(ca *Card) *CardUpdateOne {
+	mutation := newCardMutation(c.config, OpUpdateOne, withCard(ca))
+	return &CardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CardClient) UpdateOneID(id int) *CardUpdateOne {
+	mutation := newCardMutation(c.config, OpUpdateOne, withCardID(id))
+	return &CardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Card.
+func (c *CardClient) Delete() *CardDelete {
+	mutation := newCardMutation(c.config, OpDelete)
+	return &CardDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CardClient) DeleteOne(ca *Card) *CardDeleteOne {
+	return c.DeleteOneID(ca.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CardClient) DeleteOneID(id int) *CardDeleteOne {
+	builder := c.Delete().Where(card.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CardDeleteOne{builder}
+}
+
+// Query returns a query builder for Card.
+func (c *CardClient) Query() *CardQuery {
+	return &CardQuery{config: c.config}
+}
+
+// Get returns a Card entity by its id.
+func (c *CardClient) Get(ctx context.Context, id int) (*Card, error) {
+	return c.Query().Where(card.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CardClient) GetX(ctx context.Context, id int) *Card {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryNetwork queries the network edge of a Card.
+func (c *CardClient) QueryNetwork(ca *Card) *CardNetworkQuery {
+	query := &CardNetworkQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(card.Table, card.FieldID, id),
+			sqlgraph.To(cardnetwork.Table, cardnetwork.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, card.NetworkTable, card.NetworkColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CardClient) Hooks() []Hook {
+	return c.hooks.Card
+}
+
+// CardNetworkClient is a client for the CardNetwork schema.
+type CardNetworkClient struct {
+	config
+}
+
+// NewCardNetworkClient returns a client for the CardNetwork from the given config.
+func NewCardNetworkClient(c config) *CardNetworkClient {
+	return &CardNetworkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cardnetwork.Hooks(f(g(h())))`.
+func (c *CardNetworkClient) Use(hooks ...Hook) {
+	c.hooks.CardNetwork = append(c.hooks.CardNetwork, hooks...)
+}
+
+// Create returns a create builder for CardNetwork.
+func (c *CardNetworkClient) Create() *CardNetworkCreate {
+	mutation := newCardNetworkMutation(c.config, OpCreate)
+	return &CardNetworkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CardNetwork entities.
+func (c *CardNetworkClient) CreateBulk(builders ...*CardNetworkCreate) *CardNetworkCreateBulk {
+	return &CardNetworkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CardNetwork.
+func (c *CardNetworkClient) Update() *CardNetworkUpdate {
+	mutation := newCardNetworkMutation(c.config, OpUpdate)
+	return &CardNetworkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CardNetworkClient) UpdateOne(cn *CardNetwork) *CardNetworkUpdateOne {
+	mutation := newCardNetworkMutation(c.config, OpUpdateOne, withCardNetwork(cn))
+	return &CardNetworkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CardNetworkClient) UpdateOneID(id int) *CardNetworkUpdateOne {
+	mutation := newCardNetworkMutation(c.config, OpUpdateOne, withCardNetworkID(id))
+	return &CardNetworkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CardNetwork.
+func (c *CardNetworkClient) Delete() *CardNetworkDelete {
+	mutation := newCardNetworkMutation(c.config, OpDelete)
+	return &CardNetworkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CardNetworkClient) DeleteOne(cn *CardNetwork) *CardNetworkDeleteOne {
+	return c.DeleteOneID(cn.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CardNetworkClient) DeleteOneID(id int) *CardNetworkDeleteOne {
+	builder := c.Delete().Where(cardnetwork.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CardNetworkDeleteOne{builder}
+}
+
+// Query returns a query builder for CardNetwork.
+func (c *CardNetworkClient) Query() *CardNetworkQuery {
+	return &CardNetworkQuery{config: c.config}
+}
+
+// Get returns a CardNetwork entity by its id.
+func (c *CardNetworkClient) Get(ctx context.Context, id int) (*CardNetwork, error) {
+	return c.Query().Where(cardnetwork.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CardNetworkClient) GetX(ctx context.Context, id int) *CardNetwork {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CardNetworkClient) Hooks() []Hook {
+	return c.hooks.CardNetwork
+}
+
+// EntityClient is a client for the Entity schema.
+type EntityClient struct {
+	config
+}
+
+// NewEntityClient returns a client for the Entity from the given config.
+func NewEntityClient(c config) *EntityClient {
+	return &EntityClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entity.Hooks(f(g(h())))`.
+func (c *EntityClient) Use(hooks ...Hook) {
+	c.hooks.Entity = append(c.hooks.Entity, hooks...)
+}
+
+// Create returns a create builder for Entity.
+func (c *EntityClient) Create() *EntityCreate {
+	mutation := newEntityMutation(c.config, OpCreate)
+	return &EntityCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Entity entities.
+func (c *EntityClient) CreateBulk(builders ...*EntityCreate) *EntityCreateBulk {
+	return &EntityCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Entity.
+func (c *EntityClient) Update() *EntityUpdate {
+	mutation := newEntityMutation(c.config, OpUpdate)
+	return &EntityUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntityClient) UpdateOne(e *Entity) *EntityUpdateOne {
+	mutation := newEntityMutation(c.config, OpUpdateOne, withEntity(e))
+	return &EntityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntityClient) UpdateOneID(id uuid.UUID) *EntityUpdateOne {
+	mutation := newEntityMutation(c.config, OpUpdateOne, withEntityID(id))
+	return &EntityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Entity.
+func (c *EntityClient) Delete() *EntityDelete {
+	mutation := newEntityMutation(c.config, OpDelete)
+	return &EntityDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EntityClient) DeleteOne(e *Entity) *EntityDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EntityClient) DeleteOneID(id uuid.UUID) *EntityDeleteOne {
+	builder := c.Delete().Where(entity.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntityDeleteOne{builder}
+}
+
+// Query returns a query builder for Entity.
+func (c *EntityClient) Query() *EntityQuery {
+	return &EntityQuery{config: c.config}
+}
+
+// Get returns a Entity entity by its id.
+func (c *EntityClient) Get(ctx context.Context, id uuid.UUID) (*Entity, error) {
+	return c.Query().Where(entity.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntityClient) GetX(ctx context.Context, id uuid.UUID) *Entity {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEntityTaxInformation queries the entityTaxInformation edge of a Entity.
+func (c *EntityClient) QueryEntityTaxInformation(e *Entity) *EntityTaxInformationQuery {
+	query := &EntityTaxInformationQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entity.Table, entity.FieldID, id),
+			sqlgraph.To(entitytaxinformation.Table, entitytaxinformation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityTaxInformationTable, entity.EntityTaxInformationColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEntityAddresses queries the entityAddresses edge of a Entity.
+func (c *EntityClient) QueryEntityAddresses(e *Entity) *EntityAddressQuery {
+	query := &EntityAddressQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entity.Table, entity.FieldID, id),
+			sqlgraph.To(entityaddress.Table, entityaddress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityAddressesTable, entity.EntityAddressesColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEntityPreferences queries the entityPreferences edge of a Entity.
+func (c *EntityClient) QueryEntityPreferences(e *Entity) *EntityPreferenceQuery {
+	query := &EntityPreferenceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entity.Table, entity.FieldID, id),
+			sqlgraph.To(entitypreference.Table, entitypreference.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityPreferencesTable, entity.EntityPreferencesColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEntityContactPoints queries the entityContactPoints edge of a Entity.
+func (c *EntityClient) QueryEntityContactPoints(e *Entity) *EntityContactPointQuery {
+	query := &EntityContactPointQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entity.Table, entity.FieldID, id),
+			sqlgraph.To(entitycontactpoint.Table, entitycontactpoint.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityContactPointsTable, entity.EntityContactPointsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOwnsAccount queries the owns_account edge of a Entity.
+func (c *EntityClient) QueryOwnsAccount(e *Entity) *AccountQuery {
+	query := &AccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entity.Table, entity.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, entity.OwnsAccountTable, entity.OwnsAccountPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EntityClient) Hooks() []Hook {
+	return c.hooks.Entity
+}
+
+// EntityAddressClient is a client for the EntityAddress schema.
+type EntityAddressClient struct {
+	config
+}
+
+// NewEntityAddressClient returns a client for the EntityAddress from the given config.
+func NewEntityAddressClient(c config) *EntityAddressClient {
+	return &EntityAddressClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entityaddress.Hooks(f(g(h())))`.
+func (c *EntityAddressClient) Use(hooks ...Hook) {
+	c.hooks.EntityAddress = append(c.hooks.EntityAddress, hooks...)
+}
+
+// Create returns a create builder for EntityAddress.
+func (c *EntityAddressClient) Create() *EntityAddressCreate {
+	mutation := newEntityAddressMutation(c.config, OpCreate)
+	return &EntityAddressCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EntityAddress entities.
+func (c *EntityAddressClient) CreateBulk(builders ...*EntityAddressCreate) *EntityAddressCreateBulk {
+	return &EntityAddressCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EntityAddress.
+func (c *EntityAddressClient) Update() *EntityAddressUpdate {
+	mutation := newEntityAddressMutation(c.config, OpUpdate)
+	return &EntityAddressUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntityAddressClient) UpdateOne(ea *EntityAddress) *EntityAddressUpdateOne {
+	mutation := newEntityAddressMutation(c.config, OpUpdateOne, withEntityAddress(ea))
+	return &EntityAddressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntityAddressClient) UpdateOneID(id int) *EntityAddressUpdateOne {
+	mutation := newEntityAddressMutation(c.config, OpUpdateOne, withEntityAddressID(id))
+	return &EntityAddressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EntityAddress.
+func (c *EntityAddressClient) Delete() *EntityAddressDelete {
+	mutation := newEntityAddressMutation(c.config, OpDelete)
+	return &EntityAddressDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EntityAddressClient) DeleteOne(ea *EntityAddress) *EntityAddressDeleteOne {
+	return c.DeleteOneID(ea.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EntityAddressClient) DeleteOneID(id int) *EntityAddressDeleteOne {
+	builder := c.Delete().Where(entityaddress.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntityAddressDeleteOne{builder}
+}
+
+// Query returns a query builder for EntityAddress.
+func (c *EntityAddressClient) Query() *EntityAddressQuery {
+	return &EntityAddressQuery{config: c.config}
+}
+
+// Get returns a EntityAddress entity by its id.
+func (c *EntityAddressClient) Get(ctx context.Context, id int) (*EntityAddress, error) {
+	return c.Query().Where(entityaddress.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntityAddressClient) GetX(ctx context.Context, id int) *EntityAddress {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EntityAddressClient) Hooks() []Hook {
+	return c.hooks.EntityAddress
+}
+
+// EntityContactPointClient is a client for the EntityContactPoint schema.
+type EntityContactPointClient struct {
+	config
+}
+
+// NewEntityContactPointClient returns a client for the EntityContactPoint from the given config.
+func NewEntityContactPointClient(c config) *EntityContactPointClient {
+	return &EntityContactPointClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entitycontactpoint.Hooks(f(g(h())))`.
+func (c *EntityContactPointClient) Use(hooks ...Hook) {
+	c.hooks.EntityContactPoint = append(c.hooks.EntityContactPoint, hooks...)
+}
+
+// Create returns a create builder for EntityContactPoint.
+func (c *EntityContactPointClient) Create() *EntityContactPointCreate {
+	mutation := newEntityContactPointMutation(c.config, OpCreate)
+	return &EntityContactPointCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EntityContactPoint entities.
+func (c *EntityContactPointClient) CreateBulk(builders ...*EntityContactPointCreate) *EntityContactPointCreateBulk {
+	return &EntityContactPointCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EntityContactPoint.
+func (c *EntityContactPointClient) Update() *EntityContactPointUpdate {
+	mutation := newEntityContactPointMutation(c.config, OpUpdate)
+	return &EntityContactPointUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntityContactPointClient) UpdateOne(ecp *EntityContactPoint) *EntityContactPointUpdateOne {
+	mutation := newEntityContactPointMutation(c.config, OpUpdateOne, withEntityContactPoint(ecp))
+	return &EntityContactPointUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntityContactPointClient) UpdateOneID(id int) *EntityContactPointUpdateOne {
+	mutation := newEntityContactPointMutation(c.config, OpUpdateOne, withEntityContactPointID(id))
+	return &EntityContactPointUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EntityContactPoint.
+func (c *EntityContactPointClient) Delete() *EntityContactPointDelete {
+	mutation := newEntityContactPointMutation(c.config, OpDelete)
+	return &EntityContactPointDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EntityContactPointClient) DeleteOne(ecp *EntityContactPoint) *EntityContactPointDeleteOne {
+	return c.DeleteOneID(ecp.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EntityContactPointClient) DeleteOneID(id int) *EntityContactPointDeleteOne {
+	builder := c.Delete().Where(entitycontactpoint.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntityContactPointDeleteOne{builder}
+}
+
+// Query returns a query builder for EntityContactPoint.
+func (c *EntityContactPointClient) Query() *EntityContactPointQuery {
+	return &EntityContactPointQuery{config: c.config}
+}
+
+// Get returns a EntityContactPoint entity by its id.
+func (c *EntityContactPointClient) Get(ctx context.Context, id int) (*EntityContactPoint, error) {
+	return c.Query().Where(entitycontactpoint.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntityContactPointClient) GetX(ctx context.Context, id int) *EntityContactPoint {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EntityContactPointClient) Hooks() []Hook {
+	return c.hooks.EntityContactPoint
+}
+
+// EntityPreferenceClient is a client for the EntityPreference schema.
+type EntityPreferenceClient struct {
+	config
+}
+
+// NewEntityPreferenceClient returns a client for the EntityPreference from the given config.
+func NewEntityPreferenceClient(c config) *EntityPreferenceClient {
+	return &EntityPreferenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entitypreference.Hooks(f(g(h())))`.
+func (c *EntityPreferenceClient) Use(hooks ...Hook) {
+	c.hooks.EntityPreference = append(c.hooks.EntityPreference, hooks...)
+}
+
+// Create returns a create builder for EntityPreference.
+func (c *EntityPreferenceClient) Create() *EntityPreferenceCreate {
+	mutation := newEntityPreferenceMutation(c.config, OpCreate)
+	return &EntityPreferenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EntityPreference entities.
+func (c *EntityPreferenceClient) CreateBulk(builders ...*EntityPreferenceCreate) *EntityPreferenceCreateBulk {
+	return &EntityPreferenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EntityPreference.
+func (c *EntityPreferenceClient) Update() *EntityPreferenceUpdate {
+	mutation := newEntityPreferenceMutation(c.config, OpUpdate)
+	return &EntityPreferenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntityPreferenceClient) UpdateOne(ep *EntityPreference) *EntityPreferenceUpdateOne {
+	mutation := newEntityPreferenceMutation(c.config, OpUpdateOne, withEntityPreference(ep))
+	return &EntityPreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntityPreferenceClient) UpdateOneID(id int) *EntityPreferenceUpdateOne {
+	mutation := newEntityPreferenceMutation(c.config, OpUpdateOne, withEntityPreferenceID(id))
+	return &EntityPreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EntityPreference.
+func (c *EntityPreferenceClient) Delete() *EntityPreferenceDelete {
+	mutation := newEntityPreferenceMutation(c.config, OpDelete)
+	return &EntityPreferenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EntityPreferenceClient) DeleteOne(ep *EntityPreference) *EntityPreferenceDeleteOne {
+	return c.DeleteOneID(ep.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EntityPreferenceClient) DeleteOneID(id int) *EntityPreferenceDeleteOne {
+	builder := c.Delete().Where(entitypreference.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntityPreferenceDeleteOne{builder}
+}
+
+// Query returns a query builder for EntityPreference.
+func (c *EntityPreferenceClient) Query() *EntityPreferenceQuery {
+	return &EntityPreferenceQuery{config: c.config}
+}
+
+// Get returns a EntityPreference entity by its id.
+func (c *EntityPreferenceClient) Get(ctx context.Context, id int) (*EntityPreference, error) {
+	return c.Query().Where(entitypreference.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntityPreferenceClient) GetX(ctx context.Context, id int) *EntityPreference {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EntityPreferenceClient) Hooks() []Hook {
+	return c.hooks.EntityPreference
+}
+
+// EntityTaxInformationClient is a client for the EntityTaxInformation schema.
+type EntityTaxInformationClient struct {
+	config
+}
+
+// NewEntityTaxInformationClient returns a client for the EntityTaxInformation from the given config.
+func NewEntityTaxInformationClient(c config) *EntityTaxInformationClient {
+	return &EntityTaxInformationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entitytaxinformation.Hooks(f(g(h())))`.
+func (c *EntityTaxInformationClient) Use(hooks ...Hook) {
+	c.hooks.EntityTaxInformation = append(c.hooks.EntityTaxInformation, hooks...)
+}
+
+// Create returns a create builder for EntityTaxInformation.
+func (c *EntityTaxInformationClient) Create() *EntityTaxInformationCreate {
+	mutation := newEntityTaxInformationMutation(c.config, OpCreate)
+	return &EntityTaxInformationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EntityTaxInformation entities.
+func (c *EntityTaxInformationClient) CreateBulk(builders ...*EntityTaxInformationCreate) *EntityTaxInformationCreateBulk {
+	return &EntityTaxInformationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EntityTaxInformation.
+func (c *EntityTaxInformationClient) Update() *EntityTaxInformationUpdate {
+	mutation := newEntityTaxInformationMutation(c.config, OpUpdate)
+	return &EntityTaxInformationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntityTaxInformationClient) UpdateOne(eti *EntityTaxInformation) *EntityTaxInformationUpdateOne {
+	mutation := newEntityTaxInformationMutation(c.config, OpUpdateOne, withEntityTaxInformation(eti))
+	return &EntityTaxInformationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntityTaxInformationClient) UpdateOneID(id int) *EntityTaxInformationUpdateOne {
+	mutation := newEntityTaxInformationMutation(c.config, OpUpdateOne, withEntityTaxInformationID(id))
+	return &EntityTaxInformationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EntityTaxInformation.
+func (c *EntityTaxInformationClient) Delete() *EntityTaxInformationDelete {
+	mutation := newEntityTaxInformationMutation(c.config, OpDelete)
+	return &EntityTaxInformationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *EntityTaxInformationClient) DeleteOne(eti *EntityTaxInformation) *EntityTaxInformationDeleteOne {
+	return c.DeleteOneID(eti.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *EntityTaxInformationClient) DeleteOneID(id int) *EntityTaxInformationDeleteOne {
+	builder := c.Delete().Where(entitytaxinformation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntityTaxInformationDeleteOne{builder}
+}
+
+// Query returns a query builder for EntityTaxInformation.
+func (c *EntityTaxInformationClient) Query() *EntityTaxInformationQuery {
+	return &EntityTaxInformationQuery{config: c.config}
+}
+
+// Get returns a EntityTaxInformation entity by its id.
+func (c *EntityTaxInformationClient) Get(ctx context.Context, id int) (*EntityTaxInformation, error) {
+	return c.Query().Where(entitytaxinformation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntityTaxInformationClient) GetX(ctx context.Context, id int) *EntityTaxInformation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EntityTaxInformationClient) Hooks() []Hook {
+	return c.hooks.EntityTaxInformation
+}
+
+// ProductClient is a client for the Product schema.
+type ProductClient struct {
+	config
+}
+
+// NewProductClient returns a client for the Product from the given config.
+func NewProductClient(c config) *ProductClient {
+	return &ProductClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `product.Hooks(f(g(h())))`.
+func (c *ProductClient) Use(hooks ...Hook) {
+	c.hooks.Product = append(c.hooks.Product, hooks...)
+}
+
+// Create returns a create builder for Product.
+func (c *ProductClient) Create() *ProductCreate {
+	mutation := newProductMutation(c.config, OpCreate)
+	return &ProductCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Product entities.
+func (c *ProductClient) CreateBulk(builders ...*ProductCreate) *ProductCreateBulk {
+	return &ProductCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Product.
+func (c *ProductClient) Update() *ProductUpdate {
+	mutation := newProductMutation(c.config, OpUpdate)
+	return &ProductUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProductClient) UpdateOne(pr *Product) *ProductUpdateOne {
+	mutation := newProductMutation(c.config, OpUpdateOne, withProduct(pr))
+	return &ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProductClient) UpdateOneID(id int) *ProductUpdateOne {
+	mutation := newProductMutation(c.config, OpUpdateOne, withProductID(id))
+	return &ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Product.
+func (c *ProductClient) Delete() *ProductDelete {
+	mutation := newProductMutation(c.config, OpDelete)
+	return &ProductDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *ProductClient) DeleteOne(pr *Product) *ProductDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *ProductClient) DeleteOneID(id int) *ProductDeleteOne {
+	builder := c.Delete().Where(product.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProductDeleteOne{builder}
+}
+
+// Query returns a query builder for Product.
+func (c *ProductClient) Query() *ProductQuery {
+	return &ProductQuery{config: c.config}
+}
+
+// Get returns a Product entity by its id.
+func (c *ProductClient) Get(ctx context.Context, id int) (*Product, error) {
+	return c.Query().Where(product.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProductClient) GetX(ctx context.Context, id int) *Product {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProductClient) Hooks() []Hook {
+	return c.hooks.Product
+}
+
+// RoutingNumberClient is a client for the RoutingNumber schema.
+type RoutingNumberClient struct {
+	config
+}
+
+// NewRoutingNumberClient returns a client for the RoutingNumber from the given config.
+func NewRoutingNumberClient(c config) *RoutingNumberClient {
+	return &RoutingNumberClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `routingnumber.Hooks(f(g(h())))`.
+func (c *RoutingNumberClient) Use(hooks ...Hook) {
+	c.hooks.RoutingNumber = append(c.hooks.RoutingNumber, hooks...)
+}
+
+// Create returns a create builder for RoutingNumber.
+func (c *RoutingNumberClient) Create() *RoutingNumberCreate {
+	mutation := newRoutingNumberMutation(c.config, OpCreate)
+	return &RoutingNumberCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RoutingNumber entities.
+func (c *RoutingNumberClient) CreateBulk(builders ...*RoutingNumberCreate) *RoutingNumberCreateBulk {
+	return &RoutingNumberCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RoutingNumber.
+func (c *RoutingNumberClient) Update() *RoutingNumberUpdate {
+	mutation := newRoutingNumberMutation(c.config, OpUpdate)
+	return &RoutingNumberUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RoutingNumberClient) UpdateOne(rn *RoutingNumber) *RoutingNumberUpdateOne {
+	mutation := newRoutingNumberMutation(c.config, OpUpdateOne, withRoutingNumber(rn))
+	return &RoutingNumberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RoutingNumberClient) UpdateOneID(id int) *RoutingNumberUpdateOne {
+	mutation := newRoutingNumberMutation(c.config, OpUpdateOne, withRoutingNumberID(id))
+	return &RoutingNumberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RoutingNumber.
+func (c *RoutingNumberClient) Delete() *RoutingNumberDelete {
+	mutation := newRoutingNumberMutation(c.config, OpDelete)
+	return &RoutingNumberDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *RoutingNumberClient) DeleteOne(rn *RoutingNumber) *RoutingNumberDeleteOne {
+	return c.DeleteOneID(rn.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *RoutingNumberClient) DeleteOneID(id int) *RoutingNumberDeleteOne {
+	builder := c.Delete().Where(routingnumber.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RoutingNumberDeleteOne{builder}
+}
+
+// Query returns a query builder for RoutingNumber.
+func (c *RoutingNumberClient) Query() *RoutingNumberQuery {
+	return &RoutingNumberQuery{config: c.config}
+}
+
+// Get returns a RoutingNumber entity by its id.
+func (c *RoutingNumberClient) Get(ctx context.Context, id int) (*RoutingNumber, error) {
+	return c.Query().Where(routingnumber.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RoutingNumberClient) GetX(ctx context.Context, id int) *RoutingNumber {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *RoutingNumberClient) Hooks() []Hook {
+	return c.hooks.RoutingNumber
 }
