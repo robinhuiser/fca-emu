@@ -29,9 +29,9 @@ tasks:
     cmds:
       - cmd: docker-compose down
       - cmd: docker-compose rm
-      - cmd: docker volume rm finite-mock-server_finite-mock-postgres
+      - cmd: docker volume rm fca-emu_postgres-volume
         ignore_error: true
-      - cmd: docker volume rm finite-mock-server_finite-mock-mysql
+      - cmd: docker volume rm fca-emu_mysql-volume
         ignore_error: true
 
   generate:open-api:

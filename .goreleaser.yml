@@ -1,5 +1,4 @@
-# This is an example .goreleaser.yml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+# Full documentation at http://goreleaser.com
 before:
   hooks:
     - go mod tidy
@@ -26,6 +25,11 @@ dockers:
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--build-arg=BUILD_VERSION={{.Version}}"
+    - "--build-arg=BUILD_COMMIT={{.Commit}}"
+    - "--build-arg=BUILD_DATE={{.Date}}"
+    - "--build-arg=BUILD_BY=robin@technisys.com"
+
     extra_files:
       - server
       - api

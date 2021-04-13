@@ -121,9 +121,8 @@ func main() {
 
 	// Embed the Swagger UI within the Go binary
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(staticFiles)))
-
-	log.Printf("mock server started on %s:%s", appListenAddress, appListenPort)
 	log.Printf("specs available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
+	log.Printf("mock server listening on %s:%s", appListenAddress, appListenPort)
 
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
 }

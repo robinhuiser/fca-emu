@@ -14,26 +14,25 @@ services:
     expose:
       - 5432
     volumes:
-      - fca-emu-postgres:/var/lib/postgresql/data/pgdata
+      - postgres-volume:/var/lib/postgresql/data/pgdata
 
-  # mysql:
-  #   image: mysql:5.7
-  #   restart: always
-  #   environment:
-  #     MYSQL_DATABASE: finite
-  #     MYSQL_USER: emulator
-  #     MYSQL_PASSWORD: secret
-  #     MYSQL_ROOT_PASSWORD: secret
-  #   ports:
-  #     - 3306:3306
-  #   expose:
-  #     - 3306
-  #   volumes:
-  #     - fca-emu-mysql:/var/lib/mysql
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: finite
+      MYSQL_USER: emulator
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    volumes:
+      - mysql-volume:/var/lib/mysql
   
   fca-emu:
-    build:
-      context: .
+    image: rdclda/fca-emu
     restart: always
     environment:
       DB_VENDOR: postgres
@@ -47,5 +46,5 @@ services:
       - 8080:8080  
 
 volumes:
-  fca-emu-postgres:
-  fca-emu-mysql:
+  postgres-volume:
+  mysql-volume:
