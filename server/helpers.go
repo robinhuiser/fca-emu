@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/robinhuiser/finite-mock-server/util"
+	"github.com/robinhuiser/fca-emu/util"
 )
 
 const (
-	MOCK_SERVER_SECRET = "123456789"
-	MASK_SYMBOL        = "x"
+	FCA_SECRET  = "123456789"
+	MASK_SYMBOL = "x"
 )
 
 //Response return a ImplResponse struct filled
@@ -29,7 +29,7 @@ func Response(code int, body interface{}) ImplResponse {
 }
 
 func isValidSecret(s string) bool {
-	e := util.GetEnvString("MOCK_SERVER_SECRET", MOCK_SERVER_SECRET)
+	e := util.GetEnvString("FCA_SECRET", FCA_SECRET)
 	return e == s
 }
 

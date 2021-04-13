@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 )
 
 func populateCardNetworks(ctx context.Context, client *ent.Client, f *gofakeit.Faker) error {

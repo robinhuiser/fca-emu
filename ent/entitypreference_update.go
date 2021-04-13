@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/entitypreference"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/entitypreference"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // EntityPreferenceUpdate is the builder for updating EntityPreference entities.

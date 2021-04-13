@@ -3,7 +3,7 @@ package util
 import (
 	"fmt"
 
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 )
 
 func GetDatabaseClient(v string) (*ent.Client, error) {

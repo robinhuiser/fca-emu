@@ -9,9 +9,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/bank"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/bank"
+	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // BankUpdate is the builder for updating Bank entities.

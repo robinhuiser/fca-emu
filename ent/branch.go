@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/bank"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/bank"
+	"github.com/robinhuiser/fca-emu/ent/branch"
 )
 
 // Branch is the model entity for the Branch schema.

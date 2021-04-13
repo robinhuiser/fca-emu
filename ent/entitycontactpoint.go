@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/entitycontactpoint"
+	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
 )
 
 // EntityContactPoint is the model entity for the EntityContactPoint schema.

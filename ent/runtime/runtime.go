@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/robinhuiser/finite-mock-server/ent/runtime.go
+// The schema-stitching logic is generated in github.com/robinhuiser/fca-emu/ent/runtime.go
 
 const (
 	Version = "v0.7.0"                                          // Version of ent codegen.

@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/branch"
 )
 
 // Account is the model entity for the Account schema.

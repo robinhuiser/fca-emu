@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/entityaddress"
+	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 )
 
 // EntityAddressCreate is the builder for creating a EntityAddress entity.

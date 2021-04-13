@@ -1,7 +1,7 @@
 #
 # Environment setup
-@base_url = http://localhost:{{$dotenv MOCK_SERVER_LISTEN_PORT}}/cloud
-@access_token = {{$dotenv MOCK_SERVER_SECRET}}
+@base_url = http://localhost:{{$dotenv EMULATOR_LISTEN_PORT}}/cloud
+@access_token = {{$dotenv FCA_SECRET}}
 @mask = true
 @enhance = false
 

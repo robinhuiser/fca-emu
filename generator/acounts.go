@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 )
 
 func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker, e *ent.Entity) (*ent.Account, error) {

@@ -4,7 +4,7 @@ package product
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

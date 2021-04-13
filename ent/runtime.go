@@ -4,10 +4,10 @@ package ent
 
 import (
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
-	"github.com/robinhuiser/finite-mock-server/ent/schema"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/schema"
 )
 
 // The init function reads all schema descriptors with runtime code

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/cardnetwork"
+	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 )
 
 // CardNetwork is the model entity for the CardNetwork schema.

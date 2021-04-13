@@ -1,4 +1,4 @@
-module github.com/robinhuiser/finite-mock-server
+module github.com/robinhuiser/fca-emu
 
 go 1.16
 

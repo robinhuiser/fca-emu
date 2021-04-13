@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/entitytaxinformation"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // EntityTaxInformationQuery is the builder for querying EntityTaxInformation entities.

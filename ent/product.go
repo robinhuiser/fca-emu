@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/product"
+	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
 // Product is the model entity for the Product schema.

@@ -11,12 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
-	"github.com/robinhuiser/finite-mock-server/ent/entityaddress"
-	"github.com/robinhuiser/finite-mock-server/ent/entitycontactpoint"
-	"github.com/robinhuiser/finite-mock-server/ent/entitypreference"
-	"github.com/robinhuiser/finite-mock-server/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/entityaddress"
+	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
+	"github.com/robinhuiser/fca-emu/ent/entitypreference"
+	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 )
 
 // EntityCreate is the builder for creating a Entity entity.

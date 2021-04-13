@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/entitypreference"
+	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 )
 
 // EntityPreference is the model entity for the EntityPreference schema.

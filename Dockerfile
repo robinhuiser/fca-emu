@@ -16,10 +16,10 @@ COPY banner.txt .
 # ENV CGO_ENABLED=0
 RUN go get -d -v ./...
 
-RUN go build -a -ldflags "-linkmode external -extldflags '-static' -s -w" .
+RUN go build -o fca-emu -a -ldflags "-linkmode external -extldflags '-static' -s -w" .
 
 FROM scratch AS runtime
 
-COPY --from=build /go/src/finite-mock-server ./
+COPY --from=build /go/src/fca-emu ./
 EXPOSE 8080/tcp
-ENTRYPOINT ["/finite-mock-server"]
+ENTRYPOINT ["/fca-emu"]

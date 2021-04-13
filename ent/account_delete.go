@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // AccountDelete is the builder for deleting a Account entity.

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 )
 
 func Generate(ents int, branches int, c *ent.Client) error {

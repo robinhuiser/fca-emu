@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/robinhuiser/finite-mock-server/ent"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
-	"github.com/robinhuiser/finite-mock-server/ent/entityaddress"
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 )
 
 func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (*ent.Entity, error) {

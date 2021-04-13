@@ -17,9 +17,9 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/util"
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/util"
 )
 
 var clt *ent.Client

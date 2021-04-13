@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/entity"
 )
 
 // AccountCreate is the builder for creating a Account entity.

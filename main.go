@@ -1,5 +1,5 @@
 /*
- * Trexis Cloud API Mock Server
+ * Finite Cloud API Emulator
  *
  * Author: Robin Huiser robin@technisys.com
  */
@@ -16,9 +16,9 @@ import (
 
 	"github.com/dimiro1/banner"
 	"github.com/joho/godotenv"
-	"github.com/robinhuiser/finite-mock-server/generator"
-	finite "github.com/robinhuiser/finite-mock-server/server"
-	"github.com/robinhuiser/finite-mock-server/util"
+	"github.com/robinhuiser/fca-emu/generator"
+	finite "github.com/robinhuiser/fca-emu/server"
+	"github.com/robinhuiser/fca-emu/util"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
@@ -57,8 +57,8 @@ func main() {
 	log.Printf("version %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 
 	// Set application variables
-	appListenAddress := util.GetEnvString("MOCK_SERVER_LISTEN_ADDRESS", APP_LISTEN_ADDRESS)
-	appListenPort := util.GetEnvString("MOCK_SERVER_LISTEN_PORT", APP_LISTEN_PORT)
+	appListenAddress := util.GetEnvString("EMULATOR_LISTEN_ADDRESS", APP_LISTEN_ADDRESS)
+	appListenPort := util.GetEnvString("EMULATOR_LISTEN_PORT", APP_LISTEN_PORT)
 
 	// Connect to database
 	client, err := util.GetDatabaseClient(util.GetEnvString("DB_VENDOR", DB_VENDOR))

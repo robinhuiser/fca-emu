@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
-	"github.com/robinhuiser/finite-mock-server/ent/product"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
 // ProductDelete is the builder for deleting a Product entity.

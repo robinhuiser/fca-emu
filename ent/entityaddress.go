@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/entityaddress"
+	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 )
 
 // EntityAddress is the model entity for the EntityAddress schema.

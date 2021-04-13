@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 )
 
 // EntityTaxInformation is the model entity for the EntityTaxInformation schema.

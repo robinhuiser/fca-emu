@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/entitycontactpoint"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // EntityContactPointQuery is the builder for querying EntityContactPoint entities.

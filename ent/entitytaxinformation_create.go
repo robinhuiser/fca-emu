@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 )
 
 // EntityTaxInformationCreate is the builder for creating a EntityTaxInformation entity.

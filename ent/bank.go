@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/bank"
+	"github.com/robinhuiser/fca-emu/ent/bank"
 )
 
 // Bank is the model entity for the Bank schema.

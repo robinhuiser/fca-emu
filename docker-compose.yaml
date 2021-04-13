@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       POSTGRES_DB: finite
-      POSTGRES_USER: mock
+      POSTGRES_USER: emulator
       POSTGRES_PASSWORD: secret
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -14,14 +14,14 @@ services:
     expose:
       - 5432
     volumes:
-      - finite-mock-postgres:/var/lib/postgresql/data/pgdata
+      - fca-emu-postgres:/var/lib/postgresql/data/pgdata
 
   # mysql:
   #   image: mysql:5.7
   #   restart: always
   #   environment:
   #     MYSQL_DATABASE: finite
-  #     MYSQL_USER: mock
+  #     MYSQL_USER: emulator
   #     MYSQL_PASSWORD: secret
   #     MYSQL_ROOT_PASSWORD: secret
   #   ports:
@@ -29,9 +29,9 @@ services:
   #   expose:
   #     - 3306
   #   volumes:
-  #     - finite-mock-mysql:/var/lib/mysql
+  #     - fca-emu-mysql:/var/lib/mysql
   
-  mock:
+  fca-emu:
     build:
       context: .
     restart: always
@@ -39,13 +39,13 @@ services:
       DB_VENDOR: postgres
       DB_HOST: postgres
       DB_DATABASE_NAME: finite
-      DB_USER_NAME: mock
+      DB_USER_NAME: emulator
       DB_USER_PASSWORD: secret
-      MOCK_SERVER_SECRET: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
+      FCA_SECRET: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
       TEST_DATA_ACCOUNTS: 100
     ports:
       - 8080:8080  
 
 volumes:
-  finite-mock-postgres:
-  finite-mock-mysql:
+  fca-emu-postgres:
+  fca-emu-mysql:

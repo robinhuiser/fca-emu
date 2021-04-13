@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/card"
-	"github.com/robinhuiser/finite-mock-server/ent/cardnetwork"
+	"github.com/robinhuiser/fca-emu/ent/card"
+	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 )
 
 // Card is the model entity for the Card schema.

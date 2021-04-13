@@ -13,10 +13,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/account"
-	"github.com/robinhuiser/finite-mock-server/ent/branch"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
-	"github.com/robinhuiser/finite-mock-server/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
 // AccountQuery is the builder for querying Account entities.

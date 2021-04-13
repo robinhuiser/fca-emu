@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/robinhuiser/finite-mock-server/ent/routingnumber"
+	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 // RoutingNumber is the model entity for the RoutingNumber schema.

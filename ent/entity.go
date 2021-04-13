@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/robinhuiser/finite-mock-server/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/entity"
 )
 
 // Entity is the model entity for the Entity schema.

@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 	// required by schema hooks.
-	_ "github.com/robinhuiser/finite-mock-server/ent/runtime"
+	_ "github.com/robinhuiser/fca-emu/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

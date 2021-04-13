@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/robinhuiser/finite-mock-server/ent/card"
-	"github.com/robinhuiser/finite-mock-server/ent/cardnetwork"
+	"github.com/robinhuiser/fca-emu/ent/card"
+	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 )
 
 // CardCreate is the builder for creating a Card entity.

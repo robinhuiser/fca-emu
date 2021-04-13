@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/robinhuiser/finite-mock-server/ent"
+	"github.com/robinhuiser/fca-emu/ent"
 )
 
 // The AccountFunc type is an adapter to allow the use of ordinary
