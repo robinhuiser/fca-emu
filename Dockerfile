@@ -11,6 +11,7 @@ COPY swagger-ui ./swagger-ui
 COPY main.go .
 COPY go.mod .
 COPY go.sum .
+COPY banner.txt .
 
 # ENV CGO_ENABLED=0
 RUN go get -d -v ./...

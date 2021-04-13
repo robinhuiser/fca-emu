@@ -1,10 +1,5 @@
 /*
- * Trexis Cloud API
- *
- * The public facing API through which connectors are exposed as a single abstract API
- *
- * API version: v1.5
- * Contact: support@trexis.net
+ * Trexis Cloud API Mock Server
  *
  * Author: Robin Huiser robin@technisys.com
  */
@@ -48,9 +43,8 @@ const (
 	DB_VENDOR             = "sqlite3"
 	APP_LISTEN_ADDRESS    = "0.0.0.0"
 	APP_LISTEN_PORT       = "8080"
-	NR_GENERATED_ENTITIES = 10
-	NR_GENERATED_ACCOUNTS = 2
-	NR_BRANCHES_PER_BANK  = 10
+	NR_GENERATED_ENTITIES = 20
+	NR_BRANCHES_PER_BANK  = 50
 )
 
 func main() {
@@ -83,7 +77,6 @@ func main() {
 	// Generate Mock data
 	if err := generator.Generate(
 		util.GetEnvInt("NUMBER_OF_ENTITIES", NR_GENERATED_ENTITIES),
-		util.GetEnvInt("ACCOUNTS_PER_ENTITY", NR_GENERATED_ACCOUNTS),
 		util.GetEnvInt("BRANCHES_PER_BANK", NR_BRANCHES_PER_BANK),
 		client); err != nil {
 		log.Fatalf("failed creating testdata: %v", err)

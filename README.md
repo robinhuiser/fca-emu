@@ -1,4 +1,4 @@
-# Finite Mock Server
+# Finite Cloud API Emulator
 
 The public facing API through which connectors are exposed as a single abstract API.
 
@@ -7,7 +7,7 @@ The public facing API through which connectors are exposed as a single abstract 
 Start the server with the command below:
 
 ~~~bash
-$ ./finite-mock-server
+$ ./fca-emu
 2021/04/07 17:31:30 version 0.0.1, commit 6e1b03d15d7f5aeb6453d14043fe6eace379534a, built at 2021-04-07T16:16:36Z by goreleaser
 2021/04/07 17:31:30 connected to sqlite3 database
 2021/04/07 17:31:30 database migration run successfully

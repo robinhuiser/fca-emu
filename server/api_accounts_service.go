@@ -73,12 +73,24 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
+	// Retrieve the owner(s) (entities) of the account
+	owners, err := rs.QueryOwner().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	primaryAccountIndex := 0
+	// owner := Enitity{}
+
+	// for i, o := range owners {
+
+	// }
+
 	a := Account{
 		Id:                rs.ID.String(),
 		Type:              rs.Type,
 		Number:            isMasked(mask, rs.Number),
 		ParentId:          isValidUUID(rs.ParentId.String()),
-		Name:              rs.Name,
+		Name:              owners[primaryAccountIndex].Fullname, // TODO: get the primary account holder info here
 		Title:             rs.Title,
 		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
 		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),

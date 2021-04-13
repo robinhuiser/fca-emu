@@ -7,20 +7,37 @@ before:
 builds:
   - goos:
       - darwin
-      - linux
-      - windows
     goarch:
       - amd64
-      - arm64
     ldflags:
      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=robin@technisys.com      
 archives:
   - replacements:
       darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
       amd64: x86_64
+dockers:
+  - 
+    image_templates:
+      - "docker.io/rdclda/fca-emu:{{ .Tag }}"
+      - "docker.io/rdclda/fca-emu:latest"
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    extra_files:
+      - server
+      - api
+      - generator
+      - swagger-ui
+      - ent
+      - util
+      - main.go
+      - go.sum
+      - go.mod
+      - banner.txt
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -35,4 +52,4 @@ changelog:
 release:
   github:
     owner: robinhuiser
-    name: finite-mock-server
+    name: fca-emu

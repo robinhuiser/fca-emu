@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/robinhuiser/finite-mock-server/ent"
 )
 
-func Generate(ents int, accts int, branches int, c *ent.Client) error {
+func Generate(ents int, branches int, c *ent.Client) error {
 
 	f := gofakeit.New(0)
 
@@ -36,12 +37,22 @@ func Generate(ents int, accts int, branches int, c *ent.Client) error {
 		}
 
 		// Generate x number of entities
+		var accts = 0
 		for entity := 0; entity < ents; entity++ {
 			e, err := populateEntity(context.Background(), c, f)
 			if err != nil {
 				return err
 			}
-			log.Printf("created entity with Id %s", e.ID)
+			log.Printf("created entity (%s) with id %s", strings.ToLower(e.Type.String()), e.ID)
+
+			switch a := e.Type.String(); a {
+			case "ORGANIZATION":
+				accts = f.Number(2, 5)
+			case "CORPORATE":
+				accts = f.Number(3, 10)
+			default:
+				accts = f.Number(1, 3)
+			}
 
 			// Generate for each entity x number of accounts
 			for account := 0; account < accts; account++ {

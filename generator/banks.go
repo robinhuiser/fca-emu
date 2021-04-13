@@ -13,7 +13,7 @@ func populateBanks(br int, ctx context.Context, client *ent.Client, f *gofakeit.
 	b := map[string]string{
 		"BOFAUS3NXXX": "Bank of America",
 		"NFBKUS33XXX": "Capital One",
-		"CHASUSU3XXX": "Chase Bank (Jp Morgan Chase)",
+		"CHASUSU3XXX": "Chase Bank",
 		"CITIUS33XXX": "Citibank",
 		"FTBCUS3CXXX": "Fifth Third Bank",
 		"MRMDUS33XXX": "HSBC",

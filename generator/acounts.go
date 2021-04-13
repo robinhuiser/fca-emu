@@ -66,8 +66,8 @@ func randomAccountTitle(f *gofakeit.Faker) string {
 }
 
 func randomAccountStatus(f *gofakeit.Faker) string {
-	at := []string{"OPEN", "CLOSED", "BLOCKED"}
-	return at[f.Number(0, len(at)-1)]
+	as := []string{"OPEN", "CLOSED", "BLOCKED"}
+	return as[f.Number(0, len(as)-1)]
 }
 
 func randomAccountNumber(f *gofakeit.Faker) string {
