@@ -30,11 +30,11 @@ type EntityAddress func(*sql.Selector)
 // EntityContactPoint is the predicate function for entitycontactpoint builders.
 type EntityContactPoint func(*sql.Selector)
 
-// EntityPreference is the predicate function for entitypreference builders.
-type EntityPreference func(*sql.Selector)
-
 // EntityTaxInformation is the predicate function for entitytaxinformation builders.
 type EntityTaxInformation func(*sql.Selector)
+
+// Preference is the predicate function for preference builders.
+type Preference func(*sql.Selector)
 
 // Product is the predicate function for product builders.
 type Product func(*sql.Selector)

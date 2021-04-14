@@ -45,5 +45,7 @@ func (Account) Edges() []ent.Edge {
 		edge.To("branch", Branch.Type).
 			Unique(),
 		edge.To("owner", Entity.Type),
+		edge.To("preference", Preference.Type),
+		edge.To("routingnumber", RoutingNumber.Type),
 	}
 }

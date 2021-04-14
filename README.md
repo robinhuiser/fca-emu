@@ -7,25 +7,30 @@ The public facing API through which connectors are exposed as a single abstract 
 Start the server with the command below:
 
 ~~~bash
+# As a standalone process (OSX amd64 only)
+$ ./fca-emu
+
+# As a Docker
 $ docker run -p 8080:8080 rdclda/fca-emu
-TODO
 ~~~
 
-Note the Swagger spec is available on [http://0.0.0.0:8080/swagger-ui](http://0.0.0.0:8080/swagger-ui).
+Please note:
 
-The value required for the access token (`X-TOKEN`) defaults to `123456789`; use the example `curl` command below to query one of the accounts:
+* The Swagger spec is available on [http://0.0.0.0:8080/swagger-ui](http://0.0.0.0:8080/swagger-ui).
+* The value required for the access token (`X-TOKEN`) defaults to `123456789`; 
+* During startup, the emulator logs the IDs for available entities and accounts
+
+Use the example `curl` command below to query one of the accounts:
 
 ~~~bash
 $ curl -H "Accept: application/json" \
     -H "X-TOKEN: 123456789" \
-    http://0.0.0.0:8080/cloud/v1/account/d4234ac6-c550-4503-b21b-a13557c48cbb
+    http://0.0.0.0:8080/cloud/v1/account/ID_FROM_EMULATOR_LOG
 ~~~
 
 ## Configuration options
 
-The server can be configured using environment variables:
-  * `export KEY=VALUE`
-  * create a `.env` file with the KEY=VALUE pairs per line
+The emulator can be configured using environment variables below - when using the OSX binary you can create a `.env` file in the current working directory to set the values.
 
 | Key | Default value | Description |
 |--- |--- |--- |
@@ -60,21 +65,22 @@ services:
     expose:
       - 5432
     volumes:
-      - fca-db:/var/lib/postgresql/data/pgdata
-
+      - postgres-volume:/var/lib/postgresql/data/pgdata
+  
   fca-emu:
     image: rdclda/fca-emu
     restart: always
     environment:
       DB_VENDOR: postgres
       DB_HOST: postgres
-      DB_PORT: 5432
       DB_DATABASE_NAME: finite
       DB_USER_NAME: emulator
       DB_USER_PASSWORD: secret
       FCA_SECRET: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
-      NUMBER_OF_ENTITIES: 20
-      BRANCHES_PER_BANK: 50
+      TEST_DATA_ACCOUNTS: 100
     ports:
-      - 8080:8080
+      - 8080:8080  
+
+volumes:
+  postgres-volume:
 ~~~

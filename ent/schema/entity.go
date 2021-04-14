@@ -22,6 +22,7 @@ func (Entity) Fields() []ent.Field {
 		field.String("lastname").Optional(),
 		field.String("fullname").Optional(),
 		field.Time("dateOfBirth"),
+		field.Bool("active").Default(true),
 		field.Enum("type").Values("PERSON", "ORGANIZATION", "CORPORATE"),
 		field.Time("lastLoginDate"),
 		field.String("username"),
@@ -35,7 +36,7 @@ func (Entity) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("entityTaxInformation", EntityTaxInformation.Type),
 		edge.To("entityAddresses", EntityAddress.Type),
-		edge.To("entityPreferences", EntityPreference.Type),
+		edge.To("entityPreferences", Preference.Type),
 		edge.To("entityContactPoints", EntityContactPoint.Type),
 		edge.From("owns_account", Account.Type).Ref("owner"),
 	}

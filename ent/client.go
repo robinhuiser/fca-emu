@@ -18,8 +18,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
-	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 
@@ -49,10 +49,10 @@ type Client struct {
 	EntityAddress *EntityAddressClient
 	// EntityContactPoint is the client for interacting with the EntityContactPoint builders.
 	EntityContactPoint *EntityContactPointClient
-	// EntityPreference is the client for interacting with the EntityPreference builders.
-	EntityPreference *EntityPreferenceClient
 	// EntityTaxInformation is the client for interacting with the EntityTaxInformation builders.
 	EntityTaxInformation *EntityTaxInformationClient
+	// Preference is the client for interacting with the Preference builders.
+	Preference *PreferenceClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// RoutingNumber is the client for interacting with the RoutingNumber builders.
@@ -78,8 +78,8 @@ func (c *Client) init() {
 	c.Entity = NewEntityClient(c.config)
 	c.EntityAddress = NewEntityAddressClient(c.config)
 	c.EntityContactPoint = NewEntityContactPointClient(c.config)
-	c.EntityPreference = NewEntityPreferenceClient(c.config)
 	c.EntityTaxInformation = NewEntityTaxInformationClient(c.config)
+	c.Preference = NewPreferenceClient(c.config)
 	c.Product = NewProductClient(c.config)
 	c.RoutingNumber = NewRoutingNumberClient(c.config)
 }
@@ -123,8 +123,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Entity:               NewEntityClient(cfg),
 		EntityAddress:        NewEntityAddressClient(cfg),
 		EntityContactPoint:   NewEntityContactPointClient(cfg),
-		EntityPreference:     NewEntityPreferenceClient(cfg),
 		EntityTaxInformation: NewEntityTaxInformationClient(cfg),
+		Preference:           NewPreferenceClient(cfg),
 		Product:              NewProductClient(cfg),
 		RoutingNumber:        NewRoutingNumberClient(cfg),
 	}, nil
@@ -153,8 +153,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Entity:               NewEntityClient(cfg),
 		EntityAddress:        NewEntityAddressClient(cfg),
 		EntityContactPoint:   NewEntityContactPointClient(cfg),
-		EntityPreference:     NewEntityPreferenceClient(cfg),
 		EntityTaxInformation: NewEntityTaxInformationClient(cfg),
+		Preference:           NewPreferenceClient(cfg),
 		Product:              NewProductClient(cfg),
 		RoutingNumber:        NewRoutingNumberClient(cfg),
 	}, nil
@@ -194,8 +194,8 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Entity.Use(hooks...)
 	c.EntityAddress.Use(hooks...)
 	c.EntityContactPoint.Use(hooks...)
-	c.EntityPreference.Use(hooks...)
 	c.EntityTaxInformation.Use(hooks...)
+	c.Preference.Use(hooks...)
 	c.Product.Use(hooks...)
 	c.RoutingNumber.Use(hooks...)
 }
@@ -308,6 +308,38 @@ func (c *AccountClient) QueryOwner(a *Account) *EntityQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(entity.Table, entity.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPreference queries the preference edge of a Account.
+func (c *AccountClient) QueryPreference(a *Account) *PreferenceQuery {
+	query := &PreferenceQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(preference.Table, preference.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferenceTable, account.PreferenceColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRoutingnumber queries the routingnumber edge of a Account.
+func (c *AccountClient) QueryRoutingnumber(a *Account) *RoutingNumberQuery {
+	query := &RoutingNumberQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(routingnumber.Table, routingnumber.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumberTable, account.RoutingnumberColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -836,13 +868,13 @@ func (c *EntityClient) QueryEntityAddresses(e *Entity) *EntityAddressQuery {
 }
 
 // QueryEntityPreferences queries the entityPreferences edge of a Entity.
-func (c *EntityClient) QueryEntityPreferences(e *Entity) *EntityPreferenceQuery {
-	query := &EntityPreferenceQuery{config: c.config}
+func (c *EntityClient) QueryEntityPreferences(e *Entity) *PreferenceQuery {
+	query := &PreferenceQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, id),
-			sqlgraph.To(entitypreference.Table, entitypreference.FieldID),
+			sqlgraph.To(preference.Table, preference.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityPreferencesTable, entity.EntityPreferencesColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
@@ -1064,94 +1096,6 @@ func (c *EntityContactPointClient) Hooks() []Hook {
 	return c.hooks.EntityContactPoint
 }
 
-// EntityPreferenceClient is a client for the EntityPreference schema.
-type EntityPreferenceClient struct {
-	config
-}
-
-// NewEntityPreferenceClient returns a client for the EntityPreference from the given config.
-func NewEntityPreferenceClient(c config) *EntityPreferenceClient {
-	return &EntityPreferenceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `entitypreference.Hooks(f(g(h())))`.
-func (c *EntityPreferenceClient) Use(hooks ...Hook) {
-	c.hooks.EntityPreference = append(c.hooks.EntityPreference, hooks...)
-}
-
-// Create returns a create builder for EntityPreference.
-func (c *EntityPreferenceClient) Create() *EntityPreferenceCreate {
-	mutation := newEntityPreferenceMutation(c.config, OpCreate)
-	return &EntityPreferenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of EntityPreference entities.
-func (c *EntityPreferenceClient) CreateBulk(builders ...*EntityPreferenceCreate) *EntityPreferenceCreateBulk {
-	return &EntityPreferenceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for EntityPreference.
-func (c *EntityPreferenceClient) Update() *EntityPreferenceUpdate {
-	mutation := newEntityPreferenceMutation(c.config, OpUpdate)
-	return &EntityPreferenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *EntityPreferenceClient) UpdateOne(ep *EntityPreference) *EntityPreferenceUpdateOne {
-	mutation := newEntityPreferenceMutation(c.config, OpUpdateOne, withEntityPreference(ep))
-	return &EntityPreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *EntityPreferenceClient) UpdateOneID(id int) *EntityPreferenceUpdateOne {
-	mutation := newEntityPreferenceMutation(c.config, OpUpdateOne, withEntityPreferenceID(id))
-	return &EntityPreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for EntityPreference.
-func (c *EntityPreferenceClient) Delete() *EntityPreferenceDelete {
-	mutation := newEntityPreferenceMutation(c.config, OpDelete)
-	return &EntityPreferenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *EntityPreferenceClient) DeleteOne(ep *EntityPreference) *EntityPreferenceDeleteOne {
-	return c.DeleteOneID(ep.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *EntityPreferenceClient) DeleteOneID(id int) *EntityPreferenceDeleteOne {
-	builder := c.Delete().Where(entitypreference.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &EntityPreferenceDeleteOne{builder}
-}
-
-// Query returns a query builder for EntityPreference.
-func (c *EntityPreferenceClient) Query() *EntityPreferenceQuery {
-	return &EntityPreferenceQuery{config: c.config}
-}
-
-// Get returns a EntityPreference entity by its id.
-func (c *EntityPreferenceClient) Get(ctx context.Context, id int) (*EntityPreference, error) {
-	return c.Query().Where(entitypreference.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *EntityPreferenceClient) GetX(ctx context.Context, id int) *EntityPreference {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *EntityPreferenceClient) Hooks() []Hook {
-	return c.hooks.EntityPreference
-}
-
 // EntityTaxInformationClient is a client for the EntityTaxInformation schema.
 type EntityTaxInformationClient struct {
 	config
@@ -1238,6 +1182,94 @@ func (c *EntityTaxInformationClient) GetX(ctx context.Context, id int) *EntityTa
 // Hooks returns the client hooks.
 func (c *EntityTaxInformationClient) Hooks() []Hook {
 	return c.hooks.EntityTaxInformation
+}
+
+// PreferenceClient is a client for the Preference schema.
+type PreferenceClient struct {
+	config
+}
+
+// NewPreferenceClient returns a client for the Preference from the given config.
+func NewPreferenceClient(c config) *PreferenceClient {
+	return &PreferenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `preference.Hooks(f(g(h())))`.
+func (c *PreferenceClient) Use(hooks ...Hook) {
+	c.hooks.Preference = append(c.hooks.Preference, hooks...)
+}
+
+// Create returns a create builder for Preference.
+func (c *PreferenceClient) Create() *PreferenceCreate {
+	mutation := newPreferenceMutation(c.config, OpCreate)
+	return &PreferenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Preference entities.
+func (c *PreferenceClient) CreateBulk(builders ...*PreferenceCreate) *PreferenceCreateBulk {
+	return &PreferenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Preference.
+func (c *PreferenceClient) Update() *PreferenceUpdate {
+	mutation := newPreferenceMutation(c.config, OpUpdate)
+	return &PreferenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PreferenceClient) UpdateOne(pr *Preference) *PreferenceUpdateOne {
+	mutation := newPreferenceMutation(c.config, OpUpdateOne, withPreference(pr))
+	return &PreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PreferenceClient) UpdateOneID(id int) *PreferenceUpdateOne {
+	mutation := newPreferenceMutation(c.config, OpUpdateOne, withPreferenceID(id))
+	return &PreferenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Preference.
+func (c *PreferenceClient) Delete() *PreferenceDelete {
+	mutation := newPreferenceMutation(c.config, OpDelete)
+	return &PreferenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *PreferenceClient) DeleteOne(pr *Preference) *PreferenceDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *PreferenceClient) DeleteOneID(id int) *PreferenceDeleteOne {
+	builder := c.Delete().Where(preference.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PreferenceDeleteOne{builder}
+}
+
+// Query returns a query builder for Preference.
+func (c *PreferenceClient) Query() *PreferenceQuery {
+	return &PreferenceQuery{config: c.config}
+}
+
+// Get returns a Preference entity by its id.
+func (c *PreferenceClient) Get(ctx context.Context, id int) (*Preference, error) {
+	return c.Query().Where(preference.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PreferenceClient) GetX(ctx context.Context, id int) *Preference {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PreferenceClient) Hooks() []Hook {
+	return c.hooks.Preference
 }
 
 // ProductClient is a client for the Product schema.

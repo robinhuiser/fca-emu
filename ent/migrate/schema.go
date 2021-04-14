@@ -132,6 +132,7 @@ var (
 		{Name: "lastname", Type: field.TypeString, Nullable: true},
 		{Name: "fullname", Type: field.TypeString, Nullable: true},
 		{Name: "date_of_birth", Type: field.TypeTime},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"PERSON", "ORGANIZATION", "CORPORATE"}},
 		{Name: "last_login_date", Type: field.TypeTime},
 		{Name: "username", Type: field.TypeString},
@@ -197,27 +198,6 @@ var (
 			},
 		},
 	}
-	// EntityPreferencesColumns holds the columns for the "entity_preferences" table.
-	EntityPreferencesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "value", Type: field.TypeString},
-		{Name: "entity_entity_preferences", Type: field.TypeUUID, Nullable: true},
-	}
-	// EntityPreferencesTable holds the schema information for the "entity_preferences" table.
-	EntityPreferencesTable = &schema.Table{
-		Name:       "entity_preferences",
-		Columns:    EntityPreferencesColumns,
-		PrimaryKey: []*schema.Column{EntityPreferencesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "entity_preferences_entities_entityPreferences",
-				Columns:    []*schema.Column{EntityPreferencesColumns[3]},
-				RefColumns: []*schema.Column{EntitiesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// EntityTaxInformationsColumns holds the columns for the "entity_tax_informations" table.
 	EntityTaxInformationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -234,6 +214,34 @@ var (
 			{
 				Symbol:     "entity_tax_informations_entities_entityTaxInformation",
 				Columns:    []*schema.Column{EntityTaxInformationsColumns[3]},
+				RefColumns: []*schema.Column{EntitiesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// PreferencesColumns holds the columns for the "preferences" table.
+	PreferencesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "value", Type: field.TypeString},
+		{Name: "account_preference", Type: field.TypeUUID, Nullable: true},
+		{Name: "entity_entity_preferences", Type: field.TypeUUID, Nullable: true},
+	}
+	// PreferencesTable holds the schema information for the "preferences" table.
+	PreferencesTable = &schema.Table{
+		Name:       "preferences",
+		Columns:    PreferencesColumns,
+		PrimaryKey: []*schema.Column{PreferencesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "preferences_accounts_preference",
+				Columns:    []*schema.Column{PreferencesColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "preferences_entities_entityPreferences",
+				Columns:    []*schema.Column{PreferencesColumns[4]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -261,13 +269,21 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "number", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"WIRE", "ABA"}},
+		{Name: "account_routingnumber", Type: field.TypeUUID, Nullable: true},
 	}
 	// RoutingNumbersTable holds the schema information for the "routing_numbers" table.
 	RoutingNumbersTable = &schema.Table{
-		Name:        "routing_numbers",
-		Columns:     RoutingNumbersColumns,
-		PrimaryKey:  []*schema.Column{RoutingNumbersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+		Name:       "routing_numbers",
+		Columns:    RoutingNumbersColumns,
+		PrimaryKey: []*schema.Column{RoutingNumbersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "routing_numbers_accounts_routingnumber",
+				Columns:    []*schema.Column{RoutingNumbersColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// AccountOwnerColumns holds the columns for the "account_owner" table.
 	AccountOwnerColumns = []*schema.Column{
@@ -304,8 +320,8 @@ var (
 		EntitiesTable,
 		EntityAddressesTable,
 		EntityContactPointsTable,
-		EntityPreferencesTable,
 		EntityTaxInformationsTable,
+		PreferencesTable,
 		ProductsTable,
 		RoutingNumbersTable,
 		AccountOwnerTable,
@@ -318,8 +334,10 @@ func init() {
 	CardsTable.ForeignKeys[0].RefTable = CardNetworksTable
 	EntityAddressesTable.ForeignKeys[0].RefTable = EntitiesTable
 	EntityContactPointsTable.ForeignKeys[0].RefTable = EntitiesTable
-	EntityPreferencesTable.ForeignKeys[0].RefTable = EntitiesTable
 	EntityTaxInformationsTable.ForeignKeys[0].RefTable = EntitiesTable
+	PreferencesTable.ForeignKeys[0].RefTable = AccountsTable
+	PreferencesTable.ForeignKeys[1].RefTable = EntitiesTable
+	RoutingNumbersTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountOwnerTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountOwnerTable.ForeignKeys[1].RefTable = EntitiesTable
 }

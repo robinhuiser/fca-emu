@@ -1738,6 +1738,62 @@ func HasOwnerWith(preds ...predicate.Entity) predicate.Account {
 	})
 }
 
+// HasPreference applies the HasEdge predicate on the "preference" edge.
+func HasPreference() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PreferenceTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferenceTable, PreferenceColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPreferenceWith applies the HasEdge predicate on the "preference" edge with a given conditions (other predicates).
+func HasPreferenceWith(preds ...predicate.Preference) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(PreferenceInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferenceTable, PreferenceColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRoutingnumber applies the HasEdge predicate on the "routingnumber" edge.
+func HasRoutingnumber() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(RoutingnumberTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumberTable, RoutingnumberColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRoutingnumberWith applies the HasEdge predicate on the "routingnumber" edge with a given conditions (other predicates).
+func HasRoutingnumberWith(preds ...predicate.RoutingNumber) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(RoutingnumberInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumberTable, RoutingnumberColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Account) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

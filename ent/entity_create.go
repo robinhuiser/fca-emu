@@ -15,8 +15,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
-	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
+	"github.com/robinhuiser/fca-emu/ent/preference"
 )
 
 // EntityCreate is the builder for creating a Entity entity.
@@ -77,6 +77,20 @@ func (ec *EntityCreate) SetNillableFullname(s *string) *EntityCreate {
 // SetDateOfBirth sets the "dateOfBirth" field.
 func (ec *EntityCreate) SetDateOfBirth(t time.Time) *EntityCreate {
 	ec.mutation.SetDateOfBirth(t)
+	return ec
+}
+
+// SetActive sets the "active" field.
+func (ec *EntityCreate) SetActive(b bool) *EntityCreate {
+	ec.mutation.SetActive(b)
+	return ec
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (ec *EntityCreate) SetNillableActive(b *bool) *EntityCreate {
+	if b != nil {
+		ec.SetActive(*b)
+	}
 	return ec
 }
 
@@ -146,17 +160,17 @@ func (ec *EntityCreate) AddEntityAddresses(e ...*EntityAddress) *EntityCreate {
 	return ec.AddEntityAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the EntityPreference entity by IDs.
+// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
 func (ec *EntityCreate) AddEntityPreferenceIDs(ids ...int) *EntityCreate {
 	ec.mutation.AddEntityPreferenceIDs(ids...)
 	return ec
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the EntityPreference entity.
-func (ec *EntityCreate) AddEntityPreferences(e ...*EntityPreference) *EntityCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
+func (ec *EntityCreate) AddEntityPreferences(p ...*Preference) *EntityCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return ec.AddEntityPreferenceIDs(ids...)
 }
@@ -243,6 +257,10 @@ func (ec *EntityCreate) SaveX(ctx context.Context) *Entity {
 
 // defaults sets the default values of the builder before save.
 func (ec *EntityCreate) defaults() {
+	if _, ok := ec.mutation.Active(); !ok {
+		v := entity.DefaultActive
+		ec.mutation.SetActive(v)
+	}
 	if _, ok := ec.mutation.ID(); !ok {
 		v := entity.DefaultID()
 		ec.mutation.SetID(v)
@@ -256,6 +274,9 @@ func (ec *EntityCreate) check() error {
 	}
 	if _, ok := ec.mutation.DateOfBirth(); !ok {
 		return &ValidationError{Name: "dateOfBirth", err: errors.New("ent: missing required field \"dateOfBirth\"")}
+	}
+	if _, ok := ec.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New("ent: missing required field \"active\"")}
 	}
 	if _, ok := ec.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New("ent: missing required field \"type\"")}
@@ -346,6 +367,14 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 		})
 		_node.DateOfBirth = value
 	}
+	if value, ok := ec.mutation.Active(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: entity.FieldActive,
+		})
+		_node.Active = value
+	}
 	if value, ok := ec.mutation.GetType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -434,7 +463,7 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker, e *ent.Entity) (*ent.Account, error) {
@@ -50,7 +51,34 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		a.Update().SetDateClosed(dlc).Save(ctx)
 	}
 
+	// Add the owner
 	a.Update().AddOwner(e).Save(ctx)
+
+	// Add one or more preferences
+	for i := 0; i < f.Number(1, 8); i++ {
+		pref, err := client.Preference.
+			Create().
+			SetName(f.Noun()).
+			SetValue(f.Word()).
+			Save(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating preference: %w", err)
+		}
+		a.Update().AddPreference(pref).Save(ctx)
+	}
+
+	// Add one or more routing numbers
+	for i := 0; i < f.Number(1, 2); i++ {
+		rtn, err := client.RoutingNumber.
+			Create().
+			SetNumber(f.AchRouting()).
+			SetType(randomRoutingNumberType(f)).
+			Save(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating routing number: %w", err)
+		}
+		a.Update().AddRoutingnumber(rtn).Save(ctx)
+	}
 
 	return a, nil
 }
@@ -58,6 +86,11 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 func randomAccountType(f *gofakeit.Faker) string {
 	at := []string{"DDA", "NOW", "MMA"}
 	return at[f.Number(0, len(at)-1)]
+}
+
+func randomRoutingNumberType(f *gofakeit.Faker) routingnumber.Type {
+	rtnt := []string{"WIRE", "ABA"}
+	return routingnumber.Type(rtnt[f.Number(0, len(rtnt)-1)])
 }
 
 func randomAccountTitle(f *gofakeit.Faker) string {

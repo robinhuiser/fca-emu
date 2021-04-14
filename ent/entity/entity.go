@@ -23,6 +23,8 @@ const (
 	FieldFullname = "fullname"
 	// FieldDateOfBirth holds the string denoting the dateofbirth field in the database.
 	FieldDateOfBirth = "date_of_birth"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldLastLoginDate holds the string denoting the lastlogindate field in the database.
@@ -60,10 +62,10 @@ const (
 	// EntityAddressesColumn is the table column denoting the entityAddresses relation/edge.
 	EntityAddressesColumn = "entity_entity_addresses"
 	// EntityPreferencesTable is the table the holds the entityPreferences relation/edge.
-	EntityPreferencesTable = "entity_preferences"
-	// EntityPreferencesInverseTable is the table name for the EntityPreference entity.
-	// It exists in this package in order to avoid circular dependency with the "entitypreference" package.
-	EntityPreferencesInverseTable = "entity_preferences"
+	EntityPreferencesTable = "preferences"
+	// EntityPreferencesInverseTable is the table name for the Preference entity.
+	// It exists in this package in order to avoid circular dependency with the "preference" package.
+	EntityPreferencesInverseTable = "preferences"
 	// EntityPreferencesColumn is the table column denoting the entityPreferences relation/edge.
 	EntityPreferencesColumn = "entity_entity_preferences"
 	// EntityContactPointsTable is the table the holds the entityContactPoints relation/edge.
@@ -88,6 +90,7 @@ var Columns = []string{
 	FieldLastname,
 	FieldFullname,
 	FieldDateOfBirth,
+	FieldActive,
 	FieldType,
 	FieldLastLoginDate,
 	FieldUsername,
@@ -112,6 +115,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

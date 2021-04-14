@@ -32,8 +32,8 @@ type hooks struct {
 	Entity               []ent.Hook
 	EntityAddress        []ent.Hook
 	EntityContactPoint   []ent.Hook
-	EntityPreference     []ent.Hook
 	EntityTaxInformation []ent.Hook
+	Preference           []ent.Hook
 	Product              []ent.Hook
 	RoutingNumber        []ent.Hook
 }

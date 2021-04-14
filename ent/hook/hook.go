@@ -113,19 +113,6 @@ func (f EntityContactPointFunc) Mutate(ctx context.Context, m ent.Mutation) (ent
 	return f(ctx, mv)
 }
 
-// The EntityPreferenceFunc type is an adapter to allow the use of ordinary
-// function as EntityPreference mutator.
-type EntityPreferenceFunc func(context.Context, *ent.EntityPreferenceMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f EntityPreferenceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.EntityPreferenceMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityPreferenceMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The EntityTaxInformationFunc type is an adapter to allow the use of ordinary
 // function as EntityTaxInformation mutator.
 type EntityTaxInformationFunc func(context.Context, *ent.EntityTaxInformationMutation) (ent.Value, error)
@@ -135,6 +122,19 @@ func (f EntityTaxInformationFunc) Mutate(ctx context.Context, m ent.Mutation) (e
 	mv, ok := m.(*ent.EntityTaxInformationMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntityTaxInformationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The PreferenceFunc type is an adapter to allow the use of ordinary
+// function as Preference mutator.
+type PreferenceFunc func(context.Context, *ent.PreferenceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PreferenceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.PreferenceMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PreferenceMutation", m)
 	}
 	return f(ctx, mv)
 }

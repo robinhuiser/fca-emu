@@ -62,9 +62,13 @@ type AccountEdges struct {
 	Branch *Branch `json:"branch,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner []*Entity `json:"owner,omitempty"`
+	// Preference holds the value of the preference edge.
+	Preference []*Preference `json:"preference,omitempty"`
+	// Routingnumber holds the value of the routingnumber edge.
+	Routingnumber []*RoutingNumber `json:"routingnumber,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // BranchOrErr returns the Branch value or an error if the edge
@@ -88,6 +92,24 @@ func (e AccountEdges) OwnerOrErr() ([]*Entity, error) {
 		return e.Owner, nil
 	}
 	return nil, &NotLoadedError{edge: "owner"}
+}
+
+// PreferenceOrErr returns the Preference value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) PreferenceOrErr() ([]*Preference, error) {
+	if e.loadedTypes[2] {
+		return e.Preference, nil
+	}
+	return nil, &NotLoadedError{edge: "preference"}
+}
+
+// RoutingnumberOrErr returns the Routingnumber value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RoutingnumberOrErr() ([]*RoutingNumber, error) {
+	if e.loadedTypes[3] {
+		return e.Routingnumber, nil
+	}
+	return nil, &NotLoadedError{edge: "routingnumber"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -244,6 +266,16 @@ func (a *Account) QueryBranch() *BranchQuery {
 // QueryOwner queries the "owner" edge of the Account entity.
 func (a *Account) QueryOwner() *EntityQuery {
 	return (&AccountClient{config: a.config}).QueryOwner(a)
+}
+
+// QueryPreference queries the "preference" edge of the Account entity.
+func (a *Account) QueryPreference() *PreferenceQuery {
+	return (&AccountClient{config: a.config}).QueryPreference(a)
+}
+
+// QueryRoutingnumber queries the "routingnumber" edge of the Account entity.
+func (a *Account) QueryRoutingnumber() *RoutingNumberQuery {
+	return (&AccountClient{config: a.config}).QueryRoutingnumber(a)
 }
 
 // Update returns a builder for updating this Account.

@@ -17,9 +17,9 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
-	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/preference"
 )
 
 // EntityQuery is the builder for querying Entity entities.
@@ -33,7 +33,7 @@ type EntityQuery struct {
 	// eager-loading edges.
 	withEntityTaxInformation *EntityTaxInformationQuery
 	withEntityAddresses      *EntityAddressQuery
-	withEntityPreferences    *EntityPreferenceQuery
+	withEntityPreferences    *PreferenceQuery
 	withEntityContactPoints  *EntityContactPointQuery
 	withOwnsAccount          *AccountQuery
 	// intermediate query (i.e. traversal path).
@@ -110,8 +110,8 @@ func (eq *EntityQuery) QueryEntityAddresses() *EntityAddressQuery {
 }
 
 // QueryEntityPreferences chains the current query on the "entityPreferences" edge.
-func (eq *EntityQuery) QueryEntityPreferences() *EntityPreferenceQuery {
-	query := &EntityPreferenceQuery{config: eq.config}
+func (eq *EntityQuery) QueryEntityPreferences() *PreferenceQuery {
+	query := &PreferenceQuery{config: eq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -122,7 +122,7 @@ func (eq *EntityQuery) QueryEntityPreferences() *EntityPreferenceQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, selector),
-			sqlgraph.To(entitypreference.Table, entitypreference.FieldID),
+			sqlgraph.To(preference.Table, preference.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityPreferencesTable, entity.EntityPreferencesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
@@ -391,8 +391,8 @@ func (eq *EntityQuery) WithEntityAddresses(opts ...func(*EntityAddressQuery)) *E
 
 // WithEntityPreferences tells the query-builder to eager-load the nodes that are connected to
 // the "entityPreferences" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EntityQuery) WithEntityPreferences(opts ...func(*EntityPreferenceQuery)) *EntityQuery {
-	query := &EntityPreferenceQuery{config: eq.config}
+func (eq *EntityQuery) WithEntityPreferences(opts ...func(*PreferenceQuery)) *EntityQuery {
+	query := &PreferenceQuery{config: eq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -579,10 +579,10 @@ func (eq *EntityQuery) sqlAll(ctx context.Context) ([]*Entity, error) {
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.EntityPreferences = []*EntityPreference{}
+			nodes[i].Edges.EntityPreferences = []*Preference{}
 		}
 		query.withFKs = true
-		query.Where(predicate.EntityPreference(func(s *sql.Selector) {
+		query.Where(predicate.Preference(func(s *sql.Selector) {
 			s.Where(sql.InValues(entity.EntityPreferencesColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)

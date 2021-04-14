@@ -100,13 +100,13 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 
 	// Add one or more preferences
 	for i := 0; i < f.Number(1, 8); i++ {
-		p, err := client.EntityPreference.
+		p, err := client.Preference.
 			Create().
 			SetName(f.Noun()).
 			SetValue(f.Word()).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating entity preferences: %w", err)
+			return nil, fmt.Errorf("failed creating preferences: %w", err)
 		}
 		e.Update().AddEntityPreferences(p).Save(ctx)
 	}

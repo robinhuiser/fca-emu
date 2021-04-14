@@ -17,6 +17,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 // AccountQuery is the builder for querying Account entities.
@@ -28,9 +30,11 @@ type AccountQuery struct {
 	fields     []string
 	predicates []predicate.Account
 	// eager-loading edges.
-	withBranch *BranchQuery
-	withOwner  *EntityQuery
-	withFKs    bool
+	withBranch        *BranchQuery
+	withOwner         *EntityQuery
+	withPreference    *PreferenceQuery
+	withRoutingnumber *RoutingNumberQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -97,6 +101,50 @@ func (aq *AccountQuery) QueryOwner() *EntityQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(entity.Table, entity.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPreference chains the current query on the "preference" edge.
+func (aq *AccountQuery) QueryPreference() *PreferenceQuery {
+	query := &PreferenceQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(preference.Table, preference.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferenceTable, account.PreferenceColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRoutingnumber chains the current query on the "routingnumber" edge.
+func (aq *AccountQuery) QueryRoutingnumber() *RoutingNumberQuery {
+	query := &RoutingNumberQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(routingnumber.Table, routingnumber.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumberTable, account.RoutingnumberColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -280,13 +328,15 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:     aq.config,
-		limit:      aq.limit,
-		offset:     aq.offset,
-		order:      append([]OrderFunc{}, aq.order...),
-		predicates: append([]predicate.Account{}, aq.predicates...),
-		withBranch: aq.withBranch.Clone(),
-		withOwner:  aq.withOwner.Clone(),
+		config:            aq.config,
+		limit:             aq.limit,
+		offset:            aq.offset,
+		order:             append([]OrderFunc{}, aq.order...),
+		predicates:        append([]predicate.Account{}, aq.predicates...),
+		withBranch:        aq.withBranch.Clone(),
+		withOwner:         aq.withOwner.Clone(),
+		withPreference:    aq.withPreference.Clone(),
+		withRoutingnumber: aq.withRoutingnumber.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -312,6 +362,28 @@ func (aq *AccountQuery) WithOwner(opts ...func(*EntityQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withOwner = query
+	return aq
+}
+
+// WithPreference tells the query-builder to eager-load the nodes that are connected to
+// the "preference" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithPreference(opts ...func(*PreferenceQuery)) *AccountQuery {
+	query := &PreferenceQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withPreference = query
+	return aq
+}
+
+// WithRoutingnumber tells the query-builder to eager-load the nodes that are connected to
+// the "routingnumber" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithRoutingnumber(opts ...func(*RoutingNumberQuery)) *AccountQuery {
+	query := &RoutingNumberQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withRoutingnumber = query
 	return aq
 }
 
@@ -381,9 +453,11 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		nodes       = []*Account{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
 			aq.withBranch != nil,
 			aq.withOwner != nil,
+			aq.withPreference != nil,
+			aq.withRoutingnumber != nil,
 		}
 	)
 	if aq.withBranch != nil {
@@ -499,6 +573,64 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 			for i := range nodes {
 				nodes[i].Edges.Owner = append(nodes[i].Edges.Owner, n)
 			}
+		}
+	}
+
+	if query := aq.withPreference; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Account)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Preference = []*Preference{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Preference(func(s *sql.Selector) {
+			s.Where(sql.InValues(account.PreferenceColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.account_preference
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "account_preference" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_preference" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Preference = append(node.Edges.Preference, n)
+		}
+	}
+
+	if query := aq.withRoutingnumber; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Account)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Routingnumber = []*RoutingNumber{}
+		}
+		query.withFKs = true
+		query.Where(predicate.RoutingNumber(func(s *sql.Selector) {
+			s.Where(sql.InValues(account.RoutingnumberColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.account_routingnumber
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "account_routingnumber" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_routingnumber" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Routingnumber = append(node.Edges.Routingnumber, n)
 		}
 	}
 

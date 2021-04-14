@@ -15,6 +15,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 // AccountUpdate is the builder for updating Account entities.
@@ -208,6 +210,36 @@ func (au *AccountUpdate) AddOwner(e ...*Entity) *AccountUpdate {
 	return au.AddOwnerIDs(ids...)
 }
 
+// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+func (au *AccountUpdate) AddPreferenceIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddPreferenceIDs(ids...)
+	return au
+}
+
+// AddPreference adds the "preference" edges to the Preference entity.
+func (au *AccountUpdate) AddPreference(p ...*Preference) *AccountUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.AddPreferenceIDs(ids...)
+}
+
+// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+func (au *AccountUpdate) AddRoutingnumberIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddRoutingnumberIDs(ids...)
+	return au
+}
+
+// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
+func (au *AccountUpdate) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return au.AddRoutingnumberIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -238,6 +270,48 @@ func (au *AccountUpdate) RemoveOwner(e ...*Entity) *AccountUpdate {
 		ids[i] = e[i].ID
 	}
 	return au.RemoveOwnerIDs(ids...)
+}
+
+// ClearPreference clears all "preference" edges to the Preference entity.
+func (au *AccountUpdate) ClearPreference() *AccountUpdate {
+	au.mutation.ClearPreference()
+	return au
+}
+
+// RemovePreferenceIDs removes the "preference" edge to Preference entities by IDs.
+func (au *AccountUpdate) RemovePreferenceIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemovePreferenceIDs(ids...)
+	return au
+}
+
+// RemovePreference removes "preference" edges to Preference entities.
+func (au *AccountUpdate) RemovePreference(p ...*Preference) *AccountUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.RemovePreferenceIDs(ids...)
+}
+
+// ClearRoutingnumber clears all "routingnumber" edges to the RoutingNumber entity.
+func (au *AccountUpdate) ClearRoutingnumber() *AccountUpdate {
+	au.mutation.ClearRoutingnumber()
+	return au
+}
+
+// RemoveRoutingnumberIDs removes the "routingnumber" edge to RoutingNumber entities by IDs.
+func (au *AccountUpdate) RemoveRoutingnumberIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemoveRoutingnumberIDs(ids...)
+	return au
+}
+
+// RemoveRoutingnumber removes "routingnumber" edges to RoutingNumber entities.
+func (au *AccountUpdate) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return au.RemoveRoutingnumberIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -542,6 +616,114 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.PreferenceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedPreferenceIDs(); len(nodes) > 0 && !au.mutation.PreferenceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.PreferenceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.RoutingnumberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedRoutingnumberIDs(); len(nodes) > 0 && !au.mutation.RoutingnumberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -738,6 +920,36 @@ func (auo *AccountUpdateOne) AddOwner(e ...*Entity) *AccountUpdateOne {
 	return auo.AddOwnerIDs(ids...)
 }
 
+// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+func (auo *AccountUpdateOne) AddPreferenceIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddPreferenceIDs(ids...)
+	return auo
+}
+
+// AddPreference adds the "preference" edges to the Preference entity.
+func (auo *AccountUpdateOne) AddPreference(p ...*Preference) *AccountUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.AddPreferenceIDs(ids...)
+}
+
+// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+func (auo *AccountUpdateOne) AddRoutingnumberIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddRoutingnumberIDs(ids...)
+	return auo
+}
+
+// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
+func (auo *AccountUpdateOne) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return auo.AddRoutingnumberIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -768,6 +980,48 @@ func (auo *AccountUpdateOne) RemoveOwner(e ...*Entity) *AccountUpdateOne {
 		ids[i] = e[i].ID
 	}
 	return auo.RemoveOwnerIDs(ids...)
+}
+
+// ClearPreference clears all "preference" edges to the Preference entity.
+func (auo *AccountUpdateOne) ClearPreference() *AccountUpdateOne {
+	auo.mutation.ClearPreference()
+	return auo
+}
+
+// RemovePreferenceIDs removes the "preference" edge to Preference entities by IDs.
+func (auo *AccountUpdateOne) RemovePreferenceIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemovePreferenceIDs(ids...)
+	return auo
+}
+
+// RemovePreference removes "preference" edges to Preference entities.
+func (auo *AccountUpdateOne) RemovePreference(p ...*Preference) *AccountUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.RemovePreferenceIDs(ids...)
+}
+
+// ClearRoutingnumber clears all "routingnumber" edges to the RoutingNumber entity.
+func (auo *AccountUpdateOne) ClearRoutingnumber() *AccountUpdateOne {
+	auo.mutation.ClearRoutingnumber()
+	return auo
+}
+
+// RemoveRoutingnumberIDs removes the "routingnumber" edge to RoutingNumber entities by IDs.
+func (auo *AccountUpdateOne) RemoveRoutingnumberIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemoveRoutingnumberIDs(ids...)
+	return auo
+}
+
+// RemoveRoutingnumber removes "routingnumber" edges to RoutingNumber entities.
+func (auo *AccountUpdateOne) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return auo.RemoveRoutingnumberIDs(ids...)
 }
 
 // Save executes the query and returns the updated Account entity.
@@ -1069,6 +1323,114 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.PreferenceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedPreferenceIDs(); len(nodes) > 0 && !auo.mutation.PreferenceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.PreferenceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.RoutingnumberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedRoutingnumberIDs(); len(nodes) > 0 && !auo.mutation.RoutingnumberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
 				},
 			},
 		}

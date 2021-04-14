@@ -15,9 +15,9 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
-	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/preference"
 )
 
 // EntityUpdate is the builder for updating Entity entities.
@@ -105,6 +105,20 @@ func (eu *EntityUpdate) SetDateOfBirth(t time.Time) *EntityUpdate {
 	return eu
 }
 
+// SetActive sets the "active" field.
+func (eu *EntityUpdate) SetActive(b bool) *EntityUpdate {
+	eu.mutation.SetActive(b)
+	return eu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (eu *EntityUpdate) SetNillableActive(b *bool) *EntityUpdate {
+	if b != nil {
+		eu.SetActive(*b)
+	}
+	return eu
+}
+
 // SetType sets the "type" field.
 func (eu *EntityUpdate) SetType(e entity.Type) *EntityUpdate {
 	eu.mutation.SetType(e)
@@ -165,17 +179,17 @@ func (eu *EntityUpdate) AddEntityAddresses(e ...*EntityAddress) *EntityUpdate {
 	return eu.AddEntityAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the EntityPreference entity by IDs.
+// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
 func (eu *EntityUpdate) AddEntityPreferenceIDs(ids ...int) *EntityUpdate {
 	eu.mutation.AddEntityPreferenceIDs(ids...)
 	return eu
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the EntityPreference entity.
-func (eu *EntityUpdate) AddEntityPreferences(e ...*EntityPreference) *EntityUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
+func (eu *EntityUpdate) AddEntityPreferences(p ...*Preference) *EntityUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return eu.AddEntityPreferenceIDs(ids...)
 }
@@ -257,23 +271,23 @@ func (eu *EntityUpdate) RemoveEntityAddresses(e ...*EntityAddress) *EntityUpdate
 	return eu.RemoveEntityAddressIDs(ids...)
 }
 
-// ClearEntityPreferences clears all "entityPreferences" edges to the EntityPreference entity.
+// ClearEntityPreferences clears all "entityPreferences" edges to the Preference entity.
 func (eu *EntityUpdate) ClearEntityPreferences() *EntityUpdate {
 	eu.mutation.ClearEntityPreferences()
 	return eu
 }
 
-// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to EntityPreference entities by IDs.
+// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to Preference entities by IDs.
 func (eu *EntityUpdate) RemoveEntityPreferenceIDs(ids ...int) *EntityUpdate {
 	eu.mutation.RemoveEntityPreferenceIDs(ids...)
 	return eu
 }
 
-// RemoveEntityPreferences removes "entityPreferences" edges to EntityPreference entities.
-func (eu *EntityUpdate) RemoveEntityPreferences(e ...*EntityPreference) *EntityUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// RemoveEntityPreferences removes "entityPreferences" edges to Preference entities.
+func (eu *EntityUpdate) RemoveEntityPreferences(p ...*Preference) *EntityUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return eu.RemoveEntityPreferenceIDs(ids...)
 }
@@ -458,6 +472,13 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: entity.FieldDateOfBirth,
 		})
 	}
+	if value, ok := eu.mutation.Active(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: entity.FieldActive,
+		})
+	}
 	if value, ok := eu.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -611,7 +632,7 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}
@@ -627,7 +648,7 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}
@@ -646,7 +667,7 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}
@@ -853,6 +874,20 @@ func (euo *EntityUpdateOne) SetDateOfBirth(t time.Time) *EntityUpdateOne {
 	return euo
 }
 
+// SetActive sets the "active" field.
+func (euo *EntityUpdateOne) SetActive(b bool) *EntityUpdateOne {
+	euo.mutation.SetActive(b)
+	return euo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (euo *EntityUpdateOne) SetNillableActive(b *bool) *EntityUpdateOne {
+	if b != nil {
+		euo.SetActive(*b)
+	}
+	return euo
+}
+
 // SetType sets the "type" field.
 func (euo *EntityUpdateOne) SetType(e entity.Type) *EntityUpdateOne {
 	euo.mutation.SetType(e)
@@ -913,17 +948,17 @@ func (euo *EntityUpdateOne) AddEntityAddresses(e ...*EntityAddress) *EntityUpdat
 	return euo.AddEntityAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the EntityPreference entity by IDs.
+// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
 func (euo *EntityUpdateOne) AddEntityPreferenceIDs(ids ...int) *EntityUpdateOne {
 	euo.mutation.AddEntityPreferenceIDs(ids...)
 	return euo
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the EntityPreference entity.
-func (euo *EntityUpdateOne) AddEntityPreferences(e ...*EntityPreference) *EntityUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
+func (euo *EntityUpdateOne) AddEntityPreferences(p ...*Preference) *EntityUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return euo.AddEntityPreferenceIDs(ids...)
 }
@@ -1005,23 +1040,23 @@ func (euo *EntityUpdateOne) RemoveEntityAddresses(e ...*EntityAddress) *EntityUp
 	return euo.RemoveEntityAddressIDs(ids...)
 }
 
-// ClearEntityPreferences clears all "entityPreferences" edges to the EntityPreference entity.
+// ClearEntityPreferences clears all "entityPreferences" edges to the Preference entity.
 func (euo *EntityUpdateOne) ClearEntityPreferences() *EntityUpdateOne {
 	euo.mutation.ClearEntityPreferences()
 	return euo
 }
 
-// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to EntityPreference entities by IDs.
+// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to Preference entities by IDs.
 func (euo *EntityUpdateOne) RemoveEntityPreferenceIDs(ids ...int) *EntityUpdateOne {
 	euo.mutation.RemoveEntityPreferenceIDs(ids...)
 	return euo
 }
 
-// RemoveEntityPreferences removes "entityPreferences" edges to EntityPreference entities.
-func (euo *EntityUpdateOne) RemoveEntityPreferences(e ...*EntityPreference) *EntityUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// RemoveEntityPreferences removes "entityPreferences" edges to Preference entities.
+func (euo *EntityUpdateOne) RemoveEntityPreferences(p ...*Preference) *EntityUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return euo.RemoveEntityPreferenceIDs(ids...)
 }
@@ -1211,6 +1246,13 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 			Column: entity.FieldDateOfBirth,
 		})
 	}
+	if value, ok := euo.mutation.Active(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: entity.FieldActive,
+		})
+	}
 	if value, ok := euo.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -1364,7 +1406,7 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}
@@ -1380,7 +1422,7 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}
@@ -1399,7 +1441,7 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: entitypreference.FieldID,
+					Column: preference.FieldID,
 				},
 			},
 		}

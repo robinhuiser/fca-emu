@@ -28,10 +28,10 @@ type Tx struct {
 	EntityAddress *EntityAddressClient
 	// EntityContactPoint is the client for interacting with the EntityContactPoint builders.
 	EntityContactPoint *EntityContactPointClient
-	// EntityPreference is the client for interacting with the EntityPreference builders.
-	EntityPreference *EntityPreferenceClient
 	// EntityTaxInformation is the client for interacting with the EntityTaxInformation builders.
 	EntityTaxInformation *EntityTaxInformationClient
+	// Preference is the client for interacting with the Preference builders.
+	Preference *PreferenceClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
 	// RoutingNumber is the client for interacting with the RoutingNumber builders.
@@ -179,8 +179,8 @@ func (tx *Tx) init() {
 	tx.Entity = NewEntityClient(tx.config)
 	tx.EntityAddress = NewEntityAddressClient(tx.config)
 	tx.EntityContactPoint = NewEntityContactPointClient(tx.config)
-	tx.EntityPreference = NewEntityPreferenceClient(tx.config)
 	tx.EntityTaxInformation = NewEntityTaxInformationClient(tx.config)
+	tx.Preference = NewPreferenceClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
 	tx.RoutingNumber = NewRoutingNumberClient(tx.config)
 }

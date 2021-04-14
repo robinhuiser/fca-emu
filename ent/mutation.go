@@ -17,9 +17,9 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
 	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
-	"github.com/robinhuiser/fca-emu/ent/entitypreference"
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 
@@ -43,8 +43,8 @@ const (
 	TypeEntity               = "Entity"
 	TypeEntityAddress        = "EntityAddress"
 	TypeEntityContactPoint   = "EntityContactPoint"
-	TypeEntityPreference     = "EntityPreference"
 	TypeEntityTaxInformation = "EntityTaxInformation"
+	TypePreference           = "Preference"
 	TypeProduct              = "Product"
 	TypeRoutingNumber        = "RoutingNumber"
 )
@@ -52,36 +52,42 @@ const (
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
 type AccountMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *uuid.UUID
-	_type               *string
-	number              *string
-	parentId            *uuid.UUID
-	name                *string
-	title               *string
-	dateCreated         *time.Time
-	dateOpened          *time.Time
-	dateLastUpdated     *time.Time
-	dateClosed          *time.Time
-	currencyCode        *string
-	status              *string
-	source              *string
-	interestReporting   *bool
-	currentBalance      *float32
-	addcurrentBalance   *float32
-	availableBalance    *float32
-	addavailableBalance *float32
-	url                 *string
-	clearedFields       map[string]struct{}
-	branch              *int
-	clearedbranch       bool
-	owner               map[uuid.UUID]struct{}
-	removedowner        map[uuid.UUID]struct{}
-	clearedowner        bool
-	done                bool
-	oldValue            func(context.Context) (*Account, error)
-	predicates          []predicate.Account
+	op                   Op
+	typ                  string
+	id                   *uuid.UUID
+	_type                *string
+	number               *string
+	parentId             *uuid.UUID
+	name                 *string
+	title                *string
+	dateCreated          *time.Time
+	dateOpened           *time.Time
+	dateLastUpdated      *time.Time
+	dateClosed           *time.Time
+	currencyCode         *string
+	status               *string
+	source               *string
+	interestReporting    *bool
+	currentBalance       *float32
+	addcurrentBalance    *float32
+	availableBalance     *float32
+	addavailableBalance  *float32
+	url                  *string
+	clearedFields        map[string]struct{}
+	branch               *int
+	clearedbranch        bool
+	owner                map[uuid.UUID]struct{}
+	removedowner         map[uuid.UUID]struct{}
+	clearedowner         bool
+	preference           map[int]struct{}
+	removedpreference    map[int]struct{}
+	clearedpreference    bool
+	routingnumber        map[int]struct{}
+	removedroutingnumber map[int]struct{}
+	clearedroutingnumber bool
+	done                 bool
+	oldValue             func(context.Context) (*Account, error)
+	predicates           []predicate.Account
 }
 
 var _ ent.Mutation = (*AccountMutation)(nil)
@@ -916,6 +922,112 @@ func (m *AccountMutation) ResetOwner() {
 	m.removedowner = nil
 }
 
+// AddPreferenceIDs adds the "preference" edge to the Preference entity by ids.
+func (m *AccountMutation) AddPreferenceIDs(ids ...int) {
+	if m.preference == nil {
+		m.preference = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.preference[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPreference clears the "preference" edge to the Preference entity.
+func (m *AccountMutation) ClearPreference() {
+	m.clearedpreference = true
+}
+
+// PreferenceCleared returns if the "preference" edge to the Preference entity was cleared.
+func (m *AccountMutation) PreferenceCleared() bool {
+	return m.clearedpreference
+}
+
+// RemovePreferenceIDs removes the "preference" edge to the Preference entity by IDs.
+func (m *AccountMutation) RemovePreferenceIDs(ids ...int) {
+	if m.removedpreference == nil {
+		m.removedpreference = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedpreference[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPreference returns the removed IDs of the "preference" edge to the Preference entity.
+func (m *AccountMutation) RemovedPreferenceIDs() (ids []int) {
+	for id := range m.removedpreference {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PreferenceIDs returns the "preference" edge IDs in the mutation.
+func (m *AccountMutation) PreferenceIDs() (ids []int) {
+	for id := range m.preference {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPreference resets all changes to the "preference" edge.
+func (m *AccountMutation) ResetPreference() {
+	m.preference = nil
+	m.clearedpreference = false
+	m.removedpreference = nil
+}
+
+// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by ids.
+func (m *AccountMutation) AddRoutingnumberIDs(ids ...int) {
+	if m.routingnumber == nil {
+		m.routingnumber = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.routingnumber[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRoutingnumber clears the "routingnumber" edge to the RoutingNumber entity.
+func (m *AccountMutation) ClearRoutingnumber() {
+	m.clearedroutingnumber = true
+}
+
+// RoutingnumberCleared returns if the "routingnumber" edge to the RoutingNumber entity was cleared.
+func (m *AccountMutation) RoutingnumberCleared() bool {
+	return m.clearedroutingnumber
+}
+
+// RemoveRoutingnumberIDs removes the "routingnumber" edge to the RoutingNumber entity by IDs.
+func (m *AccountMutation) RemoveRoutingnumberIDs(ids ...int) {
+	if m.removedroutingnumber == nil {
+		m.removedroutingnumber = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedroutingnumber[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRoutingnumber returns the removed IDs of the "routingnumber" edge to the RoutingNumber entity.
+func (m *AccountMutation) RemovedRoutingnumberIDs() (ids []int) {
+	for id := range m.removedroutingnumber {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RoutingnumberIDs returns the "routingnumber" edge IDs in the mutation.
+func (m *AccountMutation) RoutingnumberIDs() (ids []int) {
+	for id := range m.routingnumber {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRoutingnumber resets all changes to the "routingnumber" edge.
+func (m *AccountMutation) ResetRoutingnumber() {
+	m.routingnumber = nil
+	m.clearedroutingnumber = false
+	m.removedroutingnumber = nil
+}
+
 // Op returns the operation name.
 func (m *AccountMutation) Op() Op {
 	return m.op
@@ -1332,12 +1444,18 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.branch != nil {
 		edges = append(edges, account.EdgeBranch)
 	}
 	if m.owner != nil {
 		edges = append(edges, account.EdgeOwner)
+	}
+	if m.preference != nil {
+		edges = append(edges, account.EdgePreference)
+	}
+	if m.routingnumber != nil {
+		edges = append(edges, account.EdgeRoutingnumber)
 	}
 	return edges
 }
@@ -1356,15 +1474,33 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgePreference:
+		ids := make([]ent.Value, 0, len(m.preference))
+		for id := range m.preference {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRoutingnumber:
+		ids := make([]ent.Value, 0, len(m.routingnumber))
+		for id := range m.routingnumber {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedowner != nil {
 		edges = append(edges, account.EdgeOwner)
+	}
+	if m.removedpreference != nil {
+		edges = append(edges, account.EdgePreference)
+	}
+	if m.removedroutingnumber != nil {
+		edges = append(edges, account.EdgeRoutingnumber)
 	}
 	return edges
 }
@@ -1379,18 +1515,36 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgePreference:
+		ids := make([]ent.Value, 0, len(m.removedpreference))
+		for id := range m.removedpreference {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRoutingnumber:
+		ids := make([]ent.Value, 0, len(m.removedroutingnumber))
+		for id := range m.removedroutingnumber {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedbranch {
 		edges = append(edges, account.EdgeBranch)
 	}
 	if m.clearedowner {
 		edges = append(edges, account.EdgeOwner)
+	}
+	if m.clearedpreference {
+		edges = append(edges, account.EdgePreference)
+	}
+	if m.clearedroutingnumber {
+		edges = append(edges, account.EdgeRoutingnumber)
 	}
 	return edges
 }
@@ -1403,6 +1557,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedbranch
 	case account.EdgeOwner:
 		return m.clearedowner
+	case account.EdgePreference:
+		return m.clearedpreference
+	case account.EdgeRoutingnumber:
+		return m.clearedroutingnumber
 	}
 	return false
 }
@@ -1427,6 +1585,12 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeOwner:
 		m.ResetOwner()
+		return nil
+	case account.EdgePreference:
+		m.ResetPreference()
+		return nil
+	case account.EdgeRoutingnumber:
+		m.ResetRoutingnumber()
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
@@ -3808,6 +3972,7 @@ type EntityMutation struct {
 	lastname                    *string
 	fullname                    *string
 	dateOfBirth                 *time.Time
+	active                      *bool
 	_type                       *entity.Type
 	lastLoginDate               *time.Time
 	username                    *string
@@ -4138,6 +4303,42 @@ func (m *EntityMutation) ResetDateOfBirth() {
 	m.dateOfBirth = nil
 }
 
+// SetActive sets the "active" field.
+func (m *EntityMutation) SetActive(b bool) {
+	m.active = &b
+}
+
+// Active returns the value of the "active" field in the mutation.
+func (m *EntityMutation) Active() (r bool, exists bool) {
+	v := m.active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActive returns the old "active" field's value of the Entity entity.
+// If the Entity object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EntityMutation) OldActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
+	}
+	return oldValue.Active, nil
+}
+
+// ResetActive resets all changes to the "active" field.
+func (m *EntityMutation) ResetActive() {
+	m.active = nil
+}
+
 // SetType sets the "type" field.
 func (m *EntityMutation) SetType(e entity.Type) {
 	m._type = &e
@@ -4424,7 +4625,7 @@ func (m *EntityMutation) ResetEntityAddresses() {
 	m.removedentityAddresses = nil
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the EntityPreference entity by ids.
+// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by ids.
 func (m *EntityMutation) AddEntityPreferenceIDs(ids ...int) {
 	if m.entityPreferences == nil {
 		m.entityPreferences = make(map[int]struct{})
@@ -4434,17 +4635,17 @@ func (m *EntityMutation) AddEntityPreferenceIDs(ids ...int) {
 	}
 }
 
-// ClearEntityPreferences clears the "entityPreferences" edge to the EntityPreference entity.
+// ClearEntityPreferences clears the "entityPreferences" edge to the Preference entity.
 func (m *EntityMutation) ClearEntityPreferences() {
 	m.clearedentityPreferences = true
 }
 
-// EntityPreferencesCleared returns if the "entityPreferences" edge to the EntityPreference entity was cleared.
+// EntityPreferencesCleared returns if the "entityPreferences" edge to the Preference entity was cleared.
 func (m *EntityMutation) EntityPreferencesCleared() bool {
 	return m.clearedentityPreferences
 }
 
-// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to the EntityPreference entity by IDs.
+// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to the Preference entity by IDs.
 func (m *EntityMutation) RemoveEntityPreferenceIDs(ids ...int) {
 	if m.removedentityPreferences == nil {
 		m.removedentityPreferences = make(map[int]struct{})
@@ -4454,7 +4655,7 @@ func (m *EntityMutation) RemoveEntityPreferenceIDs(ids ...int) {
 	}
 }
 
-// RemovedEntityPreferences returns the removed IDs of the "entityPreferences" edge to the EntityPreference entity.
+// RemovedEntityPreferences returns the removed IDs of the "entityPreferences" edge to the Preference entity.
 func (m *EntityMutation) RemovedEntityPreferencesIDs() (ids []int) {
 	for id := range m.removedentityPreferences {
 		ids = append(ids, id)
@@ -4597,7 +4798,7 @@ func (m *EntityMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EntityMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.dateCreated != nil {
 		fields = append(fields, entity.FieldDateCreated)
 	}
@@ -4612,6 +4813,9 @@ func (m *EntityMutation) Fields() []string {
 	}
 	if m.dateOfBirth != nil {
 		fields = append(fields, entity.FieldDateOfBirth)
+	}
+	if m.active != nil {
+		fields = append(fields, entity.FieldActive)
 	}
 	if m._type != nil {
 		fields = append(fields, entity.FieldType)
@@ -4646,6 +4850,8 @@ func (m *EntityMutation) Field(name string) (ent.Value, bool) {
 		return m.Fullname()
 	case entity.FieldDateOfBirth:
 		return m.DateOfBirth()
+	case entity.FieldActive:
+		return m.Active()
 	case entity.FieldType:
 		return m.GetType()
 	case entity.FieldLastLoginDate:
@@ -4675,6 +4881,8 @@ func (m *EntityMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldFullname(ctx)
 	case entity.FieldDateOfBirth:
 		return m.OldDateOfBirth(ctx)
+	case entity.FieldActive:
+		return m.OldActive(ctx)
 	case entity.FieldType:
 		return m.OldType(ctx)
 	case entity.FieldLastLoginDate:
@@ -4728,6 +4936,13 @@ func (m *EntityMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDateOfBirth(v)
+		return nil
+	case entity.FieldActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActive(v)
 		return nil
 	case entity.FieldType:
 		v, ok := value.(entity.Type)
@@ -4848,6 +5063,9 @@ func (m *EntityMutation) ResetField(name string) error {
 		return nil
 	case entity.FieldDateOfBirth:
 		m.ResetDateOfBirth()
+		return nil
+	case entity.FieldActive:
+		m.ResetActive()
 		return nil
 	case entity.FieldType:
 		m.ResetType()
@@ -6431,347 +6649,6 @@ func (m *EntityContactPointMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown EntityContactPoint edge %s", name)
 }
 
-// EntityPreferenceMutation represents an operation that mutates the EntityPreference nodes in the graph.
-type EntityPreferenceMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	value         *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*EntityPreference, error)
-	predicates    []predicate.EntityPreference
-}
-
-var _ ent.Mutation = (*EntityPreferenceMutation)(nil)
-
-// entitypreferenceOption allows management of the mutation configuration using functional options.
-type entitypreferenceOption func(*EntityPreferenceMutation)
-
-// newEntityPreferenceMutation creates new mutation for the EntityPreference entity.
-func newEntityPreferenceMutation(c config, op Op, opts ...entitypreferenceOption) *EntityPreferenceMutation {
-	m := &EntityPreferenceMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeEntityPreference,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withEntityPreferenceID sets the ID field of the mutation.
-func withEntityPreferenceID(id int) entitypreferenceOption {
-	return func(m *EntityPreferenceMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *EntityPreference
-		)
-		m.oldValue = func(ctx context.Context) (*EntityPreference, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().EntityPreference.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withEntityPreference sets the old EntityPreference of the mutation.
-func withEntityPreference(node *EntityPreference) entitypreferenceOption {
-	return func(m *EntityPreferenceMutation) {
-		m.oldValue = func(context.Context) (*EntityPreference, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EntityPreferenceMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m EntityPreferenceMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID
-// is only available if it was provided to the builder.
-func (m *EntityPreferenceMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetName sets the "name" field.
-func (m *EntityPreferenceMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *EntityPreferenceMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the EntityPreference entity.
-// If the EntityPreference object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EntityPreferenceMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *EntityPreferenceMutation) ResetName() {
-	m.name = nil
-}
-
-// SetValue sets the "value" field.
-func (m *EntityPreferenceMutation) SetValue(s string) {
-	m.value = &s
-}
-
-// Value returns the value of the "value" field in the mutation.
-func (m *EntityPreferenceMutation) Value() (r string, exists bool) {
-	v := m.value
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldValue returns the old "value" field's value of the EntityPreference entity.
-// If the EntityPreference object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EntityPreferenceMutation) OldValue(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldValue is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldValue requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldValue: %w", err)
-	}
-	return oldValue.Value, nil
-}
-
-// ResetValue resets all changes to the "value" field.
-func (m *EntityPreferenceMutation) ResetValue() {
-	m.value = nil
-}
-
-// Op returns the operation name.
-func (m *EntityPreferenceMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (EntityPreference).
-func (m *EntityPreferenceMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *EntityPreferenceMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.name != nil {
-		fields = append(fields, entitypreference.FieldName)
-	}
-	if m.value != nil {
-		fields = append(fields, entitypreference.FieldValue)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *EntityPreferenceMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case entitypreference.FieldName:
-		return m.Name()
-	case entitypreference.FieldValue:
-		return m.Value()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *EntityPreferenceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case entitypreference.FieldName:
-		return m.OldName(ctx)
-	case entitypreference.FieldValue:
-		return m.OldValue(ctx)
-	}
-	return nil, fmt.Errorf("unknown EntityPreference field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *EntityPreferenceMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case entitypreference.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
-	case entitypreference.FieldValue:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetValue(v)
-		return nil
-	}
-	return fmt.Errorf("unknown EntityPreference field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *EntityPreferenceMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *EntityPreferenceMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *EntityPreferenceMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown EntityPreference numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *EntityPreferenceMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *EntityPreferenceMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *EntityPreferenceMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown EntityPreference nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *EntityPreferenceMutation) ResetField(name string) error {
-	switch name {
-	case entitypreference.FieldName:
-		m.ResetName()
-		return nil
-	case entitypreference.FieldValue:
-		m.ResetValue()
-		return nil
-	}
-	return fmt.Errorf("unknown EntityPreference field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EntityPreferenceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *EntityPreferenceMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EntityPreferenceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *EntityPreferenceMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EntityPreferenceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *EntityPreferenceMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *EntityPreferenceMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown EntityPreference unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *EntityPreferenceMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown EntityPreference edge %s", name)
-}
-
 // EntityTaxInformationMutation represents an operation that mutates the EntityTaxInformation nodes in the graph.
 type EntityTaxInformationMutation struct {
 	config
@@ -7111,6 +6988,347 @@ func (m *EntityTaxInformationMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EntityTaxInformationMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown EntityTaxInformation edge %s", name)
+}
+
+// PreferenceMutation represents an operation that mutates the Preference nodes in the graph.
+type PreferenceMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	value         *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Preference, error)
+	predicates    []predicate.Preference
+}
+
+var _ ent.Mutation = (*PreferenceMutation)(nil)
+
+// preferenceOption allows management of the mutation configuration using functional options.
+type preferenceOption func(*PreferenceMutation)
+
+// newPreferenceMutation creates new mutation for the Preference entity.
+func newPreferenceMutation(c config, op Op, opts ...preferenceOption) *PreferenceMutation {
+	m := &PreferenceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePreference,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPreferenceID sets the ID field of the mutation.
+func withPreferenceID(id int) preferenceOption {
+	return func(m *PreferenceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Preference
+		)
+		m.oldValue = func(ctx context.Context) (*Preference, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Preference.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPreference sets the old Preference of the mutation.
+func withPreference(node *Preference) preferenceOption {
+	return func(m *PreferenceMutation) {
+		m.oldValue = func(context.Context) (*Preference, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PreferenceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PreferenceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *PreferenceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetName sets the "name" field.
+func (m *PreferenceMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *PreferenceMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Preference entity.
+// If the Preference object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PreferenceMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *PreferenceMutation) ResetName() {
+	m.name = nil
+}
+
+// SetValue sets the "value" field.
+func (m *PreferenceMutation) SetValue(s string) {
+	m.value = &s
+}
+
+// Value returns the value of the "value" field in the mutation.
+func (m *PreferenceMutation) Value() (r string, exists bool) {
+	v := m.value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValue returns the old "value" field's value of the Preference entity.
+// If the Preference object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PreferenceMutation) OldValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValue: %w", err)
+	}
+	return oldValue.Value, nil
+}
+
+// ResetValue resets all changes to the "value" field.
+func (m *PreferenceMutation) ResetValue() {
+	m.value = nil
+}
+
+// Op returns the operation name.
+func (m *PreferenceMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Preference).
+func (m *PreferenceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PreferenceMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, preference.FieldName)
+	}
+	if m.value != nil {
+		fields = append(fields, preference.FieldValue)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PreferenceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case preference.FieldName:
+		return m.Name()
+	case preference.FieldValue:
+		return m.Value()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PreferenceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case preference.FieldName:
+		return m.OldName(ctx)
+	case preference.FieldValue:
+		return m.OldValue(ctx)
+	}
+	return nil, fmt.Errorf("unknown Preference field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PreferenceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case preference.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case preference.FieldValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Preference field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PreferenceMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PreferenceMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PreferenceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Preference numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PreferenceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PreferenceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PreferenceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Preference nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PreferenceMutation) ResetField(name string) error {
+	switch name {
+	case preference.FieldName:
+		m.ResetName()
+		return nil
+	case preference.FieldValue:
+		m.ResetValue()
+		return nil
+	}
+	return fmt.Errorf("unknown Preference field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PreferenceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PreferenceMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PreferenceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PreferenceMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PreferenceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PreferenceMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PreferenceMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Preference unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PreferenceMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Preference edge %s", name)
 }
 
 // ProductMutation represents an operation that mutates the Product nodes in the graph.

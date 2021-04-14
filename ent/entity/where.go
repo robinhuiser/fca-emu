@@ -129,6 +129,13 @@ func DateOfBirth(v time.Time) predicate.Entity {
 	})
 }
 
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.Entity {
+	return predicate.Entity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActive), v))
+	})
+}
+
 // LastLoginDate applies equality check predicate on the "lastLoginDate" field. It's identical to LastLoginDateEQ.
 func LastLoginDate(v time.Time) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
@@ -684,6 +691,20 @@ func DateOfBirthLTE(v time.Time) predicate.Entity {
 	})
 }
 
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.Entity {
+	return predicate.Entity(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActive), v))
+	})
+}
+
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.Entity {
+	return predicate.Entity(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldActive), v))
+	})
+}
+
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v Type) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
@@ -1210,7 +1231,7 @@ func HasEntityPreferences() predicate.Entity {
 }
 
 // HasEntityPreferencesWith applies the HasEdge predicate on the "entityPreferences" edge with a given conditions (other predicates).
-func HasEntityPreferencesWith(preds ...predicate.EntityPreference) predicate.Entity {
+func HasEntityPreferencesWith(preds ...predicate.Preference) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),

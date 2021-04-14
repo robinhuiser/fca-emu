@@ -27,6 +27,8 @@ type Entity struct {
 	Fullname string `json:"fullname,omitempty"`
 	// DateOfBirth holds the value of the "dateOfBirth" field.
 	DateOfBirth time.Time `json:"dateOfBirth,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// Type holds the value of the "type" field.
 	Type entity.Type `json:"type,omitempty"`
 	// LastLoginDate holds the value of the "lastLoginDate" field.
@@ -49,7 +51,7 @@ type EntityEdges struct {
 	// EntityAddresses holds the value of the entityAddresses edge.
 	EntityAddresses []*EntityAddress `json:"entityAddresses,omitempty"`
 	// EntityPreferences holds the value of the entityPreferences edge.
-	EntityPreferences []*EntityPreference `json:"entityPreferences,omitempty"`
+	EntityPreferences []*Preference `json:"entityPreferences,omitempty"`
 	// EntityContactPoints holds the value of the entityContactPoints edge.
 	EntityContactPoints []*EntityContactPoint `json:"entityContactPoints,omitempty"`
 	// OwnsAccount holds the value of the owns_account edge.
@@ -79,7 +81,7 @@ func (e EntityEdges) EntityAddressesOrErr() ([]*EntityAddress, error) {
 
 // EntityPreferencesOrErr returns the EntityPreferences value or an error if the edge
 // was not loaded in eager-loading.
-func (e EntityEdges) EntityPreferencesOrErr() ([]*EntityPreference, error) {
+func (e EntityEdges) EntityPreferencesOrErr() ([]*Preference, error) {
 	if e.loadedTypes[2] {
 		return e.EntityPreferences, nil
 	}
@@ -109,6 +111,8 @@ func (*Entity) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case entity.FieldActive:
+			values[i] = &sql.NullBool{}
 		case entity.FieldFirstname, entity.FieldLastname, entity.FieldFullname, entity.FieldType, entity.FieldUsername, entity.FieldToken, entity.FieldURL:
 			values[i] = &sql.NullString{}
 		case entity.FieldDateCreated, entity.FieldDateOfBirth, entity.FieldLastLoginDate:
@@ -166,6 +170,12 @@ func (e *Entity) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				e.DateOfBirth = value.Time
 			}
+		case entity.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				e.Active = value.Bool
+			}
 		case entity.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
@@ -212,7 +222,7 @@ func (e *Entity) QueryEntityAddresses() *EntityAddressQuery {
 }
 
 // QueryEntityPreferences queries the "entityPreferences" edge of the Entity entity.
-func (e *Entity) QueryEntityPreferences() *EntityPreferenceQuery {
+func (e *Entity) QueryEntityPreferences() *PreferenceQuery {
 	return (&EntityClient{config: e.config}).QueryEntityPreferences(e)
 }
 
@@ -259,6 +269,8 @@ func (e *Entity) String() string {
 	builder.WriteString(e.Fullname)
 	builder.WriteString(", dateOfBirth=")
 	builder.WriteString(e.DateOfBirth.Format(time.ANSIC))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", e.Active))
 	builder.WriteString(", type=")
 	builder.WriteString(fmt.Sprintf("%v", e.Type))
 	builder.WriteString(", lastLoginDate=")

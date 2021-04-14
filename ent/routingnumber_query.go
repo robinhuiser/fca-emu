@@ -23,6 +23,7 @@ type RoutingNumberQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.RoutingNumber
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -302,9 +303,13 @@ func (rnq *RoutingNumberQuery) prepareQuery(ctx context.Context) error {
 
 func (rnq *RoutingNumberQuery) sqlAll(ctx context.Context) ([]*RoutingNumber, error) {
 	var (
-		nodes = []*RoutingNumber{}
-		_spec = rnq.querySpec()
+		nodes   = []*RoutingNumber{}
+		withFKs = rnq.withFKs
+		_spec   = rnq.querySpec()
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, routingnumber.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &RoutingNumber{config: rnq.config}
 		nodes = append(nodes, node)

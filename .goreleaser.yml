@@ -17,8 +17,10 @@ archives:
 dockers:
   - 
     image_templates:
-      - "docker.io/rdclda/fca-emu:{{ .Tag }}"
-      - "docker.io/rdclda/fca-emu:latest"
+      # - "docker.io/rdclda/fca-emu:{{ .Tag }}"
+      # - "docker.io/rdclda/fca-emu:latest"
+      - "tecdigitalacr.azurecr.io/utils/fca-emu:{{ .Tag }}"
+      - "tecdigitalacr.azurecr.io/utils/fca-emu:latest"
     build_flag_templates:
     - "--pull"
     - "--label=org.opencontainers.image.created={{.Date}}"

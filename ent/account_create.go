@@ -14,6 +14,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -173,6 +175,36 @@ func (ac *AccountCreate) AddOwner(e ...*Entity) *AccountCreate {
 		ids[i] = e[i].ID
 	}
 	return ac.AddOwnerIDs(ids...)
+}
+
+// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+func (ac *AccountCreate) AddPreferenceIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddPreferenceIDs(ids...)
+	return ac
+}
+
+// AddPreference adds the "preference" edges to the Preference entity.
+func (ac *AccountCreate) AddPreference(p ...*Preference) *AccountCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ac.AddPreferenceIDs(ids...)
+}
+
+// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+func (ac *AccountCreate) AddRoutingnumberIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddRoutingnumberIDs(ids...)
+	return ac
+}
+
+// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
+func (ac *AccountCreate) AddRoutingnumber(r ...*RoutingNumber) *AccountCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ac.AddRoutingnumberIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -462,6 +494,44 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: entity.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.PreferenceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PreferenceTable,
+			Columns: []string{account.PreferenceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: preference.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RoutingnumberTable,
+			Columns: []string{account.RoutingnumberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: routingnumber.FieldID,
 				},
 			},
 		}

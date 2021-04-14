@@ -28,6 +28,10 @@ func init() {
 	branch.StateValidator = branchDescState.Validators[0].(func(string) error)
 	entityFields := schema.Entity{}.Fields()
 	_ = entityFields
+	// entityDescActive is the schema descriptor for active field.
+	entityDescActive := entityFields[6].Descriptor()
+	// entity.DefaultActive holds the default value on creation for the active field.
+	entity.DefaultActive = entityDescActive.Default.(bool)
 	// entityDescID is the schema descriptor for id field.
 	entityDescID := entityFields[0].Descriptor()
 	// entity.DefaultID holds the default value on creation for the id field.

@@ -47,6 +47,10 @@ const (
 	EdgeBranch = "branch"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
+	// EdgePreference holds the string denoting the preference edge name in mutations.
+	EdgePreference = "preference"
+	// EdgeRoutingnumber holds the string denoting the routingnumber edge name in mutations.
+	EdgeRoutingnumber = "routingnumber"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// BranchTable is the table the holds the branch relation/edge.
@@ -61,6 +65,20 @@ const (
 	// OwnerInverseTable is the table name for the Entity entity.
 	// It exists in this package in order to avoid circular dependency with the "entity" package.
 	OwnerInverseTable = "entities"
+	// PreferenceTable is the table the holds the preference relation/edge.
+	PreferenceTable = "preferences"
+	// PreferenceInverseTable is the table name for the Preference entity.
+	// It exists in this package in order to avoid circular dependency with the "preference" package.
+	PreferenceInverseTable = "preferences"
+	// PreferenceColumn is the table column denoting the preference relation/edge.
+	PreferenceColumn = "account_preference"
+	// RoutingnumberTable is the table the holds the routingnumber relation/edge.
+	RoutingnumberTable = "routing_numbers"
+	// RoutingnumberInverseTable is the table name for the RoutingNumber entity.
+	// It exists in this package in order to avoid circular dependency with the "routingnumber" package.
+	RoutingnumberInverseTable = "routing_numbers"
+	// RoutingnumberColumn is the table column denoting the routingnumber relation/edge.
+	RoutingnumberColumn = "account_routingnumber"
 )
 
 // Columns holds all SQL columns for account fields.
