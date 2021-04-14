@@ -66,5 +66,6 @@ $ git push origin main -f --tags
 $ goreleaser --skip-publish --rm-dist
 
 # Publish
+$ az acr login --name tecdigitalacr
 $ goreleaser --rm-dist
 ~~~
