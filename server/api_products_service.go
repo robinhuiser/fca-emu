@@ -36,7 +36,7 @@ func (s *ProductsApiService) GetProducts(ctx context.Context, productType string
 		return Response(401, setErrorResponse("Invalid token")), nil
 	}
 
-	// Mandatory setting
+	// Mandatory parameter
 	if len(productType) == 0 {
 		return Response(400, setErrorResponse("Mandatory parameter productType not specified")), nil
 	}
