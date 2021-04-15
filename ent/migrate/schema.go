@@ -184,10 +184,10 @@ var (
 	// EntityContactPointsColumns holds the columns for the "entity_contact_points" table.
 	EntityContactPointsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "prefix", Type: field.TypeInt, Nullable: true},
+		{Name: "prefix", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"}},
-		{Name: "suffix", Type: field.TypeInt, Nullable: true},
+		{Name: "suffix", Type: field.TypeString, Nullable: true},
 		{Name: "value", Type: field.TypeString},
 		{Name: "entity_entity_contact_points", Type: field.TypeUUID, Nullable: true},
 	}

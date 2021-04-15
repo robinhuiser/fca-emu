@@ -13,10 +13,10 @@ type EntityContactPoint struct {
 // Fields of the EntityContactPoints.
 func (EntityContactPoint) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("prefix").Optional(),
+		field.String("prefix").Optional(),
 		field.String("name"),
 		field.Enum("type").Values("SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"),
-		field.Int("suffix").Optional(),
+		field.String("suffix").Optional(),
 		field.String("value"),
 	}
 }

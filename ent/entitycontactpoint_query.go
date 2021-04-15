@@ -246,7 +246,7 @@ func (ecpq *EntityContactPointQuery) Clone() *EntityContactPointQuery {
 // Example:
 //
 //	var v []struct {
-//		Prefix int `json:"prefix,omitempty"`
+//		Prefix string `json:"prefix,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -273,7 +273,7 @@ func (ecpq *EntityContactPointQuery) GroupBy(field string, fields ...string) *En
 // Example:
 //
 //	var v []struct {
-//		Prefix int `json:"prefix,omitempty"`
+//		Prefix string `json:"prefix,omitempty"`
 //	}
 //
 //	client.EntityContactPoint.Query().

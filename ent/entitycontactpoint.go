@@ -17,13 +17,13 @@ type EntityContactPoint struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Prefix holds the value of the "prefix" field.
-	Prefix int `json:"prefix,omitempty"`
+	Prefix string `json:"prefix,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Type holds the value of the "type" field.
 	Type entitycontactpoint.Type `json:"type,omitempty"`
 	// Suffix holds the value of the "suffix" field.
-	Suffix int `json:"suffix,omitempty"`
+	Suffix string `json:"suffix,omitempty"`
 	// Value holds the value of the "value" field.
 	Value                        string `json:"value,omitempty"`
 	entity_entity_contact_points *uuid.UUID
@@ -34,9 +34,9 @@ func (*EntityContactPoint) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case entitycontactpoint.FieldID, entitycontactpoint.FieldPrefix, entitycontactpoint.FieldSuffix:
+		case entitycontactpoint.FieldID:
 			values[i] = &sql.NullInt64{}
-		case entitycontactpoint.FieldName, entitycontactpoint.FieldType, entitycontactpoint.FieldValue:
+		case entitycontactpoint.FieldPrefix, entitycontactpoint.FieldName, entitycontactpoint.FieldType, entitycontactpoint.FieldSuffix, entitycontactpoint.FieldValue:
 			values[i] = &sql.NullString{}
 		case entitycontactpoint.ForeignKeys[0]: // entity_entity_contact_points
 			values[i] = &uuid.UUID{}
@@ -62,10 +62,10 @@ func (ecp *EntityContactPoint) assignValues(columns []string, values []interface
 			}
 			ecp.ID = int(value.Int64)
 		case entitycontactpoint.FieldPrefix:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field prefix", values[i])
 			} else if value.Valid {
-				ecp.Prefix = int(value.Int64)
+				ecp.Prefix = value.String
 			}
 		case entitycontactpoint.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -80,10 +80,10 @@ func (ecp *EntityContactPoint) assignValues(columns []string, values []interface
 				ecp.Type = entitycontactpoint.Type(value.String)
 			}
 		case entitycontactpoint.FieldSuffix:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field suffix", values[i])
 			} else if value.Valid {
-				ecp.Suffix = int(value.Int64)
+				ecp.Suffix = value.String
 			}
 		case entitycontactpoint.FieldValue:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -126,13 +126,13 @@ func (ecp *EntityContactPoint) String() string {
 	builder.WriteString("EntityContactPoint(")
 	builder.WriteString(fmt.Sprintf("id=%v", ecp.ID))
 	builder.WriteString(", prefix=")
-	builder.WriteString(fmt.Sprintf("%v", ecp.Prefix))
+	builder.WriteString(ecp.Prefix)
 	builder.WriteString(", name=")
 	builder.WriteString(ecp.Name)
 	builder.WriteString(", type=")
 	builder.WriteString(fmt.Sprintf("%v", ecp.Type))
 	builder.WriteString(", suffix=")
-	builder.WriteString(fmt.Sprintf("%v", ecp.Suffix))
+	builder.WriteString(ecp.Suffix)
 	builder.WriteString(", value=")
 	builder.WriteString(ecp.Value)
 	builder.WriteByte(')')

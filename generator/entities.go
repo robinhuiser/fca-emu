@@ -3,6 +3,7 @@ package generator
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -140,10 +141,10 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		case a == 2:
 			c, err := client.EntityContactPoint.
 				Create().
-				SetPrefix(f.Number(1, 9)).
+				SetPrefix(strconv.Itoa(f.Number(1, 9))).
 				SetName("Work phone").
 				SetType("PHONE").
-				SetSuffix(f.Number(111, 999)).
+				SetSuffix(strconv.Itoa(f.Number(111, 999))).
 				SetValue(f.Phone()).
 				Save(ctx)
 			if err != nil {

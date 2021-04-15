@@ -6099,12 +6099,10 @@ type EntityContactPointMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	prefix        *int
-	addprefix     *int
+	prefix        *string
 	name          *string
 	_type         *entitycontactpoint.Type
-	suffix        *int
-	addsuffix     *int
+	suffix        *string
 	value         *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -6192,13 +6190,12 @@ func (m *EntityContactPointMutation) ID() (id int, exists bool) {
 }
 
 // SetPrefix sets the "prefix" field.
-func (m *EntityContactPointMutation) SetPrefix(i int) {
-	m.prefix = &i
-	m.addprefix = nil
+func (m *EntityContactPointMutation) SetPrefix(s string) {
+	m.prefix = &s
 }
 
 // Prefix returns the value of the "prefix" field in the mutation.
-func (m *EntityContactPointMutation) Prefix() (r int, exists bool) {
+func (m *EntityContactPointMutation) Prefix() (r string, exists bool) {
 	v := m.prefix
 	if v == nil {
 		return
@@ -6209,7 +6206,7 @@ func (m *EntityContactPointMutation) Prefix() (r int, exists bool) {
 // OldPrefix returns the old "prefix" field's value of the EntityContactPoint entity.
 // If the EntityContactPoint object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EntityContactPointMutation) OldPrefix(ctx context.Context) (v int, err error) {
+func (m *EntityContactPointMutation) OldPrefix(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldPrefix is only allowed on UpdateOne operations")
 	}
@@ -6223,28 +6220,9 @@ func (m *EntityContactPointMutation) OldPrefix(ctx context.Context) (v int, err 
 	return oldValue.Prefix, nil
 }
 
-// AddPrefix adds i to the "prefix" field.
-func (m *EntityContactPointMutation) AddPrefix(i int) {
-	if m.addprefix != nil {
-		*m.addprefix += i
-	} else {
-		m.addprefix = &i
-	}
-}
-
-// AddedPrefix returns the value that was added to the "prefix" field in this mutation.
-func (m *EntityContactPointMutation) AddedPrefix() (r int, exists bool) {
-	v := m.addprefix
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearPrefix clears the value of the "prefix" field.
 func (m *EntityContactPointMutation) ClearPrefix() {
 	m.prefix = nil
-	m.addprefix = nil
 	m.clearedFields[entitycontactpoint.FieldPrefix] = struct{}{}
 }
 
@@ -6257,7 +6235,6 @@ func (m *EntityContactPointMutation) PrefixCleared() bool {
 // ResetPrefix resets all changes to the "prefix" field.
 func (m *EntityContactPointMutation) ResetPrefix() {
 	m.prefix = nil
-	m.addprefix = nil
 	delete(m.clearedFields, entitycontactpoint.FieldPrefix)
 }
 
@@ -6334,13 +6311,12 @@ func (m *EntityContactPointMutation) ResetType() {
 }
 
 // SetSuffix sets the "suffix" field.
-func (m *EntityContactPointMutation) SetSuffix(i int) {
-	m.suffix = &i
-	m.addsuffix = nil
+func (m *EntityContactPointMutation) SetSuffix(s string) {
+	m.suffix = &s
 }
 
 // Suffix returns the value of the "suffix" field in the mutation.
-func (m *EntityContactPointMutation) Suffix() (r int, exists bool) {
+func (m *EntityContactPointMutation) Suffix() (r string, exists bool) {
 	v := m.suffix
 	if v == nil {
 		return
@@ -6351,7 +6327,7 @@ func (m *EntityContactPointMutation) Suffix() (r int, exists bool) {
 // OldSuffix returns the old "suffix" field's value of the EntityContactPoint entity.
 // If the EntityContactPoint object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EntityContactPointMutation) OldSuffix(ctx context.Context) (v int, err error) {
+func (m *EntityContactPointMutation) OldSuffix(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldSuffix is only allowed on UpdateOne operations")
 	}
@@ -6365,28 +6341,9 @@ func (m *EntityContactPointMutation) OldSuffix(ctx context.Context) (v int, err 
 	return oldValue.Suffix, nil
 }
 
-// AddSuffix adds i to the "suffix" field.
-func (m *EntityContactPointMutation) AddSuffix(i int) {
-	if m.addsuffix != nil {
-		*m.addsuffix += i
-	} else {
-		m.addsuffix = &i
-	}
-}
-
-// AddedSuffix returns the value that was added to the "suffix" field in this mutation.
-func (m *EntityContactPointMutation) AddedSuffix() (r int, exists bool) {
-	v := m.addsuffix
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearSuffix clears the value of the "suffix" field.
 func (m *EntityContactPointMutation) ClearSuffix() {
 	m.suffix = nil
-	m.addsuffix = nil
 	m.clearedFields[entitycontactpoint.FieldSuffix] = struct{}{}
 }
 
@@ -6399,7 +6356,6 @@ func (m *EntityContactPointMutation) SuffixCleared() bool {
 // ResetSuffix resets all changes to the "suffix" field.
 func (m *EntityContactPointMutation) ResetSuffix() {
 	m.suffix = nil
-	m.addsuffix = nil
 	delete(m.clearedFields, entitycontactpoint.FieldSuffix)
 }
 
@@ -6516,7 +6472,7 @@ func (m *EntityContactPointMutation) OldField(ctx context.Context, name string) 
 func (m *EntityContactPointMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case entitycontactpoint.FieldPrefix:
-		v, ok := value.(int)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6537,7 +6493,7 @@ func (m *EntityContactPointMutation) SetField(name string, value ent.Value) erro
 		m.SetType(v)
 		return nil
 	case entitycontactpoint.FieldSuffix:
-		v, ok := value.(int)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6557,26 +6513,13 @@ func (m *EntityContactPointMutation) SetField(name string, value ent.Value) erro
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *EntityContactPointMutation) AddedFields() []string {
-	var fields []string
-	if m.addprefix != nil {
-		fields = append(fields, entitycontactpoint.FieldPrefix)
-	}
-	if m.addsuffix != nil {
-		fields = append(fields, entitycontactpoint.FieldSuffix)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *EntityContactPointMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case entitycontactpoint.FieldPrefix:
-		return m.AddedPrefix()
-	case entitycontactpoint.FieldSuffix:
-		return m.AddedSuffix()
-	}
 	return nil, false
 }
 
@@ -6585,20 +6528,6 @@ func (m *EntityContactPointMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *EntityContactPointMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case entitycontactpoint.FieldPrefix:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddPrefix(v)
-		return nil
-	case entitycontactpoint.FieldSuffix:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSuffix(v)
-		return nil
 	}
 	return fmt.Errorf("unknown EntityContactPoint numeric field %s", name)
 }

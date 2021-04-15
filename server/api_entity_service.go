@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
@@ -256,10 +255,10 @@ func mapContactPoints(cntpts []*ent.EntityContactPoint) []ContactPoint {
 	contactpoints := []ContactPoint{}
 	for _, cntpt := range cntpts {
 		c := ContactPoint{
-			Prefix: strconv.Itoa(cntpt.Prefix),
+			Prefix: cntpt.Prefix,
 			Name:   cntpt.Name,
 			Type:   cntpt.Type.String(),
-			Suffix: strconv.Itoa(cntpt.Suffix),
+			Suffix: cntpt.Suffix,
 			Value:  cntpt.Value,
 		}
 		contactpoints = append(contactpoints, c)

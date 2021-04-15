@@ -91,7 +91,7 @@ func IDLTE(id int) predicate.EntityContactPoint {
 }
 
 // Prefix applies equality check predicate on the "prefix" field. It's identical to PrefixEQ.
-func Prefix(v int) predicate.EntityContactPoint {
+func Prefix(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPrefix), v))
 	})
@@ -105,7 +105,7 @@ func Name(v string) predicate.EntityContactPoint {
 }
 
 // Suffix applies equality check predicate on the "suffix" field. It's identical to SuffixEQ.
-func Suffix(v int) predicate.EntityContactPoint {
+func Suffix(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSuffix), v))
 	})
@@ -119,21 +119,21 @@ func Value(v string) predicate.EntityContactPoint {
 }
 
 // PrefixEQ applies the EQ predicate on the "prefix" field.
-func PrefixEQ(v int) predicate.EntityContactPoint {
+func PrefixEQ(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPrefix), v))
 	})
 }
 
 // PrefixNEQ applies the NEQ predicate on the "prefix" field.
-func PrefixNEQ(v int) predicate.EntityContactPoint {
+func PrefixNEQ(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldPrefix), v))
 	})
 }
 
 // PrefixIn applies the In predicate on the "prefix" field.
-func PrefixIn(vs ...int) predicate.EntityContactPoint {
+func PrefixIn(vs ...string) predicate.EntityContactPoint {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -150,7 +150,7 @@ func PrefixIn(vs ...int) predicate.EntityContactPoint {
 }
 
 // PrefixNotIn applies the NotIn predicate on the "prefix" field.
-func PrefixNotIn(vs ...int) predicate.EntityContactPoint {
+func PrefixNotIn(vs ...string) predicate.EntityContactPoint {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -167,30 +167,51 @@ func PrefixNotIn(vs ...int) predicate.EntityContactPoint {
 }
 
 // PrefixGT applies the GT predicate on the "prefix" field.
-func PrefixGT(v int) predicate.EntityContactPoint {
+func PrefixGT(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldPrefix), v))
 	})
 }
 
 // PrefixGTE applies the GTE predicate on the "prefix" field.
-func PrefixGTE(v int) predicate.EntityContactPoint {
+func PrefixGTE(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldPrefix), v))
 	})
 }
 
 // PrefixLT applies the LT predicate on the "prefix" field.
-func PrefixLT(v int) predicate.EntityContactPoint {
+func PrefixLT(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldPrefix), v))
 	})
 }
 
 // PrefixLTE applies the LTE predicate on the "prefix" field.
-func PrefixLTE(v int) predicate.EntityContactPoint {
+func PrefixLTE(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixContains applies the Contains predicate on the "prefix" field.
+func PrefixContains(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixHasPrefix applies the HasPrefix predicate on the "prefix" field.
+func PrefixHasPrefix(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixHasSuffix applies the HasSuffix predicate on the "prefix" field.
+func PrefixHasSuffix(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPrefix), v))
 	})
 }
 
@@ -205,6 +226,20 @@ func PrefixIsNil() predicate.EntityContactPoint {
 func PrefixNotNil() predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldPrefix)))
+	})
+}
+
+// PrefixEqualFold applies the EqualFold predicate on the "prefix" field.
+func PrefixEqualFold(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPrefix), v))
+	})
+}
+
+// PrefixContainsFold applies the ContainsFold predicate on the "prefix" field.
+func PrefixContainsFold(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPrefix), v))
 	})
 }
 
@@ -368,21 +403,21 @@ func TypeNotIn(vs ...Type) predicate.EntityContactPoint {
 }
 
 // SuffixEQ applies the EQ predicate on the "suffix" field.
-func SuffixEQ(v int) predicate.EntityContactPoint {
+func SuffixEQ(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSuffix), v))
 	})
 }
 
 // SuffixNEQ applies the NEQ predicate on the "suffix" field.
-func SuffixNEQ(v int) predicate.EntityContactPoint {
+func SuffixNEQ(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldSuffix), v))
 	})
 }
 
 // SuffixIn applies the In predicate on the "suffix" field.
-func SuffixIn(vs ...int) predicate.EntityContactPoint {
+func SuffixIn(vs ...string) predicate.EntityContactPoint {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -399,7 +434,7 @@ func SuffixIn(vs ...int) predicate.EntityContactPoint {
 }
 
 // SuffixNotIn applies the NotIn predicate on the "suffix" field.
-func SuffixNotIn(vs ...int) predicate.EntityContactPoint {
+func SuffixNotIn(vs ...string) predicate.EntityContactPoint {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -416,30 +451,51 @@ func SuffixNotIn(vs ...int) predicate.EntityContactPoint {
 }
 
 // SuffixGT applies the GT predicate on the "suffix" field.
-func SuffixGT(v int) predicate.EntityContactPoint {
+func SuffixGT(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldSuffix), v))
 	})
 }
 
 // SuffixGTE applies the GTE predicate on the "suffix" field.
-func SuffixGTE(v int) predicate.EntityContactPoint {
+func SuffixGTE(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldSuffix), v))
 	})
 }
 
 // SuffixLT applies the LT predicate on the "suffix" field.
-func SuffixLT(v int) predicate.EntityContactPoint {
+func SuffixLT(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldSuffix), v))
 	})
 }
 
 // SuffixLTE applies the LTE predicate on the "suffix" field.
-func SuffixLTE(v int) predicate.EntityContactPoint {
+func SuffixLTE(v string) predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSuffix), v))
+	})
+}
+
+// SuffixContains applies the Contains predicate on the "suffix" field.
+func SuffixContains(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSuffix), v))
+	})
+}
+
+// SuffixHasPrefix applies the HasPrefix predicate on the "suffix" field.
+func SuffixHasPrefix(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSuffix), v))
+	})
+}
+
+// SuffixHasSuffix applies the HasSuffix predicate on the "suffix" field.
+func SuffixHasSuffix(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSuffix), v))
 	})
 }
 
@@ -454,6 +510,20 @@ func SuffixIsNil() predicate.EntityContactPoint {
 func SuffixNotNil() predicate.EntityContactPoint {
 	return predicate.EntityContactPoint(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldSuffix)))
+	})
+}
+
+// SuffixEqualFold applies the EqualFold predicate on the "suffix" field.
+func SuffixEqualFold(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSuffix), v))
+	})
+}
+
+// SuffixContainsFold applies the ContainsFold predicate on the "suffix" field.
+func SuffixContainsFold(v string) predicate.EntityContactPoint {
+	return predicate.EntityContactPoint(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSuffix), v))
 	})
 }
 

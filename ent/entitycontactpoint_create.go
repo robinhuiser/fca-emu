@@ -20,15 +20,15 @@ type EntityContactPointCreate struct {
 }
 
 // SetPrefix sets the "prefix" field.
-func (ecpc *EntityContactPointCreate) SetPrefix(i int) *EntityContactPointCreate {
-	ecpc.mutation.SetPrefix(i)
+func (ecpc *EntityContactPointCreate) SetPrefix(s string) *EntityContactPointCreate {
+	ecpc.mutation.SetPrefix(s)
 	return ecpc
 }
 
 // SetNillablePrefix sets the "prefix" field if the given value is not nil.
-func (ecpc *EntityContactPointCreate) SetNillablePrefix(i *int) *EntityContactPointCreate {
-	if i != nil {
-		ecpc.SetPrefix(*i)
+func (ecpc *EntityContactPointCreate) SetNillablePrefix(s *string) *EntityContactPointCreate {
+	if s != nil {
+		ecpc.SetPrefix(*s)
 	}
 	return ecpc
 }
@@ -46,15 +46,15 @@ func (ecpc *EntityContactPointCreate) SetType(e entitycontactpoint.Type) *Entity
 }
 
 // SetSuffix sets the "suffix" field.
-func (ecpc *EntityContactPointCreate) SetSuffix(i int) *EntityContactPointCreate {
-	ecpc.mutation.SetSuffix(i)
+func (ecpc *EntityContactPointCreate) SetSuffix(s string) *EntityContactPointCreate {
+	ecpc.mutation.SetSuffix(s)
 	return ecpc
 }
 
 // SetNillableSuffix sets the "suffix" field if the given value is not nil.
-func (ecpc *EntityContactPointCreate) SetNillableSuffix(i *int) *EntityContactPointCreate {
-	if i != nil {
-		ecpc.SetSuffix(*i)
+func (ecpc *EntityContactPointCreate) SetNillableSuffix(s *string) *EntityContactPointCreate {
+	if s != nil {
+		ecpc.SetSuffix(*s)
 	}
 	return ecpc
 }
@@ -159,7 +159,7 @@ func (ecpc *EntityContactPointCreate) createSpec() (*EntityContactPoint, *sqlgra
 	)
 	if value, ok := ecpc.mutation.Prefix(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldPrefix,
 		})
@@ -183,7 +183,7 @@ func (ecpc *EntityContactPointCreate) createSpec() (*EntityContactPoint, *sqlgra
 	}
 	if value, ok := ecpc.mutation.Suffix(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldSuffix,
 		})

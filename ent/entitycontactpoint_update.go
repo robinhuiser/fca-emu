@@ -27,23 +27,16 @@ func (ecpu *EntityContactPointUpdate) Where(ps ...predicate.EntityContactPoint) 
 }
 
 // SetPrefix sets the "prefix" field.
-func (ecpu *EntityContactPointUpdate) SetPrefix(i int) *EntityContactPointUpdate {
-	ecpu.mutation.ResetPrefix()
-	ecpu.mutation.SetPrefix(i)
+func (ecpu *EntityContactPointUpdate) SetPrefix(s string) *EntityContactPointUpdate {
+	ecpu.mutation.SetPrefix(s)
 	return ecpu
 }
 
 // SetNillablePrefix sets the "prefix" field if the given value is not nil.
-func (ecpu *EntityContactPointUpdate) SetNillablePrefix(i *int) *EntityContactPointUpdate {
-	if i != nil {
-		ecpu.SetPrefix(*i)
+func (ecpu *EntityContactPointUpdate) SetNillablePrefix(s *string) *EntityContactPointUpdate {
+	if s != nil {
+		ecpu.SetPrefix(*s)
 	}
-	return ecpu
-}
-
-// AddPrefix adds i to the "prefix" field.
-func (ecpu *EntityContactPointUpdate) AddPrefix(i int) *EntityContactPointUpdate {
-	ecpu.mutation.AddPrefix(i)
 	return ecpu
 }
 
@@ -66,23 +59,16 @@ func (ecpu *EntityContactPointUpdate) SetType(e entitycontactpoint.Type) *Entity
 }
 
 // SetSuffix sets the "suffix" field.
-func (ecpu *EntityContactPointUpdate) SetSuffix(i int) *EntityContactPointUpdate {
-	ecpu.mutation.ResetSuffix()
-	ecpu.mutation.SetSuffix(i)
+func (ecpu *EntityContactPointUpdate) SetSuffix(s string) *EntityContactPointUpdate {
+	ecpu.mutation.SetSuffix(s)
 	return ecpu
 }
 
 // SetNillableSuffix sets the "suffix" field if the given value is not nil.
-func (ecpu *EntityContactPointUpdate) SetNillableSuffix(i *int) *EntityContactPointUpdate {
-	if i != nil {
-		ecpu.SetSuffix(*i)
+func (ecpu *EntityContactPointUpdate) SetNillableSuffix(s *string) *EntityContactPointUpdate {
+	if s != nil {
+		ecpu.SetSuffix(*s)
 	}
-	return ecpu
-}
-
-// AddSuffix adds i to the "suffix" field.
-func (ecpu *EntityContactPointUpdate) AddSuffix(i int) *EntityContactPointUpdate {
-	ecpu.mutation.AddSuffix(i)
 	return ecpu
 }
 
@@ -190,21 +176,14 @@ func (ecpu *EntityContactPointUpdate) sqlSave(ctx context.Context) (n int, err e
 	}
 	if value, ok := ecpu.mutation.Prefix(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: entitycontactpoint.FieldPrefix,
-		})
-	}
-	if value, ok := ecpu.mutation.AddedPrefix(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldPrefix,
 		})
 	}
 	if ecpu.mutation.PrefixCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Column: entitycontactpoint.FieldPrefix,
 		})
 	}
@@ -224,21 +203,14 @@ func (ecpu *EntityContactPointUpdate) sqlSave(ctx context.Context) (n int, err e
 	}
 	if value, ok := ecpu.mutation.Suffix(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: entitycontactpoint.FieldSuffix,
-		})
-	}
-	if value, ok := ecpu.mutation.AddedSuffix(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldSuffix,
 		})
 	}
 	if ecpu.mutation.SuffixCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Column: entitycontactpoint.FieldSuffix,
 		})
 	}
@@ -268,23 +240,16 @@ type EntityContactPointUpdateOne struct {
 }
 
 // SetPrefix sets the "prefix" field.
-func (ecpuo *EntityContactPointUpdateOne) SetPrefix(i int) *EntityContactPointUpdateOne {
-	ecpuo.mutation.ResetPrefix()
-	ecpuo.mutation.SetPrefix(i)
+func (ecpuo *EntityContactPointUpdateOne) SetPrefix(s string) *EntityContactPointUpdateOne {
+	ecpuo.mutation.SetPrefix(s)
 	return ecpuo
 }
 
 // SetNillablePrefix sets the "prefix" field if the given value is not nil.
-func (ecpuo *EntityContactPointUpdateOne) SetNillablePrefix(i *int) *EntityContactPointUpdateOne {
-	if i != nil {
-		ecpuo.SetPrefix(*i)
+func (ecpuo *EntityContactPointUpdateOne) SetNillablePrefix(s *string) *EntityContactPointUpdateOne {
+	if s != nil {
+		ecpuo.SetPrefix(*s)
 	}
-	return ecpuo
-}
-
-// AddPrefix adds i to the "prefix" field.
-func (ecpuo *EntityContactPointUpdateOne) AddPrefix(i int) *EntityContactPointUpdateOne {
-	ecpuo.mutation.AddPrefix(i)
 	return ecpuo
 }
 
@@ -307,23 +272,16 @@ func (ecpuo *EntityContactPointUpdateOne) SetType(e entitycontactpoint.Type) *En
 }
 
 // SetSuffix sets the "suffix" field.
-func (ecpuo *EntityContactPointUpdateOne) SetSuffix(i int) *EntityContactPointUpdateOne {
-	ecpuo.mutation.ResetSuffix()
-	ecpuo.mutation.SetSuffix(i)
+func (ecpuo *EntityContactPointUpdateOne) SetSuffix(s string) *EntityContactPointUpdateOne {
+	ecpuo.mutation.SetSuffix(s)
 	return ecpuo
 }
 
 // SetNillableSuffix sets the "suffix" field if the given value is not nil.
-func (ecpuo *EntityContactPointUpdateOne) SetNillableSuffix(i *int) *EntityContactPointUpdateOne {
-	if i != nil {
-		ecpuo.SetSuffix(*i)
+func (ecpuo *EntityContactPointUpdateOne) SetNillableSuffix(s *string) *EntityContactPointUpdateOne {
+	if s != nil {
+		ecpuo.SetSuffix(*s)
 	}
-	return ecpuo
-}
-
-// AddSuffix adds i to the "suffix" field.
-func (ecpuo *EntityContactPointUpdateOne) AddSuffix(i int) *EntityContactPointUpdateOne {
-	ecpuo.mutation.AddSuffix(i)
 	return ecpuo
 }
 
@@ -436,21 +394,14 @@ func (ecpuo *EntityContactPointUpdateOne) sqlSave(ctx context.Context) (_node *E
 	}
 	if value, ok := ecpuo.mutation.Prefix(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: entitycontactpoint.FieldPrefix,
-		})
-	}
-	if value, ok := ecpuo.mutation.AddedPrefix(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldPrefix,
 		})
 	}
 	if ecpuo.mutation.PrefixCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Column: entitycontactpoint.FieldPrefix,
 		})
 	}
@@ -470,21 +421,14 @@ func (ecpuo *EntityContactPointUpdateOne) sqlSave(ctx context.Context) (_node *E
 	}
 	if value, ok := ecpuo.mutation.Suffix(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: entitycontactpoint.FieldSuffix,
-		})
-	}
-	if value, ok := ecpuo.mutation.AddedSuffix(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: entitycontactpoint.FieldSuffix,
 		})
 	}
 	if ecpuo.mutation.SuffixCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeString,
 			Column: entitycontactpoint.FieldSuffix,
 		})
 	}
