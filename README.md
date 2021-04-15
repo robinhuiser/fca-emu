@@ -11,7 +11,7 @@ Start the server with the command below:
 $ ./fca-emu
 
 # As a Docker
-$ docker run -p 8080:8080 rdclda/fca-emu
+$ docker run -p 8080:8080 tecdigitalacr.azurecr.io/utils/fca-emu
 ~~~
 
 Please note:

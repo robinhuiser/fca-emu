@@ -57,9 +57,10 @@ To create a new release:
 ~~~bash
 # Set the token for the Github repository - see: https://github.com/settings/tokens/new
 $ export GITHUB_TOKEN=""
+$ export TAG=0.0.1
 
 # Tag (example - set to real values!)
-$ git tag -a v0.0.1 -m "initial release"
+$ git tag -a v${TAG} -m "initial release"
 $ git push origin main -f --tags
 
 # Test
@@ -68,4 +69,9 @@ $ goreleaser --skip-publish --rm-dist
 # Publish
 $ az acr login --name tecdigitalacr
 $ goreleaser --rm-dist
+
+# Create Docker archive
+$ docker save -o fca-emu_${TAG}_Docker_x86_64.tar \
+    tecdigitalacr.azurecr.io/utils/fca-emu:v${TAG} && \
+    gzip fca-emu_${TAG}_Docker_x86_64.tar
 ~~~
