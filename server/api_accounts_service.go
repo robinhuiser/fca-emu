@@ -307,39 +307,3 @@ func mapRoutingNumbers(routingnumbers []*ent.RoutingNumber) []RoutingNumber {
 	}
 	return rtns
 }
-
-func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
-	entities := []Entity{}
-	taxInformations := []TaxInformation{}
-	for _, o := range owners {
-
-		// Get Tax information
-		txs, _ := o.QueryEntityTaxInformation().All(ctx)
-		for _, t := range txs {
-			tx := TaxInformation{
-				TaxId: t.TaxId,
-				Type:  string(t.Type),
-			}
-			taxInformations = append(taxInformations, tx)
-		}
-
-		e := Entity{
-			Id:          o.ID.String(),
-			Name:        o.Fullname,
-			Active:      o.Active,
-			DateCreated: isValidBankDate(o.DateCreated.Format(util.APIDateFormat)),
-			SecurityInformation: SecurityInformation{
-				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(util.APIDateFormat)),
-				Username:      o.Username,
-				Token:         o.Token,
-			},
-			URI: FiniteUri{
-				URL: o.URL,
-			},
-			Type:           string(o.Type),
-			TaxInformation: taxInformations,
-		}
-		entities = append(entities, e)
-	}
-	return entities
-}
