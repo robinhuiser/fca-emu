@@ -18,7 +18,9 @@ Please note:
 
 * The Swagger spec is available on [http://0.0.0.0:8080/swagger-ui](http://0.0.0.0:8080/swagger-ui).
 * The value required for the access token (`X-TOKEN`) defaults to `123456789`; 
-* During startup, the emulator logs the IDs for available entities and accounts
+* During startup, the emulator logs:
+  * the available product types
+  * the IDs for available entities and accounts
 
 Use the example `curl` command below to query one of the accounts:
 
