@@ -13,7 +13,13 @@ package finite
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/entity"
+	"github.com/robinhuiser/fca-emu/util"
 )
 
 // EntityApiService is a service that implents the logic for the EntityApiServicer
@@ -29,25 +35,29 @@ func NewEntityApiService() EntityApiServicer {
 
 // GetEntity - Return entity by entityId
 func (s *EntityApiService) GetEntity(ctx context.Context, entityId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetEntity with the required logic for this service method.
-	// Add api_entity_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, Entity{}) or use other options such as http.Ok ...
-	//return Response(200, Entity{}), nil
+	// Parse and verify UUID
+	entityUUID, err := uuid.Parse(entityId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Perform the search
+	rs, err := clt.Entity.
+		Query().
+		Where(entity.ID(entityUUID)).
+		All(ctx)
+	// Error if none or more than one results are returned
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetEntity method not implemented")
+	entities := mapEntities(rs, ctx)
+	return Response(200, entities[0]), nil
 }
 
 // GetEntityProfile - Return entity profile
@@ -137,4 +147,41 @@ func (s *EntityApiService) SearchEntities(ctx context.Context, limit int32, curs
 	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchEntities method not implemented")
+}
+
+// Helper functions for mapping
+func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
+	entities := []Entity{}
+	taxInformations := []TaxInformation{}
+	for _, o := range owners {
+
+		// Get Tax information
+		txs, _ := o.QueryEntityTaxInformation().All(ctx)
+		for _, t := range txs {
+			tx := TaxInformation{
+				TaxId: t.TaxId,
+				Type:  string(t.Type),
+			}
+			taxInformations = append(taxInformations, tx)
+		}
+
+		e := Entity{
+			Id:          o.ID.String(),
+			Name:        o.Fullname,
+			Active:      o.Active,
+			DateCreated: isValidBankDate(o.DateCreated.Format(util.APIDateFormat)),
+			SecurityInformation: SecurityInformation{
+				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(util.APIDateFormat)),
+				Username:      o.Username,
+				Token:         o.Token,
+			},
+			URI: FiniteUri{
+				URL: o.URL,
+			},
+			Type:           string(o.Type),
+			TaxInformation: taxInformations,
+		}
+		entities = append(entities, e)
+	}
+	return entities
 }
