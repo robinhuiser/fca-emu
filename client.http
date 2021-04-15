@@ -6,15 +6,44 @@
 @enhance = false
 
 #
-# Test account ID
-@account_url = v1/account
-@account_id = 25c4bbde-4a9b-41ac-adc3-c2ca299302f4
+# Test data
+@account_id = 0a2854ff-b72b-4a37-90ae-946d75c6ec4c
+@product_type = DEPOSIT
+@entity_id = 2d9ad726-7dc3-43d5-a439-ddd2fb980ea8
+
 
 ### 
 
 # Get account details
 # @name account
-GET {{base_url}}/{{account_url}}/{{account_id}}?mask={{mask}}&enhance={{enhance}}
+GET {{base_url}}/v1/account/{{account_id}}?mask={{mask}}&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get products
+# @name products
+GET {{base_url}}/v1/products?productType={{product_type}}&limit=20&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get entity
+# @name entity
+GET {{base_url}}/v1/entity/{{entity_id}}?mask={{mask}}&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get entity profile
+# @name entity_profile
+GET {{base_url}}/v1/entity/{{entity_id}}/profile?mask={{mask}}&enhance={{enhance}}
 Accept: application/json
 X-TOKEN: {{access_token}}
 X-TRACE-ID: {{$guid}}
