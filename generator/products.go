@@ -9,7 +9,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
-func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker) error {
+func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (map[string]int, error) {
 
 	products := []struct {
 		productName        string
@@ -19,10 +19,15 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		productSubTypeName string
 	}{
 		{"plan401ka", "INVESTMENT", "Investment Account", "401k", "401k Plan"},
-		{"deposit112", "DEPOSIT", "Deposit Account", "DD01", "Direct Deposit Account"},
+		{"deposit111", "DEPOSIT", "Deposit One Account", "DD01", "Direct 1 Deposit Account"},
+		{"deposit112", "DEPOSIT", "Deposit Two Account", "DD02", "Direct 2 Deposit Account"},
+		{"deposit113", "DEPOSIT", "Deposit Three Account", "DD03", "Direct 3 Deposit Account"},
+		{"deposit114", "DEPOSIT", "Deposit Four Account", "DD04", "Direct 4 Deposit Account"},
 	}
 
 	// Create products
+	productTypes := map[string]int{}
+
 	for _, p := range products {
 		_, err := client.Product.
 			Create().
@@ -34,8 +39,9 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 			SetURL("https://my.cdn.com/imgs/product/" + f.DigitN(18) + ".jpg").
 			Save(ctx)
 		if err != nil {
-			return fmt.Errorf("failed creating product: %w", err)
+			return nil, fmt.Errorf("failed creating product: %w", err)
 		}
+		productTypes[p.productType] = productTypes[p.productType] + 1
 	}
-	return nil
+	return productTypes, nil
 }

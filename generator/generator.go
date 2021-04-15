@@ -33,8 +33,12 @@ func Generate(ents int, branches int, c *ent.Client) error {
 		if err := populateBanks(branches, context.Background(), c, f); err != nil {
 			return err
 		}
-		if err := populateProducts(context.Background(), c, f); err != nil {
+		pTypes, err := populateProducts(context.Background(), c, f)
+		if err != nil {
 			return err
+		}
+		for pt, n := range pTypes {
+			log.Printf("created %d product(s) with type %s", n, pt)
 		}
 
 		// Generate x number of entities
