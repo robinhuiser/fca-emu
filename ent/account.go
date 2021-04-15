@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
 // Account is the model entity for the Account schema.
@@ -52,8 +53,9 @@ type Account struct {
 	URL string `json:"url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
-	Edges          AccountEdges `json:"edges"`
-	account_branch *int
+	Edges           AccountEdges `json:"edges"`
+	account_branch  *int
+	account_product *int
 }
 
 // AccountEdges holds the relations/edges for other nodes in the graph.
@@ -66,9 +68,11 @@ type AccountEdges struct {
 	Preference []*Preference `json:"preference,omitempty"`
 	// Routingnumber holds the value of the routingnumber edge.
 	Routingnumber []*RoutingNumber `json:"routingnumber,omitempty"`
+	// Product holds the value of the product edge.
+	Product *Product `json:"product,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // BranchOrErr returns the Branch value or an error if the edge
@@ -112,6 +116,20 @@ func (e AccountEdges) RoutingnumberOrErr() ([]*RoutingNumber, error) {
 	return nil, &NotLoadedError{edge: "routingnumber"}
 }
 
+// ProductOrErr returns the Product value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AccountEdges) ProductOrErr() (*Product, error) {
+	if e.loadedTypes[4] {
+		if e.Product == nil {
+			// The edge product was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: product.Label}
+		}
+		return e.Product, nil
+	}
+	return nil, &NotLoadedError{edge: "product"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Account) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
@@ -128,6 +146,8 @@ func (*Account) scanValues(columns []string) ([]interface{}, error) {
 		case account.FieldID, account.FieldParentId:
 			values[i] = &uuid.UUID{}
 		case account.ForeignKeys[0]: // account_branch
+			values[i] = &sql.NullInt64{}
+		case account.ForeignKeys[1]: // account_product
 			values[i] = &sql.NullInt64{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Account", columns[i])
@@ -253,6 +273,13 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 				a.account_branch = new(int)
 				*a.account_branch = int(value.Int64)
 			}
+		case account.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field account_product", value)
+			} else if value.Valid {
+				a.account_product = new(int)
+				*a.account_product = int(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -276,6 +303,11 @@ func (a *Account) QueryPreference() *PreferenceQuery {
 // QueryRoutingnumber queries the "routingnumber" edge of the Account entity.
 func (a *Account) QueryRoutingnumber() *RoutingNumberQuery {
 	return (&AccountClient{config: a.config}).QueryRoutingnumber(a)
+}
+
+// QueryProduct queries the "product" edge of the Account entity.
+func (a *Account) QueryProduct() *ProductQuery {
+	return (&AccountClient{config: a.config}).QueryProduct(a)
 }
 
 // Update returns a builder for updating this Account.

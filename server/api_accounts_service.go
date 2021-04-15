@@ -61,96 +61,51 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	// Retrieve the branch of the account
-	qbr, err := rs.QueryBranch().Only(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the bank of the branch
+	// Retrieve the linked bank
 	qba, err := rs.QueryBranch().QueryBranchOwner().Only(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	// Retrieve preference(s) (attributes) of the account
-	attributes, err := rs.QueryPreference().All(ctx)
+	// Retrieve the linked branch
+	qbr, err := rs.QueryBranch().Only(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	preferences := []Attribute{}
-	for _, pref := range attributes {
-		attr := Attribute{
-			Name:  pref.Name,
-			Value: pref.Value,
-		}
-		preferences = append(preferences, attr)
+	// Retrieve the linked product
+	qpr, err := rs.QueryProduct().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
+
+	// Retrieve the linked account attributes
+	atrs, err := rs.QueryPreference().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	preferences := mapPreferences(atrs)
 
 	// Retrieve routing number(s) of the account
-	routingnumbers, err := rs.QueryRoutingnumber().All(ctx)
+	rtns, err := rs.QueryRoutingnumber().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
-
-	rtns := []RoutingNumber{}
-	for _, rtn := range routingnumbers {
-		rn := RoutingNumber{
-			Number: rtn.Number,
-			Type:   string(rtn.Type),
-		}
-		rtns = append(rtns, rn)
-	}
+	routingnumbers := mapRoutingNumbers(rtns)
 
 	// Retrieve the owner(s) (entities) of the account
-	owners, err := rs.QueryOwner().All(ctx)
+	ents, err := rs.QueryOwner().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
-
-	entities := []Entity{}
-	taxInformations := []TaxInformation{}
-	for _, o := range owners {
-
-		// Get Tax information
-		txs, err := o.QueryEntityTaxInformation().All(ctx)
-		if err != nil {
-			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-		}
-		for _, t := range txs {
-			tx := TaxInformation{
-				TaxId: t.TaxId,
-				Type:  string(t.Type),
-			}
-			taxInformations = append(taxInformations, tx)
-		}
-
-		e := Entity{
-			Id:          o.ID.String(),
-			Name:        o.Fullname,
-			Active:      o.Active,
-			DateCreated: isValidBankDate(o.DateCreated.Format(util.APIDateFormat)),
-			SecurityInformation: SecurityInformation{
-				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(util.APIDateFormat)),
-				Username:      o.Username,
-				Token:         o.Token,
-			},
-			URI: FiniteUri{
-				URL: o.URL,
-			},
-			Type:           string(o.Type),
-			TaxInformation: taxInformations,
-		}
-		entities = append(entities, e)
-	}
+	entities := mapEntities(ents, ctx)
 
 	a := Account{
 		Id:                rs.ID.String(),
 		Type:              rs.Type,
 		Number:            isMasked(mask, rs.Number),
 		ParentId:          isValidUUID(rs.ParentId.String()),
-		Name:              owners[0].Fullname, // TODO: get the primary account holder info here
+		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
 		Title:             rs.Title,
 		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
 		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),
@@ -177,7 +132,17 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		},
 		Entities:       entities,
 		Preferences:    preferences,
-		Routingnumbers: rtns,
+		Routingnumbers: routingnumbers,
+		Product: Product{
+			Number:      qpr.Name,
+			Type:        string(qpr.Type),
+			TypeName:    qpr.TypeName,
+			SubType:     qpr.SubType,
+			SubTypeName: qpr.SubTypeName,
+			URI: FiniteUri{
+				URL: qpr.URL,
+			},
+		},
 	}
 
 	return Response(200, a), nil
@@ -316,4 +281,65 @@ func (s *AccountsApiService) SearchAccounts(ctx context.Context, fields string, 
 	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchAccounts method not implemented")
+}
+
+// Helper functions for mapping
+func mapPreferences(attributes []*ent.Preference) []Attribute {
+	preferences := []Attribute{}
+	for _, pref := range attributes {
+		attr := Attribute{
+			Name:  pref.Name,
+			Value: pref.Value,
+		}
+		preferences = append(preferences, attr)
+	}
+	return preferences
+}
+
+func mapRoutingNumbers(routingnumbers []*ent.RoutingNumber) []RoutingNumber {
+	rtns := []RoutingNumber{}
+	for _, rtn := range routingnumbers {
+		rn := RoutingNumber{
+			Number: rtn.Number,
+			Type:   string(rtn.Type),
+		}
+		rtns = append(rtns, rn)
+	}
+	return rtns
+}
+
+func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
+	entities := []Entity{}
+	taxInformations := []TaxInformation{}
+	for _, o := range owners {
+
+		// Get Tax information
+		txs, _ := o.QueryEntityTaxInformation().All(ctx)
+		for _, t := range txs {
+			tx := TaxInformation{
+				TaxId: t.TaxId,
+				Type:  string(t.Type),
+			}
+			taxInformations = append(taxInformations, tx)
+		}
+
+		e := Entity{
+			Id:          o.ID.String(),
+			Name:        o.Fullname,
+			Active:      o.Active,
+			DateCreated: isValidBankDate(o.DateCreated.Format(util.APIDateFormat)),
+			SecurityInformation: SecurityInformation{
+				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(util.APIDateFormat)),
+				Username:      o.Username,
+				Token:         o.Token,
+			},
+			URI: FiniteUri{
+				URL: o.URL,
+			},
+			Type:           string(o.Type),
+			TaxInformation: taxInformations,
+		}
+		entities = append(entities, e)
+	}
+	return entities
 }

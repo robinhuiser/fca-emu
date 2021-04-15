@@ -28,6 +28,7 @@ var (
 		{Name: "available_balance", Type: field.TypeFloat32},
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "account_branch", Type: field.TypeInt, Nullable: true},
+		{Name: "account_product", Type: field.TypeInt, Nullable: true},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
 	AccountsTable = &schema.Table{
@@ -39,6 +40,12 @@ var (
 				Symbol:     "accounts_branches_branch",
 				Columns:    []*schema.Column{AccountsColumns[17]},
 				RefColumns: []*schema.Column{BranchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "accounts_products_product",
+				Columns:    []*schema.Column{AccountsColumns[18]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -330,6 +337,7 @@ var (
 
 func init() {
 	AccountsTable.ForeignKeys[0].RefTable = BranchesTable
+	AccountsTable.ForeignKeys[1].RefTable = ProductsTable
 	BranchesTable.ForeignKeys[0].RefTable = BanksTable
 	CardsTable.ForeignKeys[0].RefTable = CardNetworksTable
 	EntityAddressesTable.ForeignKeys[0].RefTable = EntitiesTable

@@ -16,6 +16,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
@@ -240,6 +241,25 @@ func (au *AccountUpdate) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdate {
 	return au.AddRoutingnumberIDs(ids...)
 }
 
+// SetProductID sets the "product" edge to the Product entity by ID.
+func (au *AccountUpdate) SetProductID(id int) *AccountUpdate {
+	au.mutation.SetProductID(id)
+	return au
+}
+
+// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
+func (au *AccountUpdate) SetNillableProductID(id *int) *AccountUpdate {
+	if id != nil {
+		au = au.SetProductID(*id)
+	}
+	return au
+}
+
+// SetProduct sets the "product" edge to the Product entity.
+func (au *AccountUpdate) SetProduct(p *Product) *AccountUpdate {
+	return au.SetProductID(p.ID)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -312,6 +332,12 @@ func (au *AccountUpdate) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdate
 		ids[i] = r[i].ID
 	}
 	return au.RemoveRoutingnumberIDs(ids...)
+}
+
+// ClearProduct clears the "product" edge to the Product entity.
+func (au *AccountUpdate) ClearProduct() *AccountUpdate {
+	au.mutation.ClearProduct()
+	return au
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -724,6 +750,41 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.ProductCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.ProductTable,
+			Columns: []string{account.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: product.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.ProductTable,
+			Columns: []string{account.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: product.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -950,6 +1011,25 @@ func (auo *AccountUpdateOne) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdat
 	return auo.AddRoutingnumberIDs(ids...)
 }
 
+// SetProductID sets the "product" edge to the Product entity by ID.
+func (auo *AccountUpdateOne) SetProductID(id int) *AccountUpdateOne {
+	auo.mutation.SetProductID(id)
+	return auo
+}
+
+// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableProductID(id *int) *AccountUpdateOne {
+	if id != nil {
+		auo = auo.SetProductID(*id)
+	}
+	return auo
+}
+
+// SetProduct sets the "product" edge to the Product entity.
+func (auo *AccountUpdateOne) SetProduct(p *Product) *AccountUpdateOne {
+	return auo.SetProductID(p.ID)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -1022,6 +1102,12 @@ func (auo *AccountUpdateOne) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUp
 		ids[i] = r[i].ID
 	}
 	return auo.RemoveRoutingnumberIDs(ids...)
+}
+
+// ClearProduct clears the "product" edge to the Product entity.
+func (auo *AccountUpdateOne) ClearProduct() *AccountUpdateOne {
+	auo.mutation.ClearProduct()
+	return auo
 }
 
 // Save executes the query and returns the updated Account entity.
@@ -1431,6 +1517,41 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: routingnumber.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ProductCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.ProductTable,
+			Columns: []string{account.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: product.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.ProductTable,
+			Columns: []string{account.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: product.FieldID,
 				},
 			},
 		}

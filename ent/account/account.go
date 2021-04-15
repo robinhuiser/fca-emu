@@ -51,6 +51,8 @@ const (
 	EdgePreference = "preference"
 	// EdgeRoutingnumber holds the string denoting the routingnumber edge name in mutations.
 	EdgeRoutingnumber = "routingnumber"
+	// EdgeProduct holds the string denoting the product edge name in mutations.
+	EdgeProduct = "product"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// BranchTable is the table the holds the branch relation/edge.
@@ -79,6 +81,13 @@ const (
 	RoutingnumberInverseTable = "routing_numbers"
 	// RoutingnumberColumn is the table column denoting the routingnumber relation/edge.
 	RoutingnumberColumn = "account_routingnumber"
+	// ProductTable is the table the holds the product relation/edge.
+	ProductTable = "accounts"
+	// ProductInverseTable is the table name for the Product entity.
+	// It exists in this package in order to avoid circular dependency with the "product" package.
+	ProductInverseTable = "products"
+	// ProductColumn is the table column denoting the product relation/edge.
+	ProductColumn = "account_product"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -106,6 +115,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"account_branch",
+	"account_product",
 }
 
 var (

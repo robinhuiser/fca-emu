@@ -25,6 +25,12 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		return nil, fmt.Errorf("failed retrieving available branches: %w", err)
 	}
 
+	// Retrieve available products
+	pr, err := client.Product.Query().All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving available products: %w", err)
+	}
+
 	a, err := client.Account.
 		Create().
 		SetType(randomAccountType(f)).
@@ -41,7 +47,8 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		SetAvailableBalance(ab).
 		SetCurrentBalance(ab).
 		SetURL("https://my.cdn.com/imgs/account/" + f.DigitN(18) + ".jpg").
-		SetBranch(b[f.Number(0, len(b))]).
+		SetBranch(b[f.Number(0, len(b)-1)]).
+		SetProduct(pr[f.Number(0, len(pr)-1)]).
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating account: %w", err)

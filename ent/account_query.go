@@ -18,6 +18,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
@@ -34,6 +35,7 @@ type AccountQuery struct {
 	withOwner         *EntityQuery
 	withPreference    *PreferenceQuery
 	withRoutingnumber *RoutingNumberQuery
+	withProduct       *ProductQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -145,6 +147,28 @@ func (aq *AccountQuery) QueryRoutingnumber() *RoutingNumberQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(routingnumber.Table, routingnumber.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumberTable, account.RoutingnumberColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProduct chains the current query on the "product" edge.
+func (aq *AccountQuery) QueryProduct() *ProductQuery {
+	query := &ProductQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, account.ProductTable, account.ProductColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -337,6 +361,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withOwner:         aq.withOwner.Clone(),
 		withPreference:    aq.withPreference.Clone(),
 		withRoutingnumber: aq.withRoutingnumber.Clone(),
+		withProduct:       aq.withProduct.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -384,6 +409,17 @@ func (aq *AccountQuery) WithRoutingnumber(opts ...func(*RoutingNumberQuery)) *Ac
 		opt(query)
 	}
 	aq.withRoutingnumber = query
+	return aq
+}
+
+// WithProduct tells the query-builder to eager-load the nodes that are connected to
+// the "product" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithProduct(opts ...func(*ProductQuery)) *AccountQuery {
+	query := &ProductQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withProduct = query
 	return aq
 }
 
@@ -453,14 +489,15 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		nodes       = []*Account{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			aq.withBranch != nil,
 			aq.withOwner != nil,
 			aq.withPreference != nil,
 			aq.withRoutingnumber != nil,
+			aq.withProduct != nil,
 		}
 	)
-	if aq.withBranch != nil {
+	if aq.withBranch != nil || aq.withProduct != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -631,6 +668,32 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "account_routingnumber" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Routingnumber = append(node.Edges.Routingnumber, n)
+		}
+	}
+
+	if query := aq.withProduct; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Account)
+		for i := range nodes {
+			fk := nodes[i].account_product
+			if fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(product.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_product" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Product = n
+			}
 		}
 	}
 

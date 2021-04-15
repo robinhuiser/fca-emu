@@ -15,6 +15,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/preference"
+	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
@@ -205,6 +206,25 @@ func (ac *AccountCreate) AddRoutingnumber(r ...*RoutingNumber) *AccountCreate {
 		ids[i] = r[i].ID
 	}
 	return ac.AddRoutingnumberIDs(ids...)
+}
+
+// SetProductID sets the "product" edge to the Product entity by ID.
+func (ac *AccountCreate) SetProductID(id int) *AccountCreate {
+	ac.mutation.SetProductID(id)
+	return ac
+}
+
+// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
+func (ac *AccountCreate) SetNillableProductID(id *int) *AccountCreate {
+	if id != nil {
+		ac = ac.SetProductID(*id)
+	}
+	return ac
+}
+
+// SetProduct sets the "product" edge to the Product entity.
+func (ac *AccountCreate) SetProduct(p *Product) *AccountCreate {
+	return ac.SetProductID(p.ID)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -538,6 +558,26 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   account.ProductTable,
+			Columns: []string{account.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: product.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.account_product = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

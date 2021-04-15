@@ -347,6 +347,22 @@ func (c *AccountClient) QueryRoutingnumber(a *Account) *RoutingNumberQuery {
 	return query
 }
 
+// QueryProduct queries the product edge of a Account.
+func (c *AccountClient) QueryProduct(a *Account) *ProductQuery {
+	query := &ProductQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, account.ProductTable, account.ProductColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
