@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_DB: finite
+      POSTGRES_DB: fca
       POSTGRES_USER: emulator
       POSTGRES_PASSWORD: secret
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -20,7 +20,7 @@ services:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: finite
+      MYSQL_DATABASE: fca
       MYSQL_USER: emulator
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: secret
@@ -32,7 +32,7 @@ services:
       - mysql-volume:/var/lib/mysql
   
   fca-emu:
-    image: rdclda/fca-emu
+    image: tecdigitalacr.azurecr.io/utils/fca-emu
     restart: always
     environment:
       DB_VENDOR: postgres

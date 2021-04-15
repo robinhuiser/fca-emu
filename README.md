@@ -56,7 +56,7 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_DB: finite
+      POSTGRES_DB: fca
       POSTGRES_USER: emulator
       POSTGRES_PASSWORD: secret
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -68,7 +68,7 @@ services:
       - postgres-volume:/var/lib/postgresql/data/pgdata
   
   fca-emu:
-    image: rdclda/fca-emu
+    image: tecdigitalacr.azurecr.io/utils/fca-emu
     restart: always
     environment:
       DB_VENDOR: postgres
