@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
@@ -50,37 +51,83 @@ func (s *EntityApiService) GetEntity(ctx context.Context, entityId string, mask 
 	rs, err := clt.Entity.
 		Query().
 		Where(entity.ID(entityUUID)).
-		All(ctx)
+		Only(ctx)
 	// Error if none or more than one results are returned
 	if err != nil {
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	entities := mapEntities(rs, ctx)
+	entities := mapEntities([]*ent.Entity{rs}, ctx)
 	return Response(200, entities[0]), nil
 }
 
 // GetEntityProfile - Return entity profile
 func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetEntityProfile with the required logic for this service method.
-	// Add api_entity_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, EntityProfile{}) or use other options such as http.Ok ...
-	//return Response(200, EntityProfile{}), nil
+	// Parse and verify UUID
+	entityUUID, err := uuid.Parse(entityId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Perform the search
+	rs, err := clt.Entity.
+		Query().
+		Where(entity.ID(entityUUID)).
+		Only(ctx)
+	// Error if none or more than one results are returned
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Retrieve the linked entity attributes
+	addrs, err := rs.QueryEntityAddresses().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	addresses := mapAddresses(addrs)
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	// Retrieve the linked entity attributes
+	atrs, err := rs.QueryEntityPreferences().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	preferences := mapPreferences(atrs)
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	// Retrieve the linked entity contact points
+	cntpts, err := rs.QueryEntityContactPoints().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	contactpoints := mapContactPoints(cntpts)
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetEntityProfile method not implemented")
+	// Retrieve the linked entity tax information
+	taxinfs, err := rs.QueryEntityTaxInformation().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	taxinformations := mapTaxInformations(taxinfs)
+
+	entityProfile := EntityProfile{
+		Firstname:      rs.Firstname,
+		Addresses:      addresses,
+		Preferences:    preferences,
+		ContactPoints:  contactpoints,
+		DateOfBirth:    isValidBankDate(rs.DateOfBirth.Format(util.APIDateFormat)),
+		Id:             rs.ID.String(),
+		Fullname:       rs.Fullname,
+		TaxInformation: taxinformations,
+		Type:           rs.Type.String(),
+		URI: FiniteUri{
+			URL: rs.URL,
+		},
+		Lastname: rs.Lastname,
+	}
+	return Response(200, entityProfile), nil
 }
 
 // PostEntityProfile - Create entity
@@ -184,4 +231,50 @@ func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
 		entities = append(entities, e)
 	}
 	return entities
+}
+
+func mapAddresses(addrs []*ent.EntityAddress) []Address {
+	addresses := []Address{}
+	for _, addr := range addrs {
+		a := Address{
+			Country:    addr.Country,
+			City:       addr.City,
+			PostalCode: addr.PostalCode,
+			State:      addr.State,
+			Type:       string(addr.Type),
+			Line1:      addr.Line1,
+			Line2:      addr.Line2,
+			Line3:      addr.Line3,
+			Primary:    addr.Primary,
+		}
+		addresses = append(addresses, a)
+	}
+	return addresses
+}
+
+func mapContactPoints(cntpts []*ent.EntityContactPoint) []ContactPoint {
+	contactpoints := []ContactPoint{}
+	for _, cntpt := range cntpts {
+		c := ContactPoint{
+			Prefix: strconv.Itoa(cntpt.Prefix),
+			Name:   cntpt.Name,
+			Type:   cntpt.Type.String(),
+			Suffix: strconv.Itoa(cntpt.Suffix),
+			Value:  cntpt.Value,
+		}
+		contactpoints = append(contactpoints, c)
+	}
+	return contactpoints
+}
+
+func mapTaxInformations(taxinfs []*ent.EntityTaxInformation) []TaxInformation {
+	taxinformations := []TaxInformation{}
+	for _, taxinf := range taxinfs {
+		c := TaxInformation{
+			TaxId: taxinf.TaxId,
+			Type:  string(taxinf.Type),
+		}
+		taxinformations = append(taxinformations, c)
+	}
+	return taxinformations
 }
