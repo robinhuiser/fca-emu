@@ -12,8 +12,10 @@ package finite
 
 import (
 	"context"
-	"errors"
-	"net/http"
+	"fmt"
+
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
 // ProductsApiService is a service that implents the logic for the ProductsApiServicer
@@ -29,23 +31,55 @@ func NewProductsApiService() ProductsApiServicer {
 
 // GetProducts - Return a list of products
 func (s *ProductsApiService) GetProducts(ctx context.Context, productType string, limit int32, cursor string, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetProducts with the required logic for this service method.
-	// Add api_products_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, ProductsList{}) or use other options such as http.Ok ...
-	//return Response(200, ProductsList{}), nil
+	// Mandatory setting
+	if len(productType) == 0 {
+		return Response(400, setErrorResponse("Mandatory parameter productType not specified")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Perform the search
+	rs, err := clt.Product.
+		Query().
+		Where(product.TypeEQ(product.Type(productType))).
+		All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// So we have any products matching the specified productType?
+	if len(rs) == 0 {
+		return Response(404, setErrorResponse(fmt.Sprintf("No product found of type %s", productType))), nil
+	}
+	products := mapProducts(rs)
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	p := ProductsList{
+		Status:     true,
+		TotalItems: int32(len(rs)),
+		Products:   products,
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	return Response(200, p), nil
+}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetProducts method not implemented")
+// Helper functions for mapping
+func mapProducts(products []*ent.Product) []Product {
+	prds := []Product{}
+	for _, pr := range products {
+		pr := Product{
+			Number:      pr.Name,
+			Type:        string(pr.Type),
+			TypeName:    pr.TypeName,
+			SubType:     pr.SubType,
+			SubTypeName: pr.SubTypeName,
+			URI: FiniteUri{
+				URL: pr.URL,
+			},
+		}
+		prds = append(prds, pr)
+	}
+	return prds
 }

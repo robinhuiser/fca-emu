@@ -26,13 +26,14 @@ func Generate(ents int, branches int, c *ent.Client) error {
 	// If there is not test data...
 	if len(ec) == 0 {
 
-		// Generate card networks
+		// Generate static data: card networks, banks with branches & products
 		if err := populateCardNetworks(context.Background(), c, f); err != nil {
 			return err
 		}
-
-		// Generate banks & branches
 		if err := populateBanks(branches, context.Background(), c, f); err != nil {
+			return err
+		}
+		if err := populateProducts(context.Background(), c, f); err != nil {
 			return err
 		}
 

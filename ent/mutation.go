@@ -85,6 +85,8 @@ type AccountMutation struct {
 	routingnumber        map[int]struct{}
 	removedroutingnumber map[int]struct{}
 	clearedroutingnumber bool
+	product              *int
+	clearedproduct       bool
 	done                 bool
 	oldValue             func(context.Context) (*Account, error)
 	predicates           []predicate.Account
@@ -1028,6 +1030,45 @@ func (m *AccountMutation) ResetRoutingnumber() {
 	m.removedroutingnumber = nil
 }
 
+// SetProductID sets the "product" edge to the Product entity by id.
+func (m *AccountMutation) SetProductID(id int) {
+	m.product = &id
+}
+
+// ClearProduct clears the "product" edge to the Product entity.
+func (m *AccountMutation) ClearProduct() {
+	m.clearedproduct = true
+}
+
+// ProductCleared returns if the "product" edge to the Product entity was cleared.
+func (m *AccountMutation) ProductCleared() bool {
+	return m.clearedproduct
+}
+
+// ProductID returns the "product" edge ID in the mutation.
+func (m *AccountMutation) ProductID() (id int, exists bool) {
+	if m.product != nil {
+		return *m.product, true
+	}
+	return
+}
+
+// ProductIDs returns the "product" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ProductID instead. It exists only for internal usage by the builders.
+func (m *AccountMutation) ProductIDs() (ids []int) {
+	if id := m.product; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetProduct resets all changes to the "product" edge.
+func (m *AccountMutation) ResetProduct() {
+	m.product = nil
+	m.clearedproduct = false
+}
+
 // Op returns the operation name.
 func (m *AccountMutation) Op() Op {
 	return m.op
@@ -1444,7 +1485,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.branch != nil {
 		edges = append(edges, account.EdgeBranch)
 	}
@@ -1456,6 +1497,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.routingnumber != nil {
 		edges = append(edges, account.EdgeRoutingnumber)
+	}
+	if m.product != nil {
+		edges = append(edges, account.EdgeProduct)
 	}
 	return edges
 }
@@ -1486,13 +1530,17 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeProduct:
+		if id := m.product; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedowner != nil {
 		edges = append(edges, account.EdgeOwner)
 	}
@@ -1533,7 +1581,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedbranch {
 		edges = append(edges, account.EdgeBranch)
 	}
@@ -1545,6 +1593,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedroutingnumber {
 		edges = append(edges, account.EdgeRoutingnumber)
+	}
+	if m.clearedproduct {
+		edges = append(edges, account.EdgeProduct)
 	}
 	return edges
 }
@@ -1561,6 +1612,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedpreference
 	case account.EdgeRoutingnumber:
 		return m.clearedroutingnumber
+	case account.EdgeProduct:
+		return m.clearedproduct
 	}
 	return false
 }
@@ -1571,6 +1624,9 @@ func (m *AccountMutation) ClearEdge(name string) error {
 	switch name {
 	case account.EdgeBranch:
 		m.ClearBranch()
+		return nil
+	case account.EdgeProduct:
+		m.ClearProduct()
 		return nil
 	}
 	return fmt.Errorf("unknown Account unique edge %s", name)
@@ -1591,6 +1647,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeRoutingnumber:
 		m.ResetRoutingnumber()
+		return nil
+	case account.EdgeProduct:
+		m.ResetProduct()
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
