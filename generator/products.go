@@ -18,9 +18,9 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		productSubType     string
 		productSubTypeName string
 	}{
-		{"SAV01", "SAVINGS", "Savings Account", "SAV-BASIC", "Basic Savings"},
-		{"SAV02", "SAVINGS", "Savings Account", "SAV-COL", "College Savings"},
-		{"SAV03", "SAVINGS", "Savings Account", "SAV-TAX", "Tax Savings"},
+		{"SAV01", "SAVING", "Savings Account", "SAV-BASIC", "Basic Savings"},
+		{"SAV02", "SAVING", "Savings Account", "SAV-COL", "College Savings"},
+		{"SAV03", "SAVING", "Savings Account", "SAV-TAX", "Tax Savings"},
 		{"CHK01", "CHECKING", "Checking Account", "CHK-BASIC", "Basic Checking"},
 		{"CHK02", "CHECKING", "Checking Account", "CHK-BRONZE", "Bronze Checking"},
 		{"CHK03", "CHECKING", "Checking Account", "CHK-SILVER", "Silver Checking"},

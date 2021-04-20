@@ -14,7 +14,7 @@ type Product struct {
 func (Product) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
-		field.Enum("type").Values("INVESTMENT", "LOAN", "DEPOSIT", "CARD"),
+		field.Enum("type").Values("SAVING", "LOAN", "DEPOSIT", "CHECKING"),
 		field.String("typeName"),
 		field.String("subType"),
 		field.String("subTypeName"),

@@ -53,10 +53,10 @@ type Type string
 
 // Type values.
 const (
-	TypeINVESTMENT Type = "INVESTMENT"
-	TypeLOAN       Type = "LOAN"
-	TypeDEPOSIT    Type = "DEPOSIT"
-	TypeCARD       Type = "CARD"
+	TypeSAVING   Type = "SAVING"
+	TypeLOAN     Type = "LOAN"
+	TypeDEPOSIT  Type = "DEPOSIT"
+	TypeCHECKING Type = "CHECKING"
 )
 
 func (_type Type) String() string {
@@ -66,7 +66,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeINVESTMENT, TypeLOAN, TypeDEPOSIT, TypeCARD:
+	case TypeSAVING, TypeLOAN, TypeDEPOSIT, TypeCHECKING:
 		return nil
 	default:
 		return fmt.Errorf("product: invalid enum value for type field: %q", _type)
