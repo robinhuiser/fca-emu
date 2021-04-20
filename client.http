@@ -4,17 +4,19 @@
 @access_token = {{$dotenv FCA_SECRET}}
 @mask = true
 @enhance = false
+@limit = 20
+@entity_fields = 
 
 #
 # Test data
-@account_id = 0a2854ff-b72b-4a37-90ae-946d75c6ec4c
-@product_type = DEPOSIT
-@entity_id = 2d9ad726-7dc3-43d5-a439-ddd2fb980ea8
+@account_id = 5e8cc049-d791-4554-9bdf-68236dd9f83c
+@product_type = CHECKING
+@entity_id = d18c241d-fb15-4369-beb5-e890f89cb63f
 
 
 ### 
 
-# Get account details
+# Get account
 # @name account
 GET {{base_url}}/v1/account/{{account_id}}?mask={{mask}}&enhance={{enhance}}
 Accept: application/json
@@ -23,9 +25,36 @@ X-TRACE-ID: {{$guid}}
 
 ###
 
+# Get account details
+# @name accountDetails
+GET {{base_url}}/v1/account/{{account_id}}/details?mask={{mask}}&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get account balances
+# @name accountBalances
+GET {{base_url}}/v1/account/{{account_id}}/balances?mask={{mask}}&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get accounts for an entity
+# @name entityAccounts
+GET {{base_url}}/v1/entity/{{entity_id}}/accounts?limit={{limit}}&fields={{entity_fields}}&mask={{mask}}&enhance={{enhance}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
 # Get products
 # @name products
-GET {{base_url}}/v1/products?productType={{product_type}}&limit=20&enhance={{enhance}}
+GET {{base_url}}/v1/products?productType={{product_type}}&limit={{limit}}&enhance={{enhance}}
 Accept: application/json
 X-TOKEN: {{access_token}}
 X-TRACE-ID: {{$guid}}
