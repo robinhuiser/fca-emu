@@ -18,11 +18,13 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		productSubType     string
 		productSubTypeName string
 	}{
-		{"plan401ka", "INVESTMENT", "Investment Account", "401k", "401k Plan"},
-		{"deposit111", "DEPOSIT", "Deposit One Account", "DD01", "Direct 1 Deposit Account"},
-		{"deposit112", "DEPOSIT", "Deposit Two Account", "DD02", "Direct 2 Deposit Account"},
-		{"deposit113", "DEPOSIT", "Deposit Three Account", "DD03", "Direct 3 Deposit Account"},
-		{"deposit114", "DEPOSIT", "Deposit Four Account", "DD04", "Direct 4 Deposit Account"},
+		{"SAV01", "SAVINGS", "Savings Account", "SAV-BASIC", "Basic Savings"},
+		{"SAV02", "SAVINGS", "Savings Account", "SAV-COL", "College Savings"},
+		{"SAV03", "SAVINGS", "Savings Account", "SAV-TAX", "Tax Savings"},
+		{"CHK01", "CHECKING", "Checking Account", "CHK-BASIC", "Basic Checking"},
+		{"CHK02", "CHECKING", "Checking Account", "CHK-BRONZE", "Bronze Checking"},
+		{"CHK03", "CHECKING", "Checking Account", "CHK-SILVER", "Silver Checking"},
+		{"CHK04", "CHECKING", "Checking Account", "CHK-GOLD", "Gold Checking"},
 	}
 
 	// Create products
