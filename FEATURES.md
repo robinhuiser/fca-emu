@@ -19,7 +19,7 @@
 
 | Method | URL | Status |
 |--- |--- |--- |
-| GET |  `​/cloud/v1/entity/{entityId}/accounts` | Next release |
+| GET |  `​/cloud/v1/entity/{entityId}/accounts` | Implemented |
 | GET |  `​/cloud​/v1​/account​/{accountId}` | Implemented |
 | PUT | `/cloud/v1/account/{accountId}` | Open |
 | GET |  `​/cloud/v1/account/{accountId}/balances` | Implemented |
@@ -36,10 +36,10 @@
 
 | Method | URL | Status |
 |--- |--- |--- |
-| GET |  `/cloud/v1/account/{accountId}/transactions` | Open |
-| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}` | Open |
-| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}/images` | Open |
-| GET | `/cloud/v1/account/{accountId}/image/{itemId}` | Open |
+| GET |  `/cloud/v1/account/{accountId}/transactions` | Next release |
+| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}` | Next release |
+| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}/images` | Next release |
+| GET | `/cloud/v1/account/{accountId}/image/{itemId}` | Next release |
 | POST | `/cloud/v1/transactions/search` | Open |
 
 ## Statements

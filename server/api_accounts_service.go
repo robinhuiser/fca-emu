@@ -19,6 +19,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/util"
 )
 
@@ -38,7 +39,6 @@ func NewAccountsApiService(client *ent.Client) AccountsApiServicer {
 
 // GetAccount - Return a account
 func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
 		return Response(401, setErrorResponse("Invalid token")), nil
@@ -61,88 +61,9 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	// Retrieve the linked bank
-	qba, err := rs.QueryBranch().QueryBranchOwner().Only(ctx)
+	a, err := mapAccountDetails(rs, mask, ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked branch
-	qbr, err := rs.QueryBranch().Only(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked product
-	qpr, err := rs.QueryProduct().Only(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked account attributes
-	atrs, err := rs.QueryPreference().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	preferences := mapPreferences(atrs)
-
-	// Retrieve routing number(s) of the account
-	rtns, err := rs.QueryRoutingnumber().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	routingnumbers := mapRoutingNumbers(rtns)
-
-	// Retrieve the owner(s) (entities) of the account
-	ents, err := rs.QueryOwner().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	entities := mapEntities(ents, ctx)
-
-	a := Account{
-		Id:                rs.ID.String(),
-		Type:              rs.Type,
-		Number:            isMasked(mask, rs.Number),
-		ParentId:          isValidUUID(rs.ParentId.String()),
-		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
-		Title:             rs.Title,
-		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
-		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),
-		DateLastUpdated:   isValidBankDate(rs.DateLastUpdated.Format(util.APIDateFormat)),
-		DateClosed:        isValidBankDate(rs.DateClosed.Format(util.APIDateFormat)),
-		CurrencyCode:      rs.CurrencyCode,
-		Status:            rs.Status,
-		Source:            rs.Source,
-		InterestReporting: rs.InterestReporting,
-		Balances: Balances{
-			AvailableBalance: rs.AvailableBalance,
-			CurrentBalance:   rs.CurrentBalance,
-		},
-		URI: FiniteUri{
-			URL: rs.URL,
-		},
-		Bank: Bank{
-			BranchCode: qbr.BranchCode,
-			BankName:   qba.BankName,
-			Swift:      qba.Swift,
-			URI: FiniteUri{
-				URL: qba.URL,
-			},
-		},
-		Entities:       entities,
-		Preferences:    preferences,
-		Routingnumbers: routingnumbers,
-		Product: Product{
-			Number:      qpr.Name,
-			Type:        string(qpr.Type),
-			TypeName:    qpr.TypeName,
-			SubType:     qpr.SubType,
-			SubTypeName: qpr.SubTypeName,
-			URI: FiniteUri{
-				URL: qpr.URL,
-			},
-		},
 	}
 
 	return Response(200, a), nil
@@ -204,88 +125,9 @@ func (s *AccountsApiService) GetAccountDetails(ctx context.Context, accountId st
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	// Retrieve the linked bank
-	qba, err := rs.QueryBranch().QueryBranchOwner().Only(ctx)
+	a, err := mapAccountDetails(rs, mask, ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked branch
-	qbr, err := rs.QueryBranch().Only(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked product
-	qpr, err := rs.QueryProduct().Only(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Retrieve the linked account attributes
-	atrs, err := rs.QueryPreference().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	preferences := mapPreferences(atrs)
-
-	// Retrieve routing number(s) of the account
-	rtns, err := rs.QueryRoutingnumber().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	routingnumbers := mapRoutingNumbers(rtns)
-
-	// Retrieve the owner(s) (entities) of the account
-	ents, err := rs.QueryOwner().All(ctx)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-	entities := mapEntities(ents, ctx)
-
-	a := Account{
-		Id:                rs.ID.String(),
-		Type:              rs.Type,
-		Number:            isMasked(mask, rs.Number),
-		ParentId:          isValidUUID(rs.ParentId.String()),
-		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
-		Title:             rs.Title,
-		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
-		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),
-		DateLastUpdated:   isValidBankDate(rs.DateLastUpdated.Format(util.APIDateFormat)),
-		DateClosed:        isValidBankDate(rs.DateClosed.Format(util.APIDateFormat)),
-		CurrencyCode:      rs.CurrencyCode,
-		Status:            rs.Status,
-		Source:            rs.Source,
-		InterestReporting: rs.InterestReporting,
-		Balances: Balances{
-			AvailableBalance: rs.AvailableBalance,
-			CurrentBalance:   rs.CurrentBalance,
-		},
-		URI: FiniteUri{
-			URL: rs.URL,
-		},
-		Bank: Bank{
-			BranchCode: qbr.BranchCode,
-			BankName:   qba.BankName,
-			Swift:      qba.Swift,
-			URI: FiniteUri{
-				URL: qba.URL,
-			},
-		},
-		Entities:       entities,
-		Preferences:    preferences,
-		Routingnumbers: routingnumbers,
-		Product: Product{
-			Number:      qpr.Name,
-			Type:        string(qpr.Type),
-			TypeName:    qpr.TypeName,
-			SubType:     qpr.SubType,
-			SubTypeName: qpr.SubTypeName,
-			URI: FiniteUri{
-				URL: qpr.URL,
-			},
-		},
 	}
 
 	return Response(200, a), nil
@@ -293,25 +135,51 @@ func (s *AccountsApiService) GetAccountDetails(ctx context.Context, accountId st
 
 // GetEntityAccountsList - Return list a of accounts by entity
 func (s *AccountsApiService) GetEntityAccountsList(ctx context.Context, entityId string, fields string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetEntityAccountsList with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, AccountsList{}) or use other options such as http.Ok ...
-	//return Response(200, AccountsList{}), nil
+	// Parse and verify UUID
+	u, err := uuid.Parse(entityId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// 1: Find the entity
+	rs, err := clt.Entity.
+		Query().
+		Where(entity.ID(u)).
+		Only(ctx)
+	// Error if none or more than one results are returned
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// 2: Find the accounts belonging to this entity
+	accts, err := clt.Entity.QueryOwnsAccount(rs).All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	accounts := []Account{}
+	if len(accts) > 0 {
+		for _, acct := range accts {
+			a, err := mapAccountDetails(acct, mask, ctx)
+			if err != nil {
+				return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+			}
+			accounts = append(accounts, a)
+		}
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	a := AccountsList{
+		Status:     true,
+		TotalItems: int32(len(accts)),
+		Accounts:   accounts,
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetEntityAccountsList method not implemented")
+	return Response(200, a), nil
 }
 
 // PostEntityAccountsList - Return list a of accounts based on a entity search
@@ -403,4 +271,91 @@ func mapRoutingNumbers(routingnumbers []*ent.RoutingNumber) []RoutingNumber {
 		rtns = append(rtns, rn)
 	}
 	return rtns
+}
+
+func mapAccountDetails(acc *ent.Account, mask bool, ctx context.Context) (Account, error) {
+	// Retrieve the linked bank
+	qba, err := acc.QueryBranch().QueryBranchOwner().Only(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+
+	// Retrieve the linked branch
+	qbr, err := acc.QueryBranch().Only(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+
+	// Retrieve the linked product
+	qpr, err := acc.QueryProduct().Only(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+
+	// Retrieve the linked account attributes
+	atrs, err := acc.QueryPreference().All(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+	preferences := mapPreferences(atrs)
+
+	// Retrieve routing number(s) of the account
+	rtns, err := acc.QueryRoutingnumber().All(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+	routingnumbers := mapRoutingNumbers(rtns)
+
+	// Retrieve the owner(s) (entities) of the account
+	ents, err := acc.QueryOwner().All(ctx)
+	if err != nil {
+		return Account{}, fmt.Errorf("%v", err)
+	}
+	entities := mapEntities(ents, ctx)
+
+	a := Account{
+		Id:                acc.ID.String(),
+		Type:              acc.Type,
+		Number:            isMasked(mask, acc.Number),
+		ParentId:          isValidUUID(acc.ParentId.String()),
+		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
+		Title:             acc.Title,
+		DateCreated:       isValidBankDate(acc.DateCreated.Format(util.APIDateFormat)),
+		DateOpened:        isValidBankDate(acc.DateOpened.Format(util.APIDateFormat)),
+		DateLastUpdated:   isValidBankDate(acc.DateLastUpdated.Format(util.APIDateFormat)),
+		DateClosed:        isValidBankDate(acc.DateClosed.Format(util.APIDateFormat)),
+		CurrencyCode:      acc.CurrencyCode,
+		Status:            acc.Status,
+		Source:            acc.Source,
+		InterestReporting: acc.InterestReporting,
+		Balances: Balances{
+			AvailableBalance: acc.AvailableBalance,
+			CurrentBalance:   acc.CurrentBalance,
+		},
+		URI: FiniteUri{
+			URL: acc.URL,
+		},
+		Bank: Bank{
+			BranchCode: qbr.BranchCode,
+			BankName:   qba.BankName,
+			Swift:      qba.Swift,
+			URI: FiniteUri{
+				URL: qba.URL,
+			},
+		},
+		Entities:       entities,
+		Preferences:    preferences,
+		Routingnumbers: routingnumbers,
+		Product: Product{
+			Number:      qpr.Name,
+			Type:        string(qpr.Type),
+			TypeName:    qpr.TypeName,
+			SubType:     qpr.SubType,
+			SubTypeName: qpr.SubTypeName,
+			URI: FiniteUri{
+				URL: qpr.URL,
+			},
+		},
+	}
+	return a, nil
 }
