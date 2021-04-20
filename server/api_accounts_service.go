@@ -182,25 +182,113 @@ func (s *AccountsApiService) GetAccountBalances(ctx context.Context, accountId s
 
 // GetAccountDetails - Return a accounts details
 func (s *AccountsApiService) GetAccountDetails(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountDetails with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, Account{}) or use other options such as http.Ok ...
-	//return Response(200, Account{}), nil
+	// Parse and verify UUID
+	u, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Perform the search
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(u)).
+		Only(ctx)
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Error if none or more than one results are returned
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	// Retrieve the linked bank
+	qba, err := rs.QueryBranch().QueryBranchOwner().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	// Retrieve the linked branch
+	qbr, err := rs.QueryBranch().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountDetails method not implemented")
+	// Retrieve the linked product
+	qpr, err := rs.QueryProduct().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Retrieve the linked account attributes
+	atrs, err := rs.QueryPreference().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	preferences := mapPreferences(atrs)
+
+	// Retrieve routing number(s) of the account
+	rtns, err := rs.QueryRoutingnumber().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	routingnumbers := mapRoutingNumbers(rtns)
+
+	// Retrieve the owner(s) (entities) of the account
+	ents, err := rs.QueryOwner().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	entities := mapEntities(ents, ctx)
+
+	a := Account{
+		Id:                rs.ID.String(),
+		Type:              rs.Type,
+		Number:            isMasked(mask, rs.Number),
+		ParentId:          isValidUUID(rs.ParentId.String()),
+		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
+		Title:             rs.Title,
+		DateCreated:       isValidBankDate(rs.DateCreated.Format(util.APIDateFormat)),
+		DateOpened:        isValidBankDate(rs.DateOpened.Format(util.APIDateFormat)),
+		DateLastUpdated:   isValidBankDate(rs.DateLastUpdated.Format(util.APIDateFormat)),
+		DateClosed:        isValidBankDate(rs.DateClosed.Format(util.APIDateFormat)),
+		CurrencyCode:      rs.CurrencyCode,
+		Status:            rs.Status,
+		Source:            rs.Source,
+		InterestReporting: rs.InterestReporting,
+		Balances: Balances{
+			AvailableBalance: rs.AvailableBalance,
+			CurrentBalance:   rs.CurrentBalance,
+		},
+		URI: FiniteUri{
+			URL: rs.URL,
+		},
+		Bank: Bank{
+			BranchCode: qbr.BranchCode,
+			BankName:   qba.BankName,
+			Swift:      qba.Swift,
+			URI: FiniteUri{
+				URL: qba.URL,
+			},
+		},
+		Entities:       entities,
+		Preferences:    preferences,
+		Routingnumbers: routingnumbers,
+		Product: Product{
+			Number:      qpr.Name,
+			Type:        string(qpr.Type),
+			TypeName:    qpr.TypeName,
+			SubType:     qpr.SubType,
+			SubTypeName: qpr.SubTypeName,
+			URI: FiniteUri{
+				URL: qpr.URL,
+			},
+		},
+	}
+
+	return Response(200, a), nil
 }
 
 // GetEntityAccountsList - Return list a of accounts by entity

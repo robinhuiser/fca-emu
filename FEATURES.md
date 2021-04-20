@@ -23,7 +23,7 @@
 | GET |  `​/cloud​/v1​/account​/{accountId}` | Implemented |
 | PUT | `/cloud/v1/account/{accountId}` | Open |
 | GET |  `​/cloud/v1/account/{accountId}/balances` | Implemented |
-| GET |  `​/cloud/v1/account/{accountId}/details` | Next release |
+| GET |  `​/cloud/v1/account/{accountId}/details` | Implemented |
 | POST | `/cloud/v1/accounts/search` | Open |
 
 ## Cards
