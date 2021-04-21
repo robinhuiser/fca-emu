@@ -1162,25 +1162,25 @@ func URLContainsFold(v string) predicate.Entity {
 	})
 }
 
-// HasEntityTaxInformation applies the HasEdge predicate on the "entityTaxInformation" edge.
-func HasEntityTaxInformation() predicate.Entity {
+// HasTaxSpecifications applies the HasEdge predicate on the "taxSpecifications" edge.
+func HasTaxSpecifications() predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityTaxInformationTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityTaxInformationTable, EntityTaxInformationColumn),
+			sqlgraph.To(TaxSpecificationsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TaxSpecificationsTable, TaxSpecificationsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEntityTaxInformationWith applies the HasEdge predicate on the "entityTaxInformation" edge with a given conditions (other predicates).
-func HasEntityTaxInformationWith(preds ...predicate.EntityTaxInformation) predicate.Entity {
+// HasTaxSpecificationsWith applies the HasEdge predicate on the "taxSpecifications" edge with a given conditions (other predicates).
+func HasTaxSpecificationsWith(preds ...predicate.EntityTaxInformation) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityTaxInformationInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityTaxInformationTable, EntityTaxInformationColumn),
+			sqlgraph.To(TaxSpecificationsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TaxSpecificationsTable, TaxSpecificationsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1190,25 +1190,25 @@ func HasEntityTaxInformationWith(preds ...predicate.EntityTaxInformation) predic
 	})
 }
 
-// HasEntityAddresses applies the HasEdge predicate on the "entityAddresses" edge.
-func HasEntityAddresses() predicate.Entity {
+// HasAddresses applies the HasEdge predicate on the "addresses" edge.
+func HasAddresses() predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityAddressesTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityAddressesTable, EntityAddressesColumn),
+			sqlgraph.To(AddressesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AddressesTable, AddressesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEntityAddressesWith applies the HasEdge predicate on the "entityAddresses" edge with a given conditions (other predicates).
-func HasEntityAddressesWith(preds ...predicate.EntityAddress) predicate.Entity {
+// HasAddressesWith applies the HasEdge predicate on the "addresses" edge with a given conditions (other predicates).
+func HasAddressesWith(preds ...predicate.EntityAddress) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityAddressesInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityAddressesTable, EntityAddressesColumn),
+			sqlgraph.To(AddressesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AddressesTable, AddressesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1218,25 +1218,25 @@ func HasEntityAddressesWith(preds ...predicate.EntityAddress) predicate.Entity {
 	})
 }
 
-// HasEntityPreferences applies the HasEdge predicate on the "entityPreferences" edge.
-func HasEntityPreferences() predicate.Entity {
+// HasPreferences applies the HasEdge predicate on the "preferences" edge.
+func HasPreferences() predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityPreferencesTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityPreferencesTable, EntityPreferencesColumn),
+			sqlgraph.To(PreferencesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferencesTable, PreferencesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEntityPreferencesWith applies the HasEdge predicate on the "entityPreferences" edge with a given conditions (other predicates).
-func HasEntityPreferencesWith(preds ...predicate.Preference) predicate.Entity {
+// HasPreferencesWith applies the HasEdge predicate on the "preferences" edge with a given conditions (other predicates).
+func HasPreferencesWith(preds ...predicate.Preference) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityPreferencesInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityPreferencesTable, EntityPreferencesColumn),
+			sqlgraph.To(PreferencesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferencesTable, PreferencesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1246,25 +1246,25 @@ func HasEntityPreferencesWith(preds ...predicate.Preference) predicate.Entity {
 	})
 }
 
-// HasEntityContactPoints applies the HasEdge predicate on the "entityContactPoints" edge.
-func HasEntityContactPoints() predicate.Entity {
+// HasContactPoints applies the HasEdge predicate on the "contactPoints" edge.
+func HasContactPoints() predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityContactPointsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityContactPointsTable, EntityContactPointsColumn),
+			sqlgraph.To(ContactPointsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ContactPointsTable, ContactPointsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEntityContactPointsWith applies the HasEdge predicate on the "entityContactPoints" edge with a given conditions (other predicates).
-func HasEntityContactPointsWith(preds ...predicate.EntityContactPoint) predicate.Entity {
+// HasContactPointsWith applies the HasEdge predicate on the "contactPoints" edge with a given conditions (other predicates).
+func HasContactPointsWith(preds ...predicate.EntityContactPoint) predicate.Entity {
 	return predicate.Entity(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EntityContactPointsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EntityContactPointsTable, EntityContactPointsColumn),
+			sqlgraph.To(ContactPointsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ContactPointsTable, ContactPointsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

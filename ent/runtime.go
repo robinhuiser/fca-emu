@@ -5,9 +5,11 @@ package ent
 import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/schema"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -20,6 +22,12 @@ func init() {
 	accountDescID := accountFields[0].Descriptor()
 	// account.DefaultID holds the default value on creation for the id field.
 	account.DefaultID = accountDescID.Default.(func() uuid.UUID)
+	binaryitemFields := schema.BinaryItem{}.Fields()
+	_ = binaryitemFields
+	// binaryitemDescFormat is the schema descriptor for format field.
+	binaryitemDescFormat := binaryitemFields[0].Descriptor()
+	// binaryitem.FormatValidator is a validator for the "format" field. It is called by the builders before save.
+	binaryitem.FormatValidator = binaryitemDescFormat.Validators[0].(func(string) error)
 	branchFields := schema.Branch{}.Fields()
 	_ = branchFields
 	// branchDescState is the schema descriptor for state field.
@@ -36,4 +44,46 @@ func init() {
 	entityDescID := entityFields[0].Descriptor()
 	// entity.DefaultID holds the default value on creation for the id field.
 	entity.DefaultID = entityDescID.Default.(func() uuid.UUID)
+	transactionFields := schema.Transaction{}.Fields()
+	_ = transactionFields
+	// transactionDescExecutedCurrencyCode is the schema descriptor for executedCurrencyCode field.
+	transactionDescExecutedCurrencyCode := transactionFields[4].Descriptor()
+	// transaction.ExecutedCurrencyCodeValidator is a validator for the "executedCurrencyCode" field. It is called by the builders before save.
+	transaction.ExecutedCurrencyCodeValidator = func() func(string) error {
+		validators := transactionDescExecutedCurrencyCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(executedCurrencyCode string) error {
+			for _, fn := range fns {
+				if err := fn(executedCurrencyCode); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// transactionDescOriginatingCurrencyCode is the schema descriptor for originatingCurrencyCode field.
+	transactionDescOriginatingCurrencyCode := transactionFields[7].Descriptor()
+	// transaction.OriginatingCurrencyCodeValidator is a validator for the "originatingCurrencyCode" field. It is called by the builders before save.
+	transaction.OriginatingCurrencyCodeValidator = func() func(string) error {
+		validators := transactionDescOriginatingCurrencyCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(originatingCurrencyCode string) error {
+			for _, fn := range fns {
+				if err := fn(originatingCurrencyCode); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// transactionDescID is the schema descriptor for id field.
+	transactionDescID := transactionFields[0].Descriptor()
+	// transaction.DefaultID holds the default value on creation for the id field.
+	transaction.DefaultID = transactionDescID.Default.(func() uuid.UUID)
 }

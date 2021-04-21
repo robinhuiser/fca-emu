@@ -16,6 +16,8 @@ type Tx struct {
 	Account *AccountClient
 	// Bank is the client for interacting with the Bank builders.
 	Bank *BankClient
+	// BinaryItem is the client for interacting with the BinaryItem builders.
+	BinaryItem *BinaryItemClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
 	// Card is the client for interacting with the Card builders.
@@ -36,6 +38,8 @@ type Tx struct {
 	Product *ProductClient
 	// RoutingNumber is the client for interacting with the RoutingNumber builders.
 	RoutingNumber *RoutingNumberClient
+	// Transaction is the client for interacting with the Transaction builders.
+	Transaction *TransactionClient
 
 	// lazily loaded.
 	client     *Client
@@ -173,6 +177,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
 	tx.Bank = NewBankClient(tx.config)
+	tx.BinaryItem = NewBinaryItemClient(tx.config)
 	tx.Branch = NewBranchClient(tx.config)
 	tx.Card = NewCardClient(tx.config)
 	tx.CardNetwork = NewCardNetworkClient(tx.config)
@@ -183,6 +188,7 @@ func (tx *Tx) init() {
 	tx.Preference = NewPreferenceClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
 	tx.RoutingNumber = NewRoutingNumberClient(tx.config)
+	tx.Transaction = NewTransactionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

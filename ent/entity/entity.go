@@ -35,48 +35,48 @@ const (
 	FieldToken = "token"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
-	// EdgeEntityTaxInformation holds the string denoting the entitytaxinformation edge name in mutations.
-	EdgeEntityTaxInformation = "entityTaxInformation"
-	// EdgeEntityAddresses holds the string denoting the entityaddresses edge name in mutations.
-	EdgeEntityAddresses = "entityAddresses"
-	// EdgeEntityPreferences holds the string denoting the entitypreferences edge name in mutations.
-	EdgeEntityPreferences = "entityPreferences"
-	// EdgeEntityContactPoints holds the string denoting the entitycontactpoints edge name in mutations.
-	EdgeEntityContactPoints = "entityContactPoints"
+	// EdgeTaxSpecifications holds the string denoting the taxspecifications edge name in mutations.
+	EdgeTaxSpecifications = "taxSpecifications"
+	// EdgeAddresses holds the string denoting the addresses edge name in mutations.
+	EdgeAddresses = "addresses"
+	// EdgePreferences holds the string denoting the preferences edge name in mutations.
+	EdgePreferences = "preferences"
+	// EdgeContactPoints holds the string denoting the contactpoints edge name in mutations.
+	EdgeContactPoints = "contactPoints"
 	// EdgeOwnsAccount holds the string denoting the owns_account edge name in mutations.
 	EdgeOwnsAccount = "owns_account"
 	// Table holds the table name of the entity in the database.
 	Table = "entities"
-	// EntityTaxInformationTable is the table the holds the entityTaxInformation relation/edge.
-	EntityTaxInformationTable = "entity_tax_informations"
-	// EntityTaxInformationInverseTable is the table name for the EntityTaxInformation entity.
+	// TaxSpecificationsTable is the table the holds the taxSpecifications relation/edge.
+	TaxSpecificationsTable = "entity_tax_informations"
+	// TaxSpecificationsInverseTable is the table name for the EntityTaxInformation entity.
 	// It exists in this package in order to avoid circular dependency with the "entitytaxinformation" package.
-	EntityTaxInformationInverseTable = "entity_tax_informations"
-	// EntityTaxInformationColumn is the table column denoting the entityTaxInformation relation/edge.
-	EntityTaxInformationColumn = "entity_entity_tax_information"
-	// EntityAddressesTable is the table the holds the entityAddresses relation/edge.
-	EntityAddressesTable = "entity_addresses"
-	// EntityAddressesInverseTable is the table name for the EntityAddress entity.
+	TaxSpecificationsInverseTable = "entity_tax_informations"
+	// TaxSpecificationsColumn is the table column denoting the taxSpecifications relation/edge.
+	TaxSpecificationsColumn = "entity_tax_specifications"
+	// AddressesTable is the table the holds the addresses relation/edge.
+	AddressesTable = "entity_addresses"
+	// AddressesInverseTable is the table name for the EntityAddress entity.
 	// It exists in this package in order to avoid circular dependency with the "entityaddress" package.
-	EntityAddressesInverseTable = "entity_addresses"
-	// EntityAddressesColumn is the table column denoting the entityAddresses relation/edge.
-	EntityAddressesColumn = "entity_entity_addresses"
-	// EntityPreferencesTable is the table the holds the entityPreferences relation/edge.
-	EntityPreferencesTable = "preferences"
-	// EntityPreferencesInverseTable is the table name for the Preference entity.
+	AddressesInverseTable = "entity_addresses"
+	// AddressesColumn is the table column denoting the addresses relation/edge.
+	AddressesColumn = "entity_addresses"
+	// PreferencesTable is the table the holds the preferences relation/edge.
+	PreferencesTable = "preferences"
+	// PreferencesInverseTable is the table name for the Preference entity.
 	// It exists in this package in order to avoid circular dependency with the "preference" package.
-	EntityPreferencesInverseTable = "preferences"
-	// EntityPreferencesColumn is the table column denoting the entityPreferences relation/edge.
-	EntityPreferencesColumn = "entity_entity_preferences"
-	// EntityContactPointsTable is the table the holds the entityContactPoints relation/edge.
-	EntityContactPointsTable = "entity_contact_points"
-	// EntityContactPointsInverseTable is the table name for the EntityContactPoint entity.
+	PreferencesInverseTable = "preferences"
+	// PreferencesColumn is the table column denoting the preferences relation/edge.
+	PreferencesColumn = "entity_preferences"
+	// ContactPointsTable is the table the holds the contactPoints relation/edge.
+	ContactPointsTable = "entity_contact_points"
+	// ContactPointsInverseTable is the table name for the EntityContactPoint entity.
 	// It exists in this package in order to avoid circular dependency with the "entitycontactpoint" package.
-	EntityContactPointsInverseTable = "entity_contact_points"
-	// EntityContactPointsColumn is the table column denoting the entityContactPoints relation/edge.
-	EntityContactPointsColumn = "entity_entity_contact_points"
+	ContactPointsInverseTable = "entity_contact_points"
+	// ContactPointsColumn is the table column denoting the contactPoints relation/edge.
+	ContactPointsColumn = "entity_contact_points"
 	// OwnsAccountTable is the table the holds the owns_account relation/edge. The primary key declared below.
-	OwnsAccountTable = "account_owner"
+	OwnsAccountTable = "account_owners"
 	// OwnsAccountInverseTable is the table name for the Account entity.
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	OwnsAccountInverseTable = "accounts"

@@ -149,64 +149,64 @@ func (eu *EntityUpdate) SetURL(s string) *EntityUpdate {
 	return eu
 }
 
-// AddEntityTaxInformationIDs adds the "entityTaxInformation" edge to the EntityTaxInformation entity by IDs.
-func (eu *EntityUpdate) AddEntityTaxInformationIDs(ids ...int) *EntityUpdate {
-	eu.mutation.AddEntityTaxInformationIDs(ids...)
+// AddTaxSpecificationIDs adds the "taxSpecifications" edge to the EntityTaxInformation entity by IDs.
+func (eu *EntityUpdate) AddTaxSpecificationIDs(ids ...int) *EntityUpdate {
+	eu.mutation.AddTaxSpecificationIDs(ids...)
 	return eu
 }
 
-// AddEntityTaxInformation adds the "entityTaxInformation" edges to the EntityTaxInformation entity.
-func (eu *EntityUpdate) AddEntityTaxInformation(e ...*EntityTaxInformation) *EntityUpdate {
+// AddTaxSpecifications adds the "taxSpecifications" edges to the EntityTaxInformation entity.
+func (eu *EntityUpdate) AddTaxSpecifications(e ...*EntityTaxInformation) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.AddEntityTaxInformationIDs(ids...)
+	return eu.AddTaxSpecificationIDs(ids...)
 }
 
-// AddEntityAddressIDs adds the "entityAddresses" edge to the EntityAddress entity by IDs.
-func (eu *EntityUpdate) AddEntityAddressIDs(ids ...int) *EntityUpdate {
-	eu.mutation.AddEntityAddressIDs(ids...)
+// AddAddressIDs adds the "addresses" edge to the EntityAddress entity by IDs.
+func (eu *EntityUpdate) AddAddressIDs(ids ...int) *EntityUpdate {
+	eu.mutation.AddAddressIDs(ids...)
 	return eu
 }
 
-// AddEntityAddresses adds the "entityAddresses" edges to the EntityAddress entity.
-func (eu *EntityUpdate) AddEntityAddresses(e ...*EntityAddress) *EntityUpdate {
+// AddAddresses adds the "addresses" edges to the EntityAddress entity.
+func (eu *EntityUpdate) AddAddresses(e ...*EntityAddress) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.AddEntityAddressIDs(ids...)
+	return eu.AddAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
-func (eu *EntityUpdate) AddEntityPreferenceIDs(ids ...int) *EntityUpdate {
-	eu.mutation.AddEntityPreferenceIDs(ids...)
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
+func (eu *EntityUpdate) AddPreferenceIDs(ids ...int) *EntityUpdate {
+	eu.mutation.AddPreferenceIDs(ids...)
 	return eu
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
-func (eu *EntityUpdate) AddEntityPreferences(p ...*Preference) *EntityUpdate {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (eu *EntityUpdate) AddPreferences(p ...*Preference) *EntityUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return eu.AddEntityPreferenceIDs(ids...)
+	return eu.AddPreferenceIDs(ids...)
 }
 
-// AddEntityContactPointIDs adds the "entityContactPoints" edge to the EntityContactPoint entity by IDs.
-func (eu *EntityUpdate) AddEntityContactPointIDs(ids ...int) *EntityUpdate {
-	eu.mutation.AddEntityContactPointIDs(ids...)
+// AddContactPointIDs adds the "contactPoints" edge to the EntityContactPoint entity by IDs.
+func (eu *EntityUpdate) AddContactPointIDs(ids ...int) *EntityUpdate {
+	eu.mutation.AddContactPointIDs(ids...)
 	return eu
 }
 
-// AddEntityContactPoints adds the "entityContactPoints" edges to the EntityContactPoint entity.
-func (eu *EntityUpdate) AddEntityContactPoints(e ...*EntityContactPoint) *EntityUpdate {
+// AddContactPoints adds the "contactPoints" edges to the EntityContactPoint entity.
+func (eu *EntityUpdate) AddContactPoints(e ...*EntityContactPoint) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.AddEntityContactPointIDs(ids...)
+	return eu.AddContactPointIDs(ids...)
 }
 
 // AddOwnsAccountIDs adds the "owns_account" edge to the Account entity by IDs.
@@ -229,88 +229,88 @@ func (eu *EntityUpdate) Mutation() *EntityMutation {
 	return eu.mutation
 }
 
-// ClearEntityTaxInformation clears all "entityTaxInformation" edges to the EntityTaxInformation entity.
-func (eu *EntityUpdate) ClearEntityTaxInformation() *EntityUpdate {
-	eu.mutation.ClearEntityTaxInformation()
+// ClearTaxSpecifications clears all "taxSpecifications" edges to the EntityTaxInformation entity.
+func (eu *EntityUpdate) ClearTaxSpecifications() *EntityUpdate {
+	eu.mutation.ClearTaxSpecifications()
 	return eu
 }
 
-// RemoveEntityTaxInformationIDs removes the "entityTaxInformation" edge to EntityTaxInformation entities by IDs.
-func (eu *EntityUpdate) RemoveEntityTaxInformationIDs(ids ...int) *EntityUpdate {
-	eu.mutation.RemoveEntityTaxInformationIDs(ids...)
+// RemoveTaxSpecificationIDs removes the "taxSpecifications" edge to EntityTaxInformation entities by IDs.
+func (eu *EntityUpdate) RemoveTaxSpecificationIDs(ids ...int) *EntityUpdate {
+	eu.mutation.RemoveTaxSpecificationIDs(ids...)
 	return eu
 }
 
-// RemoveEntityTaxInformation removes "entityTaxInformation" edges to EntityTaxInformation entities.
-func (eu *EntityUpdate) RemoveEntityTaxInformation(e ...*EntityTaxInformation) *EntityUpdate {
+// RemoveTaxSpecifications removes "taxSpecifications" edges to EntityTaxInformation entities.
+func (eu *EntityUpdate) RemoveTaxSpecifications(e ...*EntityTaxInformation) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.RemoveEntityTaxInformationIDs(ids...)
+	return eu.RemoveTaxSpecificationIDs(ids...)
 }
 
-// ClearEntityAddresses clears all "entityAddresses" edges to the EntityAddress entity.
-func (eu *EntityUpdate) ClearEntityAddresses() *EntityUpdate {
-	eu.mutation.ClearEntityAddresses()
+// ClearAddresses clears all "addresses" edges to the EntityAddress entity.
+func (eu *EntityUpdate) ClearAddresses() *EntityUpdate {
+	eu.mutation.ClearAddresses()
 	return eu
 }
 
-// RemoveEntityAddressIDs removes the "entityAddresses" edge to EntityAddress entities by IDs.
-func (eu *EntityUpdate) RemoveEntityAddressIDs(ids ...int) *EntityUpdate {
-	eu.mutation.RemoveEntityAddressIDs(ids...)
+// RemoveAddressIDs removes the "addresses" edge to EntityAddress entities by IDs.
+func (eu *EntityUpdate) RemoveAddressIDs(ids ...int) *EntityUpdate {
+	eu.mutation.RemoveAddressIDs(ids...)
 	return eu
 }
 
-// RemoveEntityAddresses removes "entityAddresses" edges to EntityAddress entities.
-func (eu *EntityUpdate) RemoveEntityAddresses(e ...*EntityAddress) *EntityUpdate {
+// RemoveAddresses removes "addresses" edges to EntityAddress entities.
+func (eu *EntityUpdate) RemoveAddresses(e ...*EntityAddress) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.RemoveEntityAddressIDs(ids...)
+	return eu.RemoveAddressIDs(ids...)
 }
 
-// ClearEntityPreferences clears all "entityPreferences" edges to the Preference entity.
-func (eu *EntityUpdate) ClearEntityPreferences() *EntityUpdate {
-	eu.mutation.ClearEntityPreferences()
+// ClearPreferences clears all "preferences" edges to the Preference entity.
+func (eu *EntityUpdate) ClearPreferences() *EntityUpdate {
+	eu.mutation.ClearPreferences()
 	return eu
 }
 
-// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to Preference entities by IDs.
-func (eu *EntityUpdate) RemoveEntityPreferenceIDs(ids ...int) *EntityUpdate {
-	eu.mutation.RemoveEntityPreferenceIDs(ids...)
+// RemovePreferenceIDs removes the "preferences" edge to Preference entities by IDs.
+func (eu *EntityUpdate) RemovePreferenceIDs(ids ...int) *EntityUpdate {
+	eu.mutation.RemovePreferenceIDs(ids...)
 	return eu
 }
 
-// RemoveEntityPreferences removes "entityPreferences" edges to Preference entities.
-func (eu *EntityUpdate) RemoveEntityPreferences(p ...*Preference) *EntityUpdate {
+// RemovePreferences removes "preferences" edges to Preference entities.
+func (eu *EntityUpdate) RemovePreferences(p ...*Preference) *EntityUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return eu.RemoveEntityPreferenceIDs(ids...)
+	return eu.RemovePreferenceIDs(ids...)
 }
 
-// ClearEntityContactPoints clears all "entityContactPoints" edges to the EntityContactPoint entity.
-func (eu *EntityUpdate) ClearEntityContactPoints() *EntityUpdate {
-	eu.mutation.ClearEntityContactPoints()
+// ClearContactPoints clears all "contactPoints" edges to the EntityContactPoint entity.
+func (eu *EntityUpdate) ClearContactPoints() *EntityUpdate {
+	eu.mutation.ClearContactPoints()
 	return eu
 }
 
-// RemoveEntityContactPointIDs removes the "entityContactPoints" edge to EntityContactPoint entities by IDs.
-func (eu *EntityUpdate) RemoveEntityContactPointIDs(ids ...int) *EntityUpdate {
-	eu.mutation.RemoveEntityContactPointIDs(ids...)
+// RemoveContactPointIDs removes the "contactPoints" edge to EntityContactPoint entities by IDs.
+func (eu *EntityUpdate) RemoveContactPointIDs(ids ...int) *EntityUpdate {
+	eu.mutation.RemoveContactPointIDs(ids...)
 	return eu
 }
 
-// RemoveEntityContactPoints removes "entityContactPoints" edges to EntityContactPoint entities.
-func (eu *EntityUpdate) RemoveEntityContactPoints(e ...*EntityContactPoint) *EntityUpdate {
+// RemoveContactPoints removes "contactPoints" edges to EntityContactPoint entities.
+func (eu *EntityUpdate) RemoveContactPoints(e ...*EntityContactPoint) *EntityUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return eu.RemoveEntityContactPointIDs(ids...)
+	return eu.RemoveContactPointIDs(ids...)
 }
 
 // ClearOwnsAccount clears all "owns_account" edges to the Account entity.
@@ -514,12 +514,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: entity.FieldURL,
 		})
 	}
-	if eu.mutation.EntityTaxInformationCleared() {
+	if eu.mutation.TaxSpecificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -530,12 +530,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedEntityTaxInformationIDs(); len(nodes) > 0 && !eu.mutation.EntityTaxInformationCleared() {
+	if nodes := eu.mutation.RemovedTaxSpecificationsIDs(); len(nodes) > 0 && !eu.mutation.TaxSpecificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -549,12 +549,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.EntityTaxInformationIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.TaxSpecificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -568,12 +568,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.EntityAddressesCleared() {
+	if eu.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -584,12 +584,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedEntityAddressesIDs(); len(nodes) > 0 && !eu.mutation.EntityAddressesCleared() {
+	if nodes := eu.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !eu.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -603,12 +603,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.EntityAddressesIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.AddressesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -622,12 +622,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.EntityPreferencesCleared() {
+	if eu.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -638,12 +638,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedEntityPreferencesIDs(); len(nodes) > 0 && !eu.mutation.EntityPreferencesCleared() {
+	if nodes := eu.mutation.RemovedPreferencesIDs(); len(nodes) > 0 && !eu.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -657,12 +657,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.EntityPreferencesIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -676,12 +676,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.EntityContactPointsCleared() {
+	if eu.mutation.ContactPointsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -692,12 +692,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedEntityContactPointsIDs(); len(nodes) > 0 && !eu.mutation.EntityContactPointsCleared() {
+	if nodes := eu.mutation.RemovedContactPointsIDs(); len(nodes) > 0 && !eu.mutation.ContactPointsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -711,12 +711,12 @@ func (eu *EntityUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.EntityContactPointsIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.ContactPointsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -918,64 +918,64 @@ func (euo *EntityUpdateOne) SetURL(s string) *EntityUpdateOne {
 	return euo
 }
 
-// AddEntityTaxInformationIDs adds the "entityTaxInformation" edge to the EntityTaxInformation entity by IDs.
-func (euo *EntityUpdateOne) AddEntityTaxInformationIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.AddEntityTaxInformationIDs(ids...)
+// AddTaxSpecificationIDs adds the "taxSpecifications" edge to the EntityTaxInformation entity by IDs.
+func (euo *EntityUpdateOne) AddTaxSpecificationIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.AddTaxSpecificationIDs(ids...)
 	return euo
 }
 
-// AddEntityTaxInformation adds the "entityTaxInformation" edges to the EntityTaxInformation entity.
-func (euo *EntityUpdateOne) AddEntityTaxInformation(e ...*EntityTaxInformation) *EntityUpdateOne {
+// AddTaxSpecifications adds the "taxSpecifications" edges to the EntityTaxInformation entity.
+func (euo *EntityUpdateOne) AddTaxSpecifications(e ...*EntityTaxInformation) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.AddEntityTaxInformationIDs(ids...)
+	return euo.AddTaxSpecificationIDs(ids...)
 }
 
-// AddEntityAddressIDs adds the "entityAddresses" edge to the EntityAddress entity by IDs.
-func (euo *EntityUpdateOne) AddEntityAddressIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.AddEntityAddressIDs(ids...)
+// AddAddressIDs adds the "addresses" edge to the EntityAddress entity by IDs.
+func (euo *EntityUpdateOne) AddAddressIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.AddAddressIDs(ids...)
 	return euo
 }
 
-// AddEntityAddresses adds the "entityAddresses" edges to the EntityAddress entity.
-func (euo *EntityUpdateOne) AddEntityAddresses(e ...*EntityAddress) *EntityUpdateOne {
+// AddAddresses adds the "addresses" edges to the EntityAddress entity.
+func (euo *EntityUpdateOne) AddAddresses(e ...*EntityAddress) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.AddEntityAddressIDs(ids...)
+	return euo.AddAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
-func (euo *EntityUpdateOne) AddEntityPreferenceIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.AddEntityPreferenceIDs(ids...)
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
+func (euo *EntityUpdateOne) AddPreferenceIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.AddPreferenceIDs(ids...)
 	return euo
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
-func (euo *EntityUpdateOne) AddEntityPreferences(p ...*Preference) *EntityUpdateOne {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (euo *EntityUpdateOne) AddPreferences(p ...*Preference) *EntityUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return euo.AddEntityPreferenceIDs(ids...)
+	return euo.AddPreferenceIDs(ids...)
 }
 
-// AddEntityContactPointIDs adds the "entityContactPoints" edge to the EntityContactPoint entity by IDs.
-func (euo *EntityUpdateOne) AddEntityContactPointIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.AddEntityContactPointIDs(ids...)
+// AddContactPointIDs adds the "contactPoints" edge to the EntityContactPoint entity by IDs.
+func (euo *EntityUpdateOne) AddContactPointIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.AddContactPointIDs(ids...)
 	return euo
 }
 
-// AddEntityContactPoints adds the "entityContactPoints" edges to the EntityContactPoint entity.
-func (euo *EntityUpdateOne) AddEntityContactPoints(e ...*EntityContactPoint) *EntityUpdateOne {
+// AddContactPoints adds the "contactPoints" edges to the EntityContactPoint entity.
+func (euo *EntityUpdateOne) AddContactPoints(e ...*EntityContactPoint) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.AddEntityContactPointIDs(ids...)
+	return euo.AddContactPointIDs(ids...)
 }
 
 // AddOwnsAccountIDs adds the "owns_account" edge to the Account entity by IDs.
@@ -998,88 +998,88 @@ func (euo *EntityUpdateOne) Mutation() *EntityMutation {
 	return euo.mutation
 }
 
-// ClearEntityTaxInformation clears all "entityTaxInformation" edges to the EntityTaxInformation entity.
-func (euo *EntityUpdateOne) ClearEntityTaxInformation() *EntityUpdateOne {
-	euo.mutation.ClearEntityTaxInformation()
+// ClearTaxSpecifications clears all "taxSpecifications" edges to the EntityTaxInformation entity.
+func (euo *EntityUpdateOne) ClearTaxSpecifications() *EntityUpdateOne {
+	euo.mutation.ClearTaxSpecifications()
 	return euo
 }
 
-// RemoveEntityTaxInformationIDs removes the "entityTaxInformation" edge to EntityTaxInformation entities by IDs.
-func (euo *EntityUpdateOne) RemoveEntityTaxInformationIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.RemoveEntityTaxInformationIDs(ids...)
+// RemoveTaxSpecificationIDs removes the "taxSpecifications" edge to EntityTaxInformation entities by IDs.
+func (euo *EntityUpdateOne) RemoveTaxSpecificationIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.RemoveTaxSpecificationIDs(ids...)
 	return euo
 }
 
-// RemoveEntityTaxInformation removes "entityTaxInformation" edges to EntityTaxInformation entities.
-func (euo *EntityUpdateOne) RemoveEntityTaxInformation(e ...*EntityTaxInformation) *EntityUpdateOne {
+// RemoveTaxSpecifications removes "taxSpecifications" edges to EntityTaxInformation entities.
+func (euo *EntityUpdateOne) RemoveTaxSpecifications(e ...*EntityTaxInformation) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.RemoveEntityTaxInformationIDs(ids...)
+	return euo.RemoveTaxSpecificationIDs(ids...)
 }
 
-// ClearEntityAddresses clears all "entityAddresses" edges to the EntityAddress entity.
-func (euo *EntityUpdateOne) ClearEntityAddresses() *EntityUpdateOne {
-	euo.mutation.ClearEntityAddresses()
+// ClearAddresses clears all "addresses" edges to the EntityAddress entity.
+func (euo *EntityUpdateOne) ClearAddresses() *EntityUpdateOne {
+	euo.mutation.ClearAddresses()
 	return euo
 }
 
-// RemoveEntityAddressIDs removes the "entityAddresses" edge to EntityAddress entities by IDs.
-func (euo *EntityUpdateOne) RemoveEntityAddressIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.RemoveEntityAddressIDs(ids...)
+// RemoveAddressIDs removes the "addresses" edge to EntityAddress entities by IDs.
+func (euo *EntityUpdateOne) RemoveAddressIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.RemoveAddressIDs(ids...)
 	return euo
 }
 
-// RemoveEntityAddresses removes "entityAddresses" edges to EntityAddress entities.
-func (euo *EntityUpdateOne) RemoveEntityAddresses(e ...*EntityAddress) *EntityUpdateOne {
+// RemoveAddresses removes "addresses" edges to EntityAddress entities.
+func (euo *EntityUpdateOne) RemoveAddresses(e ...*EntityAddress) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.RemoveEntityAddressIDs(ids...)
+	return euo.RemoveAddressIDs(ids...)
 }
 
-// ClearEntityPreferences clears all "entityPreferences" edges to the Preference entity.
-func (euo *EntityUpdateOne) ClearEntityPreferences() *EntityUpdateOne {
-	euo.mutation.ClearEntityPreferences()
+// ClearPreferences clears all "preferences" edges to the Preference entity.
+func (euo *EntityUpdateOne) ClearPreferences() *EntityUpdateOne {
+	euo.mutation.ClearPreferences()
 	return euo
 }
 
-// RemoveEntityPreferenceIDs removes the "entityPreferences" edge to Preference entities by IDs.
-func (euo *EntityUpdateOne) RemoveEntityPreferenceIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.RemoveEntityPreferenceIDs(ids...)
+// RemovePreferenceIDs removes the "preferences" edge to Preference entities by IDs.
+func (euo *EntityUpdateOne) RemovePreferenceIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.RemovePreferenceIDs(ids...)
 	return euo
 }
 
-// RemoveEntityPreferences removes "entityPreferences" edges to Preference entities.
-func (euo *EntityUpdateOne) RemoveEntityPreferences(p ...*Preference) *EntityUpdateOne {
+// RemovePreferences removes "preferences" edges to Preference entities.
+func (euo *EntityUpdateOne) RemovePreferences(p ...*Preference) *EntityUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return euo.RemoveEntityPreferenceIDs(ids...)
+	return euo.RemovePreferenceIDs(ids...)
 }
 
-// ClearEntityContactPoints clears all "entityContactPoints" edges to the EntityContactPoint entity.
-func (euo *EntityUpdateOne) ClearEntityContactPoints() *EntityUpdateOne {
-	euo.mutation.ClearEntityContactPoints()
+// ClearContactPoints clears all "contactPoints" edges to the EntityContactPoint entity.
+func (euo *EntityUpdateOne) ClearContactPoints() *EntityUpdateOne {
+	euo.mutation.ClearContactPoints()
 	return euo
 }
 
-// RemoveEntityContactPointIDs removes the "entityContactPoints" edge to EntityContactPoint entities by IDs.
-func (euo *EntityUpdateOne) RemoveEntityContactPointIDs(ids ...int) *EntityUpdateOne {
-	euo.mutation.RemoveEntityContactPointIDs(ids...)
+// RemoveContactPointIDs removes the "contactPoints" edge to EntityContactPoint entities by IDs.
+func (euo *EntityUpdateOne) RemoveContactPointIDs(ids ...int) *EntityUpdateOne {
+	euo.mutation.RemoveContactPointIDs(ids...)
 	return euo
 }
 
-// RemoveEntityContactPoints removes "entityContactPoints" edges to EntityContactPoint entities.
-func (euo *EntityUpdateOne) RemoveEntityContactPoints(e ...*EntityContactPoint) *EntityUpdateOne {
+// RemoveContactPoints removes "contactPoints" edges to EntityContactPoint entities.
+func (euo *EntityUpdateOne) RemoveContactPoints(e ...*EntityContactPoint) *EntityUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return euo.RemoveEntityContactPointIDs(ids...)
+	return euo.RemoveContactPointIDs(ids...)
 }
 
 // ClearOwnsAccount clears all "owns_account" edges to the Account entity.
@@ -1288,12 +1288,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 			Column: entity.FieldURL,
 		})
 	}
-	if euo.mutation.EntityTaxInformationCleared() {
+	if euo.mutation.TaxSpecificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1304,12 +1304,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedEntityTaxInformationIDs(); len(nodes) > 0 && !euo.mutation.EntityTaxInformationCleared() {
+	if nodes := euo.mutation.RemovedTaxSpecificationsIDs(); len(nodes) > 0 && !euo.mutation.TaxSpecificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1323,12 +1323,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.EntityTaxInformationIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.TaxSpecificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1342,12 +1342,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.EntityAddressesCleared() {
+	if euo.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1358,12 +1358,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedEntityAddressesIDs(); len(nodes) > 0 && !euo.mutation.EntityAddressesCleared() {
+	if nodes := euo.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !euo.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1377,12 +1377,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.EntityAddressesIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.AddressesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1396,12 +1396,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.EntityPreferencesCleared() {
+	if euo.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1412,12 +1412,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedEntityPreferencesIDs(); len(nodes) > 0 && !euo.mutation.EntityPreferencesCleared() {
+	if nodes := euo.mutation.RemovedPreferencesIDs(); len(nodes) > 0 && !euo.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1431,12 +1431,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.EntityPreferencesIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1450,12 +1450,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.EntityContactPointsCleared() {
+	if euo.mutation.ContactPointsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1466,12 +1466,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedEntityContactPointsIDs(); len(nodes) > 0 && !euo.mutation.EntityContactPointsCleared() {
+	if nodes := euo.mutation.RemovedContactPointsIDs(); len(nodes) > 0 && !euo.mutation.ContactPointsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1485,12 +1485,12 @@ func (euo *EntityUpdateOne) sqlSave(ctx context.Context) (_node *Entity, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.EntityContactPointsIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.ContactPointsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

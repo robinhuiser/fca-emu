@@ -18,6 +18,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // AccountUpdate is the builder for updating Account entities.
@@ -196,14 +197,14 @@ func (au *AccountUpdate) SetBranch(b *Branch) *AccountUpdate {
 	return au.SetBranchID(b.ID)
 }
 
-// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+// AddOwnerIDs adds the "owners" edge to the Entity entity by IDs.
 func (au *AccountUpdate) AddOwnerIDs(ids ...uuid.UUID) *AccountUpdate {
 	au.mutation.AddOwnerIDs(ids...)
 	return au
 }
 
-// AddOwner adds the "owner" edges to the Entity entity.
-func (au *AccountUpdate) AddOwner(e ...*Entity) *AccountUpdate {
+// AddOwners adds the "owners" edges to the Entity entity.
+func (au *AccountUpdate) AddOwners(e ...*Entity) *AccountUpdate {
 	ids := make([]uuid.UUID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -211,14 +212,14 @@ func (au *AccountUpdate) AddOwner(e ...*Entity) *AccountUpdate {
 	return au.AddOwnerIDs(ids...)
 }
 
-// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
 func (au *AccountUpdate) AddPreferenceIDs(ids ...int) *AccountUpdate {
 	au.mutation.AddPreferenceIDs(ids...)
 	return au
 }
 
-// AddPreference adds the "preference" edges to the Preference entity.
-func (au *AccountUpdate) AddPreference(p ...*Preference) *AccountUpdate {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (au *AccountUpdate) AddPreferences(p ...*Preference) *AccountUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -226,14 +227,14 @@ func (au *AccountUpdate) AddPreference(p ...*Preference) *AccountUpdate {
 	return au.AddPreferenceIDs(ids...)
 }
 
-// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+// AddRoutingnumberIDs adds the "routingnumbers" edge to the RoutingNumber entity by IDs.
 func (au *AccountUpdate) AddRoutingnumberIDs(ids ...int) *AccountUpdate {
 	au.mutation.AddRoutingnumberIDs(ids...)
 	return au
 }
 
-// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
-func (au *AccountUpdate) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdate {
+// AddRoutingnumbers adds the "routingnumbers" edges to the RoutingNumber entity.
+func (au *AccountUpdate) AddRoutingnumbers(r ...*RoutingNumber) *AccountUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -260,6 +261,21 @@ func (au *AccountUpdate) SetProduct(p *Product) *AccountUpdate {
 	return au.SetProductID(p.ID)
 }
 
+// AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
+func (au *AccountUpdate) AddTransactionIDs(ids ...uuid.UUID) *AccountUpdate {
+	au.mutation.AddTransactionIDs(ids...)
+	return au
+}
+
+// AddTransactions adds the "transactions" edges to the Transaction entity.
+func (au *AccountUpdate) AddTransactions(t ...*Transaction) *AccountUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.AddTransactionIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -271,20 +287,20 @@ func (au *AccountUpdate) ClearBranch() *AccountUpdate {
 	return au
 }
 
-// ClearOwner clears all "owner" edges to the Entity entity.
-func (au *AccountUpdate) ClearOwner() *AccountUpdate {
-	au.mutation.ClearOwner()
+// ClearOwners clears all "owners" edges to the Entity entity.
+func (au *AccountUpdate) ClearOwners() *AccountUpdate {
+	au.mutation.ClearOwners()
 	return au
 }
 
-// RemoveOwnerIDs removes the "owner" edge to Entity entities by IDs.
+// RemoveOwnerIDs removes the "owners" edge to Entity entities by IDs.
 func (au *AccountUpdate) RemoveOwnerIDs(ids ...uuid.UUID) *AccountUpdate {
 	au.mutation.RemoveOwnerIDs(ids...)
 	return au
 }
 
-// RemoveOwner removes "owner" edges to Entity entities.
-func (au *AccountUpdate) RemoveOwner(e ...*Entity) *AccountUpdate {
+// RemoveOwners removes "owners" edges to Entity entities.
+func (au *AccountUpdate) RemoveOwners(e ...*Entity) *AccountUpdate {
 	ids := make([]uuid.UUID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -292,20 +308,20 @@ func (au *AccountUpdate) RemoveOwner(e ...*Entity) *AccountUpdate {
 	return au.RemoveOwnerIDs(ids...)
 }
 
-// ClearPreference clears all "preference" edges to the Preference entity.
-func (au *AccountUpdate) ClearPreference() *AccountUpdate {
-	au.mutation.ClearPreference()
+// ClearPreferences clears all "preferences" edges to the Preference entity.
+func (au *AccountUpdate) ClearPreferences() *AccountUpdate {
+	au.mutation.ClearPreferences()
 	return au
 }
 
-// RemovePreferenceIDs removes the "preference" edge to Preference entities by IDs.
+// RemovePreferenceIDs removes the "preferences" edge to Preference entities by IDs.
 func (au *AccountUpdate) RemovePreferenceIDs(ids ...int) *AccountUpdate {
 	au.mutation.RemovePreferenceIDs(ids...)
 	return au
 }
 
-// RemovePreference removes "preference" edges to Preference entities.
-func (au *AccountUpdate) RemovePreference(p ...*Preference) *AccountUpdate {
+// RemovePreferences removes "preferences" edges to Preference entities.
+func (au *AccountUpdate) RemovePreferences(p ...*Preference) *AccountUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -313,20 +329,20 @@ func (au *AccountUpdate) RemovePreference(p ...*Preference) *AccountUpdate {
 	return au.RemovePreferenceIDs(ids...)
 }
 
-// ClearRoutingnumber clears all "routingnumber" edges to the RoutingNumber entity.
-func (au *AccountUpdate) ClearRoutingnumber() *AccountUpdate {
-	au.mutation.ClearRoutingnumber()
+// ClearRoutingnumbers clears all "routingnumbers" edges to the RoutingNumber entity.
+func (au *AccountUpdate) ClearRoutingnumbers() *AccountUpdate {
+	au.mutation.ClearRoutingnumbers()
 	return au
 }
 
-// RemoveRoutingnumberIDs removes the "routingnumber" edge to RoutingNumber entities by IDs.
+// RemoveRoutingnumberIDs removes the "routingnumbers" edge to RoutingNumber entities by IDs.
 func (au *AccountUpdate) RemoveRoutingnumberIDs(ids ...int) *AccountUpdate {
 	au.mutation.RemoveRoutingnumberIDs(ids...)
 	return au
 }
 
-// RemoveRoutingnumber removes "routingnumber" edges to RoutingNumber entities.
-func (au *AccountUpdate) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdate {
+// RemoveRoutingnumbers removes "routingnumbers" edges to RoutingNumber entities.
+func (au *AccountUpdate) RemoveRoutingnumbers(r ...*RoutingNumber) *AccountUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -338,6 +354,27 @@ func (au *AccountUpdate) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdate
 func (au *AccountUpdate) ClearProduct() *AccountUpdate {
 	au.mutation.ClearProduct()
 	return au
+}
+
+// ClearTransactions clears all "transactions" edges to the Transaction entity.
+func (au *AccountUpdate) ClearTransactions() *AccountUpdate {
+	au.mutation.ClearTransactions()
+	return au
+}
+
+// RemoveTransactionIDs removes the "transactions" edge to Transaction entities by IDs.
+func (au *AccountUpdate) RemoveTransactionIDs(ids ...uuid.UUID) *AccountUpdate {
+	au.mutation.RemoveTransactionIDs(ids...)
+	return au
+}
+
+// RemoveTransactions removes "transactions" edges to Transaction entities.
+func (au *AccountUpdate) RemoveTransactions(t ...*Transaction) *AccountUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.RemoveTransactionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -588,12 +625,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.OwnerCleared() {
+	if au.mutation.OwnersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -604,12 +641,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !au.mutation.OwnerCleared() {
+	if nodes := au.mutation.RemovedOwnersIDs(); len(nodes) > 0 && !au.mutation.OwnersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -623,12 +660,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.OwnersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -642,12 +679,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.PreferenceCleared() {
+	if au.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -658,12 +695,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedPreferenceIDs(); len(nodes) > 0 && !au.mutation.PreferenceCleared() {
+	if nodes := au.mutation.RemovedPreferencesIDs(); len(nodes) > 0 && !au.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -677,12 +714,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.PreferenceIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -696,12 +733,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.RoutingnumberCleared() {
+	if au.mutation.RoutingnumbersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -712,12 +749,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedRoutingnumberIDs(); len(nodes) > 0 && !au.mutation.RoutingnumberCleared() {
+	if nodes := au.mutation.RemovedRoutingnumbersIDs(); len(nodes) > 0 && !au.mutation.RoutingnumbersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -731,12 +768,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.RoutingnumbersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -777,6 +814,60 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: product.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.TransactionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedTransactionsIDs(); len(nodes) > 0 && !au.mutation.TransactionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.TransactionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
 				},
 			},
 		}
@@ -966,14 +1057,14 @@ func (auo *AccountUpdateOne) SetBranch(b *Branch) *AccountUpdateOne {
 	return auo.SetBranchID(b.ID)
 }
 
-// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+// AddOwnerIDs adds the "owners" edge to the Entity entity by IDs.
 func (auo *AccountUpdateOne) AddOwnerIDs(ids ...uuid.UUID) *AccountUpdateOne {
 	auo.mutation.AddOwnerIDs(ids...)
 	return auo
 }
 
-// AddOwner adds the "owner" edges to the Entity entity.
-func (auo *AccountUpdateOne) AddOwner(e ...*Entity) *AccountUpdateOne {
+// AddOwners adds the "owners" edges to the Entity entity.
+func (auo *AccountUpdateOne) AddOwners(e ...*Entity) *AccountUpdateOne {
 	ids := make([]uuid.UUID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -981,14 +1072,14 @@ func (auo *AccountUpdateOne) AddOwner(e ...*Entity) *AccountUpdateOne {
 	return auo.AddOwnerIDs(ids...)
 }
 
-// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
 func (auo *AccountUpdateOne) AddPreferenceIDs(ids ...int) *AccountUpdateOne {
 	auo.mutation.AddPreferenceIDs(ids...)
 	return auo
 }
 
-// AddPreference adds the "preference" edges to the Preference entity.
-func (auo *AccountUpdateOne) AddPreference(p ...*Preference) *AccountUpdateOne {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (auo *AccountUpdateOne) AddPreferences(p ...*Preference) *AccountUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -996,14 +1087,14 @@ func (auo *AccountUpdateOne) AddPreference(p ...*Preference) *AccountUpdateOne {
 	return auo.AddPreferenceIDs(ids...)
 }
 
-// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+// AddRoutingnumberIDs adds the "routingnumbers" edge to the RoutingNumber entity by IDs.
 func (auo *AccountUpdateOne) AddRoutingnumberIDs(ids ...int) *AccountUpdateOne {
 	auo.mutation.AddRoutingnumberIDs(ids...)
 	return auo
 }
 
-// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
-func (auo *AccountUpdateOne) AddRoutingnumber(r ...*RoutingNumber) *AccountUpdateOne {
+// AddRoutingnumbers adds the "routingnumbers" edges to the RoutingNumber entity.
+func (auo *AccountUpdateOne) AddRoutingnumbers(r ...*RoutingNumber) *AccountUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -1030,6 +1121,21 @@ func (auo *AccountUpdateOne) SetProduct(p *Product) *AccountUpdateOne {
 	return auo.SetProductID(p.ID)
 }
 
+// AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
+func (auo *AccountUpdateOne) AddTransactionIDs(ids ...uuid.UUID) *AccountUpdateOne {
+	auo.mutation.AddTransactionIDs(ids...)
+	return auo
+}
+
+// AddTransactions adds the "transactions" edges to the Transaction entity.
+func (auo *AccountUpdateOne) AddTransactions(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.AddTransactionIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -1041,20 +1147,20 @@ func (auo *AccountUpdateOne) ClearBranch() *AccountUpdateOne {
 	return auo
 }
 
-// ClearOwner clears all "owner" edges to the Entity entity.
-func (auo *AccountUpdateOne) ClearOwner() *AccountUpdateOne {
-	auo.mutation.ClearOwner()
+// ClearOwners clears all "owners" edges to the Entity entity.
+func (auo *AccountUpdateOne) ClearOwners() *AccountUpdateOne {
+	auo.mutation.ClearOwners()
 	return auo
 }
 
-// RemoveOwnerIDs removes the "owner" edge to Entity entities by IDs.
+// RemoveOwnerIDs removes the "owners" edge to Entity entities by IDs.
 func (auo *AccountUpdateOne) RemoveOwnerIDs(ids ...uuid.UUID) *AccountUpdateOne {
 	auo.mutation.RemoveOwnerIDs(ids...)
 	return auo
 }
 
-// RemoveOwner removes "owner" edges to Entity entities.
-func (auo *AccountUpdateOne) RemoveOwner(e ...*Entity) *AccountUpdateOne {
+// RemoveOwners removes "owners" edges to Entity entities.
+func (auo *AccountUpdateOne) RemoveOwners(e ...*Entity) *AccountUpdateOne {
 	ids := make([]uuid.UUID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -1062,20 +1168,20 @@ func (auo *AccountUpdateOne) RemoveOwner(e ...*Entity) *AccountUpdateOne {
 	return auo.RemoveOwnerIDs(ids...)
 }
 
-// ClearPreference clears all "preference" edges to the Preference entity.
-func (auo *AccountUpdateOne) ClearPreference() *AccountUpdateOne {
-	auo.mutation.ClearPreference()
+// ClearPreferences clears all "preferences" edges to the Preference entity.
+func (auo *AccountUpdateOne) ClearPreferences() *AccountUpdateOne {
+	auo.mutation.ClearPreferences()
 	return auo
 }
 
-// RemovePreferenceIDs removes the "preference" edge to Preference entities by IDs.
+// RemovePreferenceIDs removes the "preferences" edge to Preference entities by IDs.
 func (auo *AccountUpdateOne) RemovePreferenceIDs(ids ...int) *AccountUpdateOne {
 	auo.mutation.RemovePreferenceIDs(ids...)
 	return auo
 }
 
-// RemovePreference removes "preference" edges to Preference entities.
-func (auo *AccountUpdateOne) RemovePreference(p ...*Preference) *AccountUpdateOne {
+// RemovePreferences removes "preferences" edges to Preference entities.
+func (auo *AccountUpdateOne) RemovePreferences(p ...*Preference) *AccountUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -1083,20 +1189,20 @@ func (auo *AccountUpdateOne) RemovePreference(p ...*Preference) *AccountUpdateOn
 	return auo.RemovePreferenceIDs(ids...)
 }
 
-// ClearRoutingnumber clears all "routingnumber" edges to the RoutingNumber entity.
-func (auo *AccountUpdateOne) ClearRoutingnumber() *AccountUpdateOne {
-	auo.mutation.ClearRoutingnumber()
+// ClearRoutingnumbers clears all "routingnumbers" edges to the RoutingNumber entity.
+func (auo *AccountUpdateOne) ClearRoutingnumbers() *AccountUpdateOne {
+	auo.mutation.ClearRoutingnumbers()
 	return auo
 }
 
-// RemoveRoutingnumberIDs removes the "routingnumber" edge to RoutingNumber entities by IDs.
+// RemoveRoutingnumberIDs removes the "routingnumbers" edge to RoutingNumber entities by IDs.
 func (auo *AccountUpdateOne) RemoveRoutingnumberIDs(ids ...int) *AccountUpdateOne {
 	auo.mutation.RemoveRoutingnumberIDs(ids...)
 	return auo
 }
 
-// RemoveRoutingnumber removes "routingnumber" edges to RoutingNumber entities.
-func (auo *AccountUpdateOne) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUpdateOne {
+// RemoveRoutingnumbers removes "routingnumbers" edges to RoutingNumber entities.
+func (auo *AccountUpdateOne) RemoveRoutingnumbers(r ...*RoutingNumber) *AccountUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -1108,6 +1214,27 @@ func (auo *AccountUpdateOne) RemoveRoutingnumber(r ...*RoutingNumber) *AccountUp
 func (auo *AccountUpdateOne) ClearProduct() *AccountUpdateOne {
 	auo.mutation.ClearProduct()
 	return auo
+}
+
+// ClearTransactions clears all "transactions" edges to the Transaction entity.
+func (auo *AccountUpdateOne) ClearTransactions() *AccountUpdateOne {
+	auo.mutation.ClearTransactions()
+	return auo
+}
+
+// RemoveTransactionIDs removes the "transactions" edge to Transaction entities by IDs.
+func (auo *AccountUpdateOne) RemoveTransactionIDs(ids ...uuid.UUID) *AccountUpdateOne {
+	auo.mutation.RemoveTransactionIDs(ids...)
+	return auo
+}
+
+// RemoveTransactions removes "transactions" edges to Transaction entities.
+func (auo *AccountUpdateOne) RemoveTransactions(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.RemoveTransactionIDs(ids...)
 }
 
 // Save executes the query and returns the updated Account entity.
@@ -1363,12 +1490,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.OwnerCleared() {
+	if auo.mutation.OwnersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1379,12 +1506,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !auo.mutation.OwnerCleared() {
+	if nodes := auo.mutation.RemovedOwnersIDs(); len(nodes) > 0 && !auo.mutation.OwnersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1398,12 +1525,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.OwnersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1417,12 +1544,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.PreferenceCleared() {
+	if auo.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1433,12 +1560,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedPreferenceIDs(); len(nodes) > 0 && !auo.mutation.PreferenceCleared() {
+	if nodes := auo.mutation.RemovedPreferencesIDs(); len(nodes) > 0 && !auo.mutation.PreferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1452,12 +1579,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.PreferenceIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1471,12 +1598,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.RoutingnumberCleared() {
+	if auo.mutation.RoutingnumbersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1487,12 +1614,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedRoutingnumberIDs(); len(nodes) > 0 && !auo.mutation.RoutingnumberCleared() {
+	if nodes := auo.mutation.RemovedRoutingnumbersIDs(); len(nodes) > 0 && !auo.mutation.RoutingnumbersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1506,12 +1633,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.RoutingnumbersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1552,6 +1679,60 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: product.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.TransactionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedTransactionsIDs(); len(nodes) > 0 && !auo.mutation.TransactionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.TransactionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
 				},
 			},
 		}

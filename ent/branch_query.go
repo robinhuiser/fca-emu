@@ -25,8 +25,8 @@ type BranchQuery struct {
 	fields     []string
 	predicates []predicate.Branch
 	// eager-loading edges.
-	withBranchOwner *BankQuery
-	withFKs         bool
+	withOwner *BankQuery
+	withFKs   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,8 +56,8 @@ func (bq *BranchQuery) Order(o ...OrderFunc) *BranchQuery {
 	return bq
 }
 
-// QueryBranchOwner chains the current query on the "branch_owner" edge.
-func (bq *BranchQuery) QueryBranchOwner() *BankQuery {
+// QueryOwner chains the current query on the "owner" edge.
+func (bq *BranchQuery) QueryOwner() *BankQuery {
 	query := &BankQuery{config: bq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := bq.prepareQuery(ctx); err != nil {
@@ -70,7 +70,7 @@ func (bq *BranchQuery) QueryBranchOwner() *BankQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(branch.Table, branch.FieldID, selector),
 			sqlgraph.To(bank.Table, bank.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, branch.BranchOwnerTable, branch.BranchOwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, branch.OwnerTable, branch.OwnerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
 		return fromU, nil
@@ -254,26 +254,26 @@ func (bq *BranchQuery) Clone() *BranchQuery {
 		return nil
 	}
 	return &BranchQuery{
-		config:          bq.config,
-		limit:           bq.limit,
-		offset:          bq.offset,
-		order:           append([]OrderFunc{}, bq.order...),
-		predicates:      append([]predicate.Branch{}, bq.predicates...),
-		withBranchOwner: bq.withBranchOwner.Clone(),
+		config:     bq.config,
+		limit:      bq.limit,
+		offset:     bq.offset,
+		order:      append([]OrderFunc{}, bq.order...),
+		predicates: append([]predicate.Branch{}, bq.predicates...),
+		withOwner:  bq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  bq.sql.Clone(),
 		path: bq.path,
 	}
 }
 
-// WithBranchOwner tells the query-builder to eager-load the nodes that are connected to
-// the "branch_owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BranchQuery) WithBranchOwner(opts ...func(*BankQuery)) *BranchQuery {
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (bq *BranchQuery) WithOwner(opts ...func(*BankQuery)) *BranchQuery {
 	query := &BankQuery{config: bq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	bq.withBranchOwner = query
+	bq.withOwner = query
 	return bq
 }
 
@@ -344,10 +344,10 @@ func (bq *BranchQuery) sqlAll(ctx context.Context) ([]*Branch, error) {
 		withFKs     = bq.withFKs
 		_spec       = bq.querySpec()
 		loadedTypes = [1]bool{
-			bq.withBranchOwner != nil,
+			bq.withOwner != nil,
 		}
 	)
-	if bq.withBranchOwner != nil {
+	if bq.withOwner != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -373,7 +373,7 @@ func (bq *BranchQuery) sqlAll(ctx context.Context) ([]*Branch, error) {
 		return nodes, nil
 	}
 
-	if query := bq.withBranchOwner; query != nil {
+	if query := bq.withOwner; query != nil {
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*Branch)
 		for i := range nodes {
@@ -394,7 +394,7 @@ func (bq *BranchQuery) sqlAll(ctx context.Context) ([]*Branch, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "bank_branches" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.BranchOwner = n
+				nodes[i].Edges.Owner = n
 			}
 		}
 	}

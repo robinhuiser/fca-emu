@@ -31,11 +31,11 @@ type EntityQuery struct {
 	fields     []string
 	predicates []predicate.Entity
 	// eager-loading edges.
-	withEntityTaxInformation *EntityTaxInformationQuery
-	withEntityAddresses      *EntityAddressQuery
-	withEntityPreferences    *PreferenceQuery
-	withEntityContactPoints  *EntityContactPointQuery
-	withOwnsAccount          *AccountQuery
+	withTaxSpecifications *EntityTaxInformationQuery
+	withAddresses         *EntityAddressQuery
+	withPreferences       *PreferenceQuery
+	withContactPoints     *EntityContactPointQuery
+	withOwnsAccount       *AccountQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,8 +65,8 @@ func (eq *EntityQuery) Order(o ...OrderFunc) *EntityQuery {
 	return eq
 }
 
-// QueryEntityTaxInformation chains the current query on the "entityTaxInformation" edge.
-func (eq *EntityQuery) QueryEntityTaxInformation() *EntityTaxInformationQuery {
+// QueryTaxSpecifications chains the current query on the "taxSpecifications" edge.
+func (eq *EntityQuery) QueryTaxSpecifications() *EntityTaxInformationQuery {
 	query := &EntityTaxInformationQuery{config: eq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -79,7 +79,7 @@ func (eq *EntityQuery) QueryEntityTaxInformation() *EntityTaxInformationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, selector),
 			sqlgraph.To(entitytaxinformation.Table, entitytaxinformation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityTaxInformationTable, entity.EntityTaxInformationColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.TaxSpecificationsTable, entity.TaxSpecificationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -87,8 +87,8 @@ func (eq *EntityQuery) QueryEntityTaxInformation() *EntityTaxInformationQuery {
 	return query
 }
 
-// QueryEntityAddresses chains the current query on the "entityAddresses" edge.
-func (eq *EntityQuery) QueryEntityAddresses() *EntityAddressQuery {
+// QueryAddresses chains the current query on the "addresses" edge.
+func (eq *EntityQuery) QueryAddresses() *EntityAddressQuery {
 	query := &EntityAddressQuery{config: eq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -101,7 +101,7 @@ func (eq *EntityQuery) QueryEntityAddresses() *EntityAddressQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, selector),
 			sqlgraph.To(entityaddress.Table, entityaddress.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityAddressesTable, entity.EntityAddressesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.AddressesTable, entity.AddressesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -109,8 +109,8 @@ func (eq *EntityQuery) QueryEntityAddresses() *EntityAddressQuery {
 	return query
 }
 
-// QueryEntityPreferences chains the current query on the "entityPreferences" edge.
-func (eq *EntityQuery) QueryEntityPreferences() *PreferenceQuery {
+// QueryPreferences chains the current query on the "preferences" edge.
+func (eq *EntityQuery) QueryPreferences() *PreferenceQuery {
 	query := &PreferenceQuery{config: eq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -123,7 +123,7 @@ func (eq *EntityQuery) QueryEntityPreferences() *PreferenceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, selector),
 			sqlgraph.To(preference.Table, preference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityPreferencesTable, entity.EntityPreferencesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.PreferencesTable, entity.PreferencesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -131,8 +131,8 @@ func (eq *EntityQuery) QueryEntityPreferences() *PreferenceQuery {
 	return query
 }
 
-// QueryEntityContactPoints chains the current query on the "entityContactPoints" edge.
-func (eq *EntityQuery) QueryEntityContactPoints() *EntityContactPointQuery {
+// QueryContactPoints chains the current query on the "contactPoints" edge.
+func (eq *EntityQuery) QueryContactPoints() *EntityContactPointQuery {
 	query := &EntityContactPointQuery{config: eq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -145,7 +145,7 @@ func (eq *EntityQuery) QueryEntityContactPoints() *EntityContactPointQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, selector),
 			sqlgraph.To(entitycontactpoint.Table, entitycontactpoint.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityContactPointsTable, entity.EntityContactPointsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.ContactPointsTable, entity.ContactPointsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -351,63 +351,63 @@ func (eq *EntityQuery) Clone() *EntityQuery {
 		return nil
 	}
 	return &EntityQuery{
-		config:                   eq.config,
-		limit:                    eq.limit,
-		offset:                   eq.offset,
-		order:                    append([]OrderFunc{}, eq.order...),
-		predicates:               append([]predicate.Entity{}, eq.predicates...),
-		withEntityTaxInformation: eq.withEntityTaxInformation.Clone(),
-		withEntityAddresses:      eq.withEntityAddresses.Clone(),
-		withEntityPreferences:    eq.withEntityPreferences.Clone(),
-		withEntityContactPoints:  eq.withEntityContactPoints.Clone(),
-		withOwnsAccount:          eq.withOwnsAccount.Clone(),
+		config:                eq.config,
+		limit:                 eq.limit,
+		offset:                eq.offset,
+		order:                 append([]OrderFunc{}, eq.order...),
+		predicates:            append([]predicate.Entity{}, eq.predicates...),
+		withTaxSpecifications: eq.withTaxSpecifications.Clone(),
+		withAddresses:         eq.withAddresses.Clone(),
+		withPreferences:       eq.withPreferences.Clone(),
+		withContactPoints:     eq.withContactPoints.Clone(),
+		withOwnsAccount:       eq.withOwnsAccount.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
 }
 
-// WithEntityTaxInformation tells the query-builder to eager-load the nodes that are connected to
-// the "entityTaxInformation" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EntityQuery) WithEntityTaxInformation(opts ...func(*EntityTaxInformationQuery)) *EntityQuery {
+// WithTaxSpecifications tells the query-builder to eager-load the nodes that are connected to
+// the "taxSpecifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EntityQuery) WithTaxSpecifications(opts ...func(*EntityTaxInformationQuery)) *EntityQuery {
 	query := &EntityTaxInformationQuery{config: eq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withEntityTaxInformation = query
+	eq.withTaxSpecifications = query
 	return eq
 }
 
-// WithEntityAddresses tells the query-builder to eager-load the nodes that are connected to
-// the "entityAddresses" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EntityQuery) WithEntityAddresses(opts ...func(*EntityAddressQuery)) *EntityQuery {
+// WithAddresses tells the query-builder to eager-load the nodes that are connected to
+// the "addresses" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EntityQuery) WithAddresses(opts ...func(*EntityAddressQuery)) *EntityQuery {
 	query := &EntityAddressQuery{config: eq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withEntityAddresses = query
+	eq.withAddresses = query
 	return eq
 }
 
-// WithEntityPreferences tells the query-builder to eager-load the nodes that are connected to
-// the "entityPreferences" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EntityQuery) WithEntityPreferences(opts ...func(*PreferenceQuery)) *EntityQuery {
+// WithPreferences tells the query-builder to eager-load the nodes that are connected to
+// the "preferences" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EntityQuery) WithPreferences(opts ...func(*PreferenceQuery)) *EntityQuery {
 	query := &PreferenceQuery{config: eq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withEntityPreferences = query
+	eq.withPreferences = query
 	return eq
 }
 
-// WithEntityContactPoints tells the query-builder to eager-load the nodes that are connected to
-// the "entityContactPoints" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EntityQuery) WithEntityContactPoints(opts ...func(*EntityContactPointQuery)) *EntityQuery {
+// WithContactPoints tells the query-builder to eager-load the nodes that are connected to
+// the "contactPoints" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EntityQuery) WithContactPoints(opts ...func(*EntityContactPointQuery)) *EntityQuery {
 	query := &EntityContactPointQuery{config: eq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withEntityContactPoints = query
+	eq.withContactPoints = query
 	return eq
 }
 
@@ -488,10 +488,10 @@ func (eq *EntityQuery) sqlAll(ctx context.Context) ([]*Entity, error) {
 		nodes       = []*Entity{}
 		_spec       = eq.querySpec()
 		loadedTypes = [5]bool{
-			eq.withEntityTaxInformation != nil,
-			eq.withEntityAddresses != nil,
-			eq.withEntityPreferences != nil,
-			eq.withEntityContactPoints != nil,
+			eq.withTaxSpecifications != nil,
+			eq.withAddresses != nil,
+			eq.withPreferences != nil,
+			eq.withContactPoints != nil,
 			eq.withOwnsAccount != nil,
 		}
 	)
@@ -515,119 +515,119 @@ func (eq *EntityQuery) sqlAll(ctx context.Context) ([]*Entity, error) {
 		return nodes, nil
 	}
 
-	if query := eq.withEntityTaxInformation; query != nil {
+	if query := eq.withTaxSpecifications; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Entity)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.EntityTaxInformation = []*EntityTaxInformation{}
+			nodes[i].Edges.TaxSpecifications = []*EntityTaxInformation{}
 		}
 		query.withFKs = true
 		query.Where(predicate.EntityTaxInformation(func(s *sql.Selector) {
-			s.Where(sql.InValues(entity.EntityTaxInformationColumn, fks...))
+			s.Where(sql.InValues(entity.TaxSpecificationsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.entity_entity_tax_information
+			fk := n.entity_tax_specifications
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "entity_entity_tax_information" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "entity_tax_specifications" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "entity_entity_tax_information" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "entity_tax_specifications" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.EntityTaxInformation = append(node.Edges.EntityTaxInformation, n)
+			node.Edges.TaxSpecifications = append(node.Edges.TaxSpecifications, n)
 		}
 	}
 
-	if query := eq.withEntityAddresses; query != nil {
+	if query := eq.withAddresses; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Entity)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.EntityAddresses = []*EntityAddress{}
+			nodes[i].Edges.Addresses = []*EntityAddress{}
 		}
 		query.withFKs = true
 		query.Where(predicate.EntityAddress(func(s *sql.Selector) {
-			s.Where(sql.InValues(entity.EntityAddressesColumn, fks...))
+			s.Where(sql.InValues(entity.AddressesColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.entity_entity_addresses
+			fk := n.entity_addresses
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "entity_entity_addresses" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "entity_addresses" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "entity_entity_addresses" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "entity_addresses" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.EntityAddresses = append(node.Edges.EntityAddresses, n)
+			node.Edges.Addresses = append(node.Edges.Addresses, n)
 		}
 	}
 
-	if query := eq.withEntityPreferences; query != nil {
+	if query := eq.withPreferences; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Entity)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.EntityPreferences = []*Preference{}
+			nodes[i].Edges.Preferences = []*Preference{}
 		}
 		query.withFKs = true
 		query.Where(predicate.Preference(func(s *sql.Selector) {
-			s.Where(sql.InValues(entity.EntityPreferencesColumn, fks...))
+			s.Where(sql.InValues(entity.PreferencesColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.entity_entity_preferences
+			fk := n.entity_preferences
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "entity_entity_preferences" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "entity_preferences" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "entity_entity_preferences" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "entity_preferences" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.EntityPreferences = append(node.Edges.EntityPreferences, n)
+			node.Edges.Preferences = append(node.Edges.Preferences, n)
 		}
 	}
 
-	if query := eq.withEntityContactPoints; query != nil {
+	if query := eq.withContactPoints; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Entity)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.EntityContactPoints = []*EntityContactPoint{}
+			nodes[i].Edges.ContactPoints = []*EntityContactPoint{}
 		}
 		query.withFKs = true
 		query.Where(predicate.EntityContactPoint(func(s *sql.Selector) {
-			s.Where(sql.InValues(entity.EntityContactPointsColumn, fks...))
+			s.Where(sql.InValues(entity.ContactPointsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.entity_entity_contact_points
+			fk := n.entity_contact_points
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "entity_entity_contact_points" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "entity_contact_points" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "entity_entity_contact_points" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "entity_contact_points" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.EntityContactPoints = append(node.Edges.EntityContactPoints, n)
+			node.Edges.ContactPoints = append(node.Edges.ContactPoints, n)
 		}
 	}
 

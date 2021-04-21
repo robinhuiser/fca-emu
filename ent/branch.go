@@ -40,25 +40,25 @@ type Branch struct {
 
 // BranchEdges holds the relations/edges for other nodes in the graph.
 type BranchEdges struct {
-	// BranchOwner holds the value of the branch_owner edge.
-	BranchOwner *Bank `json:"branch_owner,omitempty"`
+	// Owner holds the value of the owner edge.
+	Owner *Bank `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// BranchOwnerOrErr returns the BranchOwner value or an error if the edge
+// OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e BranchEdges) BranchOwnerOrErr() (*Bank, error) {
+func (e BranchEdges) OwnerOrErr() (*Bank, error) {
 	if e.loadedTypes[0] {
-		if e.BranchOwner == nil {
-			// The edge branch_owner was loaded in eager-loading,
+		if e.Owner == nil {
+			// The edge owner was loaded in eager-loading,
 			// but was not found.
 			return nil, &NotFoundError{label: bank.Label}
 		}
-		return e.BranchOwner, nil
+		return e.Owner, nil
 	}
-	return nil, &NotLoadedError{edge: "branch_owner"}
+	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -155,9 +155,9 @@ func (b *Branch) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
-// QueryBranchOwner queries the "branch_owner" edge of the Branch entity.
-func (b *Branch) QueryBranchOwner() *BankQuery {
-	return (&BranchClient{config: b.config}).QueryBranchOwner(b)
+// QueryOwner queries the "owner" edge of the Branch entity.
+func (b *Branch) QueryOwner() *BankQuery {
+	return (&BranchClient{config: b.config}).QueryOwner(b)
 }
 
 // Update returns a builder for updating this Branch.

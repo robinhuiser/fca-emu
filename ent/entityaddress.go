@@ -33,8 +33,8 @@ type EntityAddress struct {
 	// Line3 holds the value of the "line3" field.
 	Line3 string `json:"line3,omitempty"`
 	// Primary holds the value of the "primary" field.
-	Primary                 bool `json:"primary,omitempty"`
-	entity_entity_addresses *uuid.UUID
+	Primary          bool `json:"primary,omitempty"`
+	entity_addresses *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -48,7 +48,7 @@ func (*EntityAddress) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullInt64{}
 		case entityaddress.FieldCountry, entityaddress.FieldCity, entityaddress.FieldPostalCode, entityaddress.FieldState, entityaddress.FieldType, entityaddress.FieldLine1, entityaddress.FieldLine2, entityaddress.FieldLine3:
 			values[i] = &sql.NullString{}
-		case entityaddress.ForeignKeys[0]: // entity_entity_addresses
+		case entityaddress.ForeignKeys[0]: // entity_addresses
 			values[i] = &uuid.UUID{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type EntityAddress", columns[i])
@@ -127,9 +127,9 @@ func (ea *EntityAddress) assignValues(columns []string, values []interface{}) er
 			}
 		case entityaddress.ForeignKeys[0]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field entity_entity_addresses", values[i])
+				return fmt.Errorf("unexpected type %T for field entity_addresses", values[i])
 			} else if value != nil {
-				ea.entity_entity_addresses = value
+				ea.entity_addresses = value
 			}
 		}
 	}

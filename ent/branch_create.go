@@ -68,23 +68,23 @@ func (bc *BranchCreate) SetLongitude(f float64) *BranchCreate {
 	return bc
 }
 
-// SetBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID.
-func (bc *BranchCreate) SetBranchOwnerID(id int) *BranchCreate {
-	bc.mutation.SetBranchOwnerID(id)
+// SetOwnerID sets the "owner" edge to the Bank entity by ID.
+func (bc *BranchCreate) SetOwnerID(id int) *BranchCreate {
+	bc.mutation.SetOwnerID(id)
 	return bc
 }
 
-// SetNillableBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID if the given value is not nil.
-func (bc *BranchCreate) SetNillableBranchOwnerID(id *int) *BranchCreate {
+// SetNillableOwnerID sets the "owner" edge to the Bank entity by ID if the given value is not nil.
+func (bc *BranchCreate) SetNillableOwnerID(id *int) *BranchCreate {
 	if id != nil {
-		bc = bc.SetBranchOwnerID(*id)
+		bc = bc.SetOwnerID(*id)
 	}
 	return bc
 }
 
-// SetBranchOwner sets the "branch_owner" edge to the Bank entity.
-func (bc *BranchCreate) SetBranchOwner(b *Bank) *BranchCreate {
-	return bc.SetBranchOwnerID(b.ID)
+// SetOwner sets the "owner" edge to the Bank entity.
+func (bc *BranchCreate) SetOwner(b *Bank) *BranchCreate {
+	return bc.SetOwnerID(b.ID)
 }
 
 // Mutation returns the BranchMutation object of the builder.
@@ -258,12 +258,12 @@ func (bc *BranchCreate) createSpec() (*Branch, *sqlgraph.CreateSpec) {
 		})
 		_node.Longitude = value
 	}
-	if nodes := bc.mutation.BranchOwnerIDs(); len(nodes) > 0 {
+	if nodes := bc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   branch.BranchOwnerTable,
-			Columns: []string{branch.BranchOwnerColumn},
+			Table:   branch.OwnerTable,
+			Columns: []string{branch.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

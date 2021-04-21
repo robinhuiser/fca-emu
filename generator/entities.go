@@ -82,7 +82,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		if err != nil {
 			return nil, fmt.Errorf("failed creating entity address: %w", err)
 		}
-		e.Update().AddEntityAddresses(a).Save(ctx)
+		e.Update().AddAddresses(a).Save(ctx)
 		primary_address = false
 	}
 
@@ -96,7 +96,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		if err != nil {
 			return nil, fmt.Errorf("failed creating entity tax info: %w", err)
 		}
-		e.Update().AddEntityTaxInformation(t).Save(ctx)
+		e.Update().AddTaxSpecifications(t).Save(ctx)
 	}
 
 	// Add one or more preferences
@@ -109,7 +109,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		if err != nil {
 			return nil, fmt.Errorf("failed creating preferences: %w", err)
 		}
-		e.Update().AddEntityPreferences(p).Save(ctx)
+		e.Update().AddPreferences(p).Save(ctx)
 	}
 
 	// Add one or more contact points
@@ -126,7 +126,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			if err != nil {
 				return nil, fmt.Errorf("failed creating entity contact points: %w", err)
 			}
-			e.Update().AddEntityContactPoints(c).Save(ctx)
+			e.Update().AddContactPoints(c).Save(ctx)
 		case a == 1:
 			c, err := client.EntityContactPoint.
 				Create().
@@ -137,7 +137,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			if err != nil {
 				return nil, fmt.Errorf("failed creating entity contact points: %w", err)
 			}
-			e.Update().AddEntityContactPoints(c).Save(ctx)
+			e.Update().AddContactPoints(c).Save(ctx)
 		case a == 2:
 			c, err := client.EntityContactPoint.
 				Create().
@@ -150,7 +150,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			if err != nil {
 				return nil, fmt.Errorf("failed creating entity contact points: %w", err)
 			}
-			e.Update().AddEntityContactPoints(c).Save(ctx)
+			e.Update().AddContactPoints(c).Save(ctx)
 		}
 
 	}

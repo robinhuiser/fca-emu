@@ -84,32 +84,32 @@ func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string
 	}
 
 	// Retrieve the linked entity attributes
-	addrs, err := rs.QueryEntityAddresses().All(ctx)
+	addrs, err := rs.QueryAddresses().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 	addresses := mapAddresses(addrs)
 
 	// Retrieve the linked entity attributes
-	atrs, err := rs.QueryEntityPreferences().All(ctx)
+	atrs, err := rs.QueryPreferences().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 	preferences := mapPreferences(atrs)
 
 	// Retrieve the linked entity contact points
-	cntpts, err := rs.QueryEntityContactPoints().All(ctx)
+	cntpts, err := rs.QueryContactPoints().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 	contactpoints := mapContactPoints(cntpts)
 
 	// Retrieve the linked entity tax information
-	taxinfs, err := rs.QueryEntityTaxInformation().All(ctx)
+	taxspecs, err := rs.QueryTaxSpecifications().All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
-	taxinformations := mapTaxInformations(taxinfs)
+	taxspecifications := mapTaxSpecifications(taxspecs)
 
 	entityProfile := EntityProfile{
 		Firstname:      rs.Firstname,
@@ -119,7 +119,7 @@ func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string
 		DateOfBirth:    isValidBankDate(rs.DateOfBirth.Format(util.APIDateFormat)),
 		Id:             rs.ID.String(),
 		Fullname:       rs.Fullname,
-		TaxInformation: taxinformations,
+		TaxInformation: taxspecifications,
 		Type:           rs.Type.String(),
 		URI: FiniteUri{
 			URL: rs.URL,
@@ -202,7 +202,7 @@ func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
 	for _, o := range owners {
 
 		// Get Tax information
-		txs, _ := o.QueryEntityTaxInformation().All(ctx)
+		txs, _ := o.QueryTaxSpecifications().All(ctx)
 		for _, t := range txs {
 			tx := TaxInformation{
 				TaxId: t.TaxId,
@@ -266,7 +266,7 @@ func mapContactPoints(cntpts []*ent.EntityContactPoint) []ContactPoint {
 	return contactpoints
 }
 
-func mapTaxInformations(taxinfs []*ent.EntityTaxInformation) []TaxInformation {
+func mapTaxSpecifications(taxinfs []*ent.EntityTaxInformation) []TaxInformation {
 	taxinformations := []TaxInformation{}
 	for _, taxinf := range taxinfs {
 		c := TaxInformation{

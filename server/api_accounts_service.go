@@ -275,7 +275,7 @@ func mapRoutingNumbers(routingnumbers []*ent.RoutingNumber) []RoutingNumber {
 
 func mapAccountDetails(acc *ent.Account, mask bool, ctx context.Context) (Account, error) {
 	// Retrieve the linked bank
-	qba, err := acc.QueryBranch().QueryBranchOwner().Only(ctx)
+	qba, err := acc.QueryBranch().QueryOwner().Only(ctx)
 	if err != nil {
 		return Account{}, fmt.Errorf("%v", err)
 	}
@@ -293,21 +293,21 @@ func mapAccountDetails(acc *ent.Account, mask bool, ctx context.Context) (Accoun
 	}
 
 	// Retrieve the linked account attributes
-	atrs, err := acc.QueryPreference().All(ctx)
+	atrs, err := acc.QueryPreferences().All(ctx)
 	if err != nil {
 		return Account{}, fmt.Errorf("%v", err)
 	}
 	preferences := mapPreferences(atrs)
 
 	// Retrieve routing number(s) of the account
-	rtns, err := acc.QueryRoutingnumber().All(ctx)
+	rtns, err := acc.QueryRoutingnumbers().All(ctx)
 	if err != nil {
 		return Account{}, fmt.Errorf("%v", err)
 	}
 	routingnumbers := mapRoutingNumbers(rtns)
 
 	// Retrieve the owner(s) (entities) of the account
-	ents, err := acc.QueryOwner().All(ctx)
+	ents, err := acc.QueryOwners().All(ctx)
 	if err != nil {
 		return Account{}, fmt.Errorf("%v", err)
 	}

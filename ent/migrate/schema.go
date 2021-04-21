@@ -65,6 +65,29 @@ var (
 		PrimaryKey:  []*schema.Column{BanksColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// BinaryItemsColumns holds the columns for the "binary_items" table.
+	BinaryItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "format", Type: field.TypeString},
+		{Name: "length", Type: field.TypeInt},
+		{Name: "content", Type: field.TypeBytes},
+		{Name: "url", Type: field.TypeString},
+		{Name: "transaction_images", Type: field.TypeUUID, Nullable: true},
+	}
+	// BinaryItemsTable holds the schema information for the "binary_items" table.
+	BinaryItemsTable = &schema.Table{
+		Name:       "binary_items",
+		Columns:    BinaryItemsColumns,
+		PrimaryKey: []*schema.Column{BinaryItemsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "binary_items_transactions_images",
+				Columns:    []*schema.Column{BinaryItemsColumns[5]},
+				RefColumns: []*schema.Column{TransactionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// BranchesColumns holds the columns for the "branches" table.
 	BranchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -165,7 +188,7 @@ var (
 		{Name: "line2", Type: field.TypeString, Nullable: true},
 		{Name: "line3", Type: field.TypeString, Nullable: true},
 		{Name: "primary", Type: field.TypeBool},
-		{Name: "entity_entity_addresses", Type: field.TypeUUID, Nullable: true},
+		{Name: "entity_addresses", Type: field.TypeUUID, Nullable: true},
 	}
 	// EntityAddressesTable holds the schema information for the "entity_addresses" table.
 	EntityAddressesTable = &schema.Table{
@@ -174,7 +197,7 @@ var (
 		PrimaryKey: []*schema.Column{EntityAddressesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "entity_addresses_entities_entityAddresses",
+				Symbol:     "entity_addresses_entities_addresses",
 				Columns:    []*schema.Column{EntityAddressesColumns[10]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -189,7 +212,7 @@ var (
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"}},
 		{Name: "suffix", Type: field.TypeString, Nullable: true},
 		{Name: "value", Type: field.TypeString},
-		{Name: "entity_entity_contact_points", Type: field.TypeUUID, Nullable: true},
+		{Name: "entity_contact_points", Type: field.TypeUUID, Nullable: true},
 	}
 	// EntityContactPointsTable holds the schema information for the "entity_contact_points" table.
 	EntityContactPointsTable = &schema.Table{
@@ -198,7 +221,7 @@ var (
 		PrimaryKey: []*schema.Column{EntityContactPointsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "entity_contact_points_entities_entityContactPoints",
+				Symbol:     "entity_contact_points_entities_contactPoints",
 				Columns:    []*schema.Column{EntityContactPointsColumns[6]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -210,7 +233,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"SSN"}},
 		{Name: "tax_id", Type: field.TypeString},
-		{Name: "entity_entity_tax_information", Type: field.TypeUUID, Nullable: true},
+		{Name: "entity_tax_specifications", Type: field.TypeUUID, Nullable: true},
 	}
 	// EntityTaxInformationsTable holds the schema information for the "entity_tax_informations" table.
 	EntityTaxInformationsTable = &schema.Table{
@@ -219,7 +242,7 @@ var (
 		PrimaryKey: []*schema.Column{EntityTaxInformationsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "entity_tax_informations_entities_entityTaxInformation",
+				Symbol:     "entity_tax_informations_entities_taxSpecifications",
 				Columns:    []*schema.Column{EntityTaxInformationsColumns[3]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -231,8 +254,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "value", Type: field.TypeString},
-		{Name: "account_preference", Type: field.TypeUUID, Nullable: true},
-		{Name: "entity_entity_preferences", Type: field.TypeUUID, Nullable: true},
+		{Name: "account_preferences", Type: field.TypeUUID, Nullable: true},
+		{Name: "entity_preferences", Type: field.TypeUUID, Nullable: true},
 	}
 	// PreferencesTable holds the schema information for the "preferences" table.
 	PreferencesTable = &schema.Table{
@@ -241,13 +264,13 @@ var (
 		PrimaryKey: []*schema.Column{PreferencesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "preferences_accounts_preference",
+				Symbol:     "preferences_accounts_preferences",
 				Columns:    []*schema.Column{PreferencesColumns[3]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "preferences_entities_entityPreferences",
+				Symbol:     "preferences_entities_preferences",
 				Columns:    []*schema.Column{PreferencesColumns[4]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -276,7 +299,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "number", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"WIRE", "ABA"}},
-		{Name: "account_routingnumber", Type: field.TypeUUID, Nullable: true},
+		{Name: "account_routingnumbers", Type: field.TypeUUID, Nullable: true},
 	}
 	// RoutingNumbersTable holds the schema information for the "routing_numbers" table.
 	RoutingNumbersTable = &schema.Table{
@@ -285,33 +308,80 @@ var (
 		PrimaryKey: []*schema.Column{RoutingNumbersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "routing_numbers_accounts_routingnumber",
+				Symbol:     "routing_numbers_accounts_routingnumbers",
 				Columns:    []*schema.Column{RoutingNumbersColumns[3]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 	}
-	// AccountOwnerColumns holds the columns for the "account_owner" table.
-	AccountOwnerColumns = []*schema.Column{
+	// TransactionsColumns holds the columns for the "transactions" table.
+	TransactionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "sequence_in_day", Type: field.TypeInt, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING", "POSTED"}},
+		{Name: "executed_amount", Type: field.TypeFloat64},
+		{Name: "executed_currency_code", Type: field.TypeString, Size: 3},
+		{Name: "exchange_rate", Type: field.TypeFloat64},
+		{Name: "originating_amount", Type: field.TypeFloat64},
+		{Name: "originating_currency_code", Type: field.TypeString, Size: 3},
+		{Name: "direction", Type: field.TypeEnum, Enums: []string{"DEBIT", "CREDIT"}},
+		{Name: "running_balance", Type: field.TypeFloat64},
+		{Name: "created_date", Type: field.TypeTime},
+		{Name: "posted_date", Type: field.TypeTime},
+		{Name: "executed_date", Type: field.TypeTime},
+		{Name: "updated_date", Type: field.TypeTime},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "memo", Type: field.TypeString, Nullable: true},
+		{Name: "group", Type: field.TypeString, Nullable: true},
+		{Name: "type", Type: field.TypeString, Nullable: true},
+		{Name: "main_category", Type: field.TypeString, Nullable: true},
+		{Name: "sub_category", Type: field.TypeString, Nullable: true},
+		{Name: "check_number", Type: field.TypeString, Nullable: true},
+		{Name: "latitude", Type: field.TypeFloat64, Nullable: true},
+		{Name: "longitude", Type: field.TypeFloat64, Nullable: true},
+		{Name: "merchant_code", Type: field.TypeString, Nullable: true},
+		{Name: "reversal", Type: field.TypeBool},
+		{Name: "reversal_for", Type: field.TypeString, Nullable: true},
+		{Name: "reversed", Type: field.TypeBool},
+		{Name: "reversed_by", Type: field.TypeString, Nullable: true},
+		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "account_transactions", Type: field.TypeUUID, Nullable: true},
+	}
+	// TransactionsTable holds the schema information for the "transactions" table.
+	TransactionsTable = &schema.Table{
+		Name:       "transactions",
+		Columns:    TransactionsColumns,
+		PrimaryKey: []*schema.Column{TransactionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "transactions_accounts_transactions",
+				Columns:    []*schema.Column{TransactionsColumns[29]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// AccountOwnersColumns holds the columns for the "account_owners" table.
+	AccountOwnersColumns = []*schema.Column{
 		{Name: "account_id", Type: field.TypeUUID},
 		{Name: "entity_id", Type: field.TypeUUID},
 	}
-	// AccountOwnerTable holds the schema information for the "account_owner" table.
-	AccountOwnerTable = &schema.Table{
-		Name:       "account_owner",
-		Columns:    AccountOwnerColumns,
-		PrimaryKey: []*schema.Column{AccountOwnerColumns[0], AccountOwnerColumns[1]},
+	// AccountOwnersTable holds the schema information for the "account_owners" table.
+	AccountOwnersTable = &schema.Table{
+		Name:       "account_owners",
+		Columns:    AccountOwnersColumns,
+		PrimaryKey: []*schema.Column{AccountOwnersColumns[0], AccountOwnersColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "account_owner_account_id",
-				Columns:    []*schema.Column{AccountOwnerColumns[0]},
+				Symbol:     "account_owners_account_id",
+				Columns:    []*schema.Column{AccountOwnersColumns[0]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "account_owner_entity_id",
-				Columns:    []*schema.Column{AccountOwnerColumns[1]},
+				Symbol:     "account_owners_entity_id",
+				Columns:    []*schema.Column{AccountOwnersColumns[1]},
 				RefColumns: []*schema.Column{EntitiesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -321,6 +391,7 @@ var (
 	Tables = []*schema.Table{
 		AccountsTable,
 		BanksTable,
+		BinaryItemsTable,
 		BranchesTable,
 		CardsTable,
 		CardNetworksTable,
@@ -331,13 +402,15 @@ var (
 		PreferencesTable,
 		ProductsTable,
 		RoutingNumbersTable,
-		AccountOwnerTable,
+		TransactionsTable,
+		AccountOwnersTable,
 	}
 )
 
 func init() {
 	AccountsTable.ForeignKeys[0].RefTable = BranchesTable
 	AccountsTable.ForeignKeys[1].RefTable = ProductsTable
+	BinaryItemsTable.ForeignKeys[0].RefTable = TransactionsTable
 	BranchesTable.ForeignKeys[0].RefTable = BanksTable
 	CardsTable.ForeignKeys[0].RefTable = CardNetworksTable
 	EntityAddressesTable.ForeignKeys[0].RefTable = EntitiesTable
@@ -346,6 +419,7 @@ func init() {
 	PreferencesTable.ForeignKeys[0].RefTable = AccountsTable
 	PreferencesTable.ForeignKeys[1].RefTable = EntitiesTable
 	RoutingNumbersTable.ForeignKeys[0].RefTable = AccountsTable
-	AccountOwnerTable.ForeignKeys[0].RefTable = AccountsTable
-	AccountOwnerTable.ForeignKeys[1].RefTable = EntitiesTable
+	TransactionsTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountOwnersTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountOwnersTable.ForeignKeys[1].RefTable = EntitiesTable
 }

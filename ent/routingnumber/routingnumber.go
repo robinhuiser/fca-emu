@@ -29,7 +29,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "routing_numbers"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"account_routingnumber",
+	"account_routingnumbers",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

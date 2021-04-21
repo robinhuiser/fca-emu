@@ -19,8 +19,8 @@ type RoutingNumber struct {
 	// Number holds the value of the "number" field.
 	Number string `json:"number,omitempty"`
 	// Type holds the value of the "type" field.
-	Type                  routingnumber.Type `json:"type,omitempty"`
-	account_routingnumber *uuid.UUID
+	Type                   routingnumber.Type `json:"type,omitempty"`
+	account_routingnumbers *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +32,7 @@ func (*RoutingNumber) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullInt64{}
 		case routingnumber.FieldNumber, routingnumber.FieldType:
 			values[i] = &sql.NullString{}
-		case routingnumber.ForeignKeys[0]: // account_routingnumber
+		case routingnumber.ForeignKeys[0]: // account_routingnumbers
 			values[i] = &uuid.UUID{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type RoutingNumber", columns[i])
@@ -69,9 +69,9 @@ func (rn *RoutingNumber) assignValues(columns []string, values []interface{}) er
 			}
 		case routingnumber.ForeignKeys[0]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field account_routingnumber", values[i])
+				return fmt.Errorf("unexpected type %T for field account_routingnumbers", values[i])
 			} else if value != nil {
-				rn.account_routingnumber = value
+				rn.account_routingnumbers = value
 			}
 		}
 	}

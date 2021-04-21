@@ -89,23 +89,23 @@ func (bu *BranchUpdate) AddLongitude(f float64) *BranchUpdate {
 	return bu
 }
 
-// SetBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID.
-func (bu *BranchUpdate) SetBranchOwnerID(id int) *BranchUpdate {
-	bu.mutation.SetBranchOwnerID(id)
+// SetOwnerID sets the "owner" edge to the Bank entity by ID.
+func (bu *BranchUpdate) SetOwnerID(id int) *BranchUpdate {
+	bu.mutation.SetOwnerID(id)
 	return bu
 }
 
-// SetNillableBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID if the given value is not nil.
-func (bu *BranchUpdate) SetNillableBranchOwnerID(id *int) *BranchUpdate {
+// SetNillableOwnerID sets the "owner" edge to the Bank entity by ID if the given value is not nil.
+func (bu *BranchUpdate) SetNillableOwnerID(id *int) *BranchUpdate {
 	if id != nil {
-		bu = bu.SetBranchOwnerID(*id)
+		bu = bu.SetOwnerID(*id)
 	}
 	return bu
 }
 
-// SetBranchOwner sets the "branch_owner" edge to the Bank entity.
-func (bu *BranchUpdate) SetBranchOwner(b *Bank) *BranchUpdate {
-	return bu.SetBranchOwnerID(b.ID)
+// SetOwner sets the "owner" edge to the Bank entity.
+func (bu *BranchUpdate) SetOwner(b *Bank) *BranchUpdate {
+	return bu.SetOwnerID(b.ID)
 }
 
 // Mutation returns the BranchMutation object of the builder.
@@ -113,9 +113,9 @@ func (bu *BranchUpdate) Mutation() *BranchMutation {
 	return bu.mutation
 }
 
-// ClearBranchOwner clears the "branch_owner" edge to the Bank entity.
-func (bu *BranchUpdate) ClearBranchOwner() *BranchUpdate {
-	bu.mutation.ClearBranchOwner()
+// ClearOwner clears the "owner" edge to the Bank entity.
+func (bu *BranchUpdate) ClearOwner() *BranchUpdate {
+	bu.mutation.ClearOwner()
 	return bu
 }
 
@@ -274,12 +274,12 @@ func (bu *BranchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: branch.FieldLongitude,
 		})
 	}
-	if bu.mutation.BranchOwnerCleared() {
+	if bu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   branch.BranchOwnerTable,
-			Columns: []string{branch.BranchOwnerColumn},
+			Table:   branch.OwnerTable,
+			Columns: []string{branch.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -290,12 +290,12 @@ func (bu *BranchUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := bu.mutation.BranchOwnerIDs(); len(nodes) > 0 {
+	if nodes := bu.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   branch.BranchOwnerTable,
-			Columns: []string{branch.BranchOwnerColumn},
+			Table:   branch.OwnerTable,
+			Columns: []string{branch.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -389,23 +389,23 @@ func (buo *BranchUpdateOne) AddLongitude(f float64) *BranchUpdateOne {
 	return buo
 }
 
-// SetBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID.
-func (buo *BranchUpdateOne) SetBranchOwnerID(id int) *BranchUpdateOne {
-	buo.mutation.SetBranchOwnerID(id)
+// SetOwnerID sets the "owner" edge to the Bank entity by ID.
+func (buo *BranchUpdateOne) SetOwnerID(id int) *BranchUpdateOne {
+	buo.mutation.SetOwnerID(id)
 	return buo
 }
 
-// SetNillableBranchOwnerID sets the "branch_owner" edge to the Bank entity by ID if the given value is not nil.
-func (buo *BranchUpdateOne) SetNillableBranchOwnerID(id *int) *BranchUpdateOne {
+// SetNillableOwnerID sets the "owner" edge to the Bank entity by ID if the given value is not nil.
+func (buo *BranchUpdateOne) SetNillableOwnerID(id *int) *BranchUpdateOne {
 	if id != nil {
-		buo = buo.SetBranchOwnerID(*id)
+		buo = buo.SetOwnerID(*id)
 	}
 	return buo
 }
 
-// SetBranchOwner sets the "branch_owner" edge to the Bank entity.
-func (buo *BranchUpdateOne) SetBranchOwner(b *Bank) *BranchUpdateOne {
-	return buo.SetBranchOwnerID(b.ID)
+// SetOwner sets the "owner" edge to the Bank entity.
+func (buo *BranchUpdateOne) SetOwner(b *Bank) *BranchUpdateOne {
+	return buo.SetOwnerID(b.ID)
 }
 
 // Mutation returns the BranchMutation object of the builder.
@@ -413,9 +413,9 @@ func (buo *BranchUpdateOne) Mutation() *BranchMutation {
 	return buo.mutation
 }
 
-// ClearBranchOwner clears the "branch_owner" edge to the Bank entity.
-func (buo *BranchUpdateOne) ClearBranchOwner() *BranchUpdateOne {
-	buo.mutation.ClearBranchOwner()
+// ClearOwner clears the "owner" edge to the Bank entity.
+func (buo *BranchUpdateOne) ClearOwner() *BranchUpdateOne {
+	buo.mutation.ClearOwner()
 	return buo
 }
 
@@ -579,12 +579,12 @@ func (buo *BranchUpdateOne) sqlSave(ctx context.Context) (_node *Branch, err err
 			Column: branch.FieldLongitude,
 		})
 	}
-	if buo.mutation.BranchOwnerCleared() {
+	if buo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   branch.BranchOwnerTable,
-			Columns: []string{branch.BranchOwnerColumn},
+			Table:   branch.OwnerTable,
+			Columns: []string{branch.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -595,12 +595,12 @@ func (buo *BranchUpdateOne) sqlSave(ctx context.Context) (_node *Branch, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := buo.mutation.BranchOwnerIDs(); len(nodes) > 0 {
+	if nodes := buo.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   branch.BranchOwnerTable,
-			Columns: []string{branch.BranchOwnerColumn},
+			Table:   branch.OwnerTable,
+			Columns: []string{branch.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

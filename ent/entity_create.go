@@ -130,64 +130,64 @@ func (ec *EntityCreate) SetID(u uuid.UUID) *EntityCreate {
 	return ec
 }
 
-// AddEntityTaxInformationIDs adds the "entityTaxInformation" edge to the EntityTaxInformation entity by IDs.
-func (ec *EntityCreate) AddEntityTaxInformationIDs(ids ...int) *EntityCreate {
-	ec.mutation.AddEntityTaxInformationIDs(ids...)
+// AddTaxSpecificationIDs adds the "taxSpecifications" edge to the EntityTaxInformation entity by IDs.
+func (ec *EntityCreate) AddTaxSpecificationIDs(ids ...int) *EntityCreate {
+	ec.mutation.AddTaxSpecificationIDs(ids...)
 	return ec
 }
 
-// AddEntityTaxInformation adds the "entityTaxInformation" edges to the EntityTaxInformation entity.
-func (ec *EntityCreate) AddEntityTaxInformation(e ...*EntityTaxInformation) *EntityCreate {
+// AddTaxSpecifications adds the "taxSpecifications" edges to the EntityTaxInformation entity.
+func (ec *EntityCreate) AddTaxSpecifications(e ...*EntityTaxInformation) *EntityCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ec.AddEntityTaxInformationIDs(ids...)
+	return ec.AddTaxSpecificationIDs(ids...)
 }
 
-// AddEntityAddressIDs adds the "entityAddresses" edge to the EntityAddress entity by IDs.
-func (ec *EntityCreate) AddEntityAddressIDs(ids ...int) *EntityCreate {
-	ec.mutation.AddEntityAddressIDs(ids...)
+// AddAddressIDs adds the "addresses" edge to the EntityAddress entity by IDs.
+func (ec *EntityCreate) AddAddressIDs(ids ...int) *EntityCreate {
+	ec.mutation.AddAddressIDs(ids...)
 	return ec
 }
 
-// AddEntityAddresses adds the "entityAddresses" edges to the EntityAddress entity.
-func (ec *EntityCreate) AddEntityAddresses(e ...*EntityAddress) *EntityCreate {
+// AddAddresses adds the "addresses" edges to the EntityAddress entity.
+func (ec *EntityCreate) AddAddresses(e ...*EntityAddress) *EntityCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ec.AddEntityAddressIDs(ids...)
+	return ec.AddAddressIDs(ids...)
 }
 
-// AddEntityPreferenceIDs adds the "entityPreferences" edge to the Preference entity by IDs.
-func (ec *EntityCreate) AddEntityPreferenceIDs(ids ...int) *EntityCreate {
-	ec.mutation.AddEntityPreferenceIDs(ids...)
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
+func (ec *EntityCreate) AddPreferenceIDs(ids ...int) *EntityCreate {
+	ec.mutation.AddPreferenceIDs(ids...)
 	return ec
 }
 
-// AddEntityPreferences adds the "entityPreferences" edges to the Preference entity.
-func (ec *EntityCreate) AddEntityPreferences(p ...*Preference) *EntityCreate {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (ec *EntityCreate) AddPreferences(p ...*Preference) *EntityCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return ec.AddEntityPreferenceIDs(ids...)
+	return ec.AddPreferenceIDs(ids...)
 }
 
-// AddEntityContactPointIDs adds the "entityContactPoints" edge to the EntityContactPoint entity by IDs.
-func (ec *EntityCreate) AddEntityContactPointIDs(ids ...int) *EntityCreate {
-	ec.mutation.AddEntityContactPointIDs(ids...)
+// AddContactPointIDs adds the "contactPoints" edge to the EntityContactPoint entity by IDs.
+func (ec *EntityCreate) AddContactPointIDs(ids ...int) *EntityCreate {
+	ec.mutation.AddContactPointIDs(ids...)
 	return ec
 }
 
-// AddEntityContactPoints adds the "entityContactPoints" edges to the EntityContactPoint entity.
-func (ec *EntityCreate) AddEntityContactPoints(e ...*EntityContactPoint) *EntityCreate {
+// AddContactPoints adds the "contactPoints" edges to the EntityContactPoint entity.
+func (ec *EntityCreate) AddContactPoints(e ...*EntityContactPoint) *EntityCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ec.AddEntityContactPointIDs(ids...)
+	return ec.AddContactPointIDs(ids...)
 }
 
 // AddOwnsAccountIDs adds the "owns_account" edge to the Account entity by IDs.
@@ -415,12 +415,12 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 		})
 		_node.URL = value
 	}
-	if nodes := ec.mutation.EntityTaxInformationIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.TaxSpecificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityTaxInformationTable,
-			Columns: []string{entity.EntityTaxInformationColumn},
+			Table:   entity.TaxSpecificationsTable,
+			Columns: []string{entity.TaxSpecificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -434,12 +434,12 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.EntityAddressesIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.AddressesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityAddressesTable,
-			Columns: []string{entity.EntityAddressesColumn},
+			Table:   entity.AddressesTable,
+			Columns: []string{entity.AddressesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -453,12 +453,12 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.EntityPreferencesIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityPreferencesTable,
-			Columns: []string{entity.EntityPreferencesColumn},
+			Table:   entity.PreferencesTable,
+			Columns: []string{entity.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -472,12 +472,12 @@ func (ec *EntityCreate) createSpec() (*Entity, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.EntityContactPointsIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.ContactPointsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   entity.EntityContactPointsTable,
-			Columns: []string{entity.EntityContactPointsColumn},
+			Table:   entity.ContactPointsTable,
+			Columns: []string{entity.ContactPointsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

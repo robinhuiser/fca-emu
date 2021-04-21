@@ -17,6 +17,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -163,14 +164,14 @@ func (ac *AccountCreate) SetBranch(b *Branch) *AccountCreate {
 	return ac.SetBranchID(b.ID)
 }
 
-// AddOwnerIDs adds the "owner" edge to the Entity entity by IDs.
+// AddOwnerIDs adds the "owners" edge to the Entity entity by IDs.
 func (ac *AccountCreate) AddOwnerIDs(ids ...uuid.UUID) *AccountCreate {
 	ac.mutation.AddOwnerIDs(ids...)
 	return ac
 }
 
-// AddOwner adds the "owner" edges to the Entity entity.
-func (ac *AccountCreate) AddOwner(e ...*Entity) *AccountCreate {
+// AddOwners adds the "owners" edges to the Entity entity.
+func (ac *AccountCreate) AddOwners(e ...*Entity) *AccountCreate {
 	ids := make([]uuid.UUID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -178,14 +179,14 @@ func (ac *AccountCreate) AddOwner(e ...*Entity) *AccountCreate {
 	return ac.AddOwnerIDs(ids...)
 }
 
-// AddPreferenceIDs adds the "preference" edge to the Preference entity by IDs.
+// AddPreferenceIDs adds the "preferences" edge to the Preference entity by IDs.
 func (ac *AccountCreate) AddPreferenceIDs(ids ...int) *AccountCreate {
 	ac.mutation.AddPreferenceIDs(ids...)
 	return ac
 }
 
-// AddPreference adds the "preference" edges to the Preference entity.
-func (ac *AccountCreate) AddPreference(p ...*Preference) *AccountCreate {
+// AddPreferences adds the "preferences" edges to the Preference entity.
+func (ac *AccountCreate) AddPreferences(p ...*Preference) *AccountCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -193,14 +194,14 @@ func (ac *AccountCreate) AddPreference(p ...*Preference) *AccountCreate {
 	return ac.AddPreferenceIDs(ids...)
 }
 
-// AddRoutingnumberIDs adds the "routingnumber" edge to the RoutingNumber entity by IDs.
+// AddRoutingnumberIDs adds the "routingnumbers" edge to the RoutingNumber entity by IDs.
 func (ac *AccountCreate) AddRoutingnumberIDs(ids ...int) *AccountCreate {
 	ac.mutation.AddRoutingnumberIDs(ids...)
 	return ac
 }
 
-// AddRoutingnumber adds the "routingnumber" edges to the RoutingNumber entity.
-func (ac *AccountCreate) AddRoutingnumber(r ...*RoutingNumber) *AccountCreate {
+// AddRoutingnumbers adds the "routingnumbers" edges to the RoutingNumber entity.
+func (ac *AccountCreate) AddRoutingnumbers(r ...*RoutingNumber) *AccountCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -225,6 +226,21 @@ func (ac *AccountCreate) SetNillableProductID(id *int) *AccountCreate {
 // SetProduct sets the "product" edge to the Product entity.
 func (ac *AccountCreate) SetProduct(p *Product) *AccountCreate {
 	return ac.SetProductID(p.ID)
+}
+
+// AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
+func (ac *AccountCreate) AddTransactionIDs(ids ...uuid.UUID) *AccountCreate {
+	ac.mutation.AddTransactionIDs(ids...)
+	return ac
+}
+
+// AddTransactions adds the "transactions" edges to the Transaction entity.
+func (ac *AccountCreate) AddTransactions(t ...*Transaction) *AccountCreate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ac.AddTransactionIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -503,12 +519,12 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_node.account_branch = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.OwnersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   account.OwnerTable,
-			Columns: account.OwnerPrimaryKey,
+			Table:   account.OwnersTable,
+			Columns: account.OwnersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -522,12 +538,12 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.PreferenceIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.PreferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.PreferenceTable,
-			Columns: []string{account.PreferenceColumn},
+			Table:   account.PreferencesTable,
+			Columns: []string{account.PreferencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -541,12 +557,12 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.RoutingnumberIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.RoutingnumbersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.RoutingnumberTable,
-			Columns: []string{account.RoutingnumberColumn},
+			Table:   account.RoutingnumbersTable,
+			Columns: []string{account.RoutingnumbersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -578,6 +594,25 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.account_product = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.TransactionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TransactionsTable,
+			Columns: []string{account.TransactionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

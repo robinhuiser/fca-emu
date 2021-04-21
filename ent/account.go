@@ -62,17 +62,19 @@ type Account struct {
 type AccountEdges struct {
 	// Branch holds the value of the branch edge.
 	Branch *Branch `json:"branch,omitempty"`
-	// Owner holds the value of the owner edge.
-	Owner []*Entity `json:"owner,omitempty"`
-	// Preference holds the value of the preference edge.
-	Preference []*Preference `json:"preference,omitempty"`
-	// Routingnumber holds the value of the routingnumber edge.
-	Routingnumber []*RoutingNumber `json:"routingnumber,omitempty"`
+	// Owners holds the value of the owners edge.
+	Owners []*Entity `json:"owners,omitempty"`
+	// Preferences holds the value of the preferences edge.
+	Preferences []*Preference `json:"preferences,omitempty"`
+	// Routingnumbers holds the value of the routingnumbers edge.
+	Routingnumbers []*RoutingNumber `json:"routingnumbers,omitempty"`
 	// Product holds the value of the product edge.
 	Product *Product `json:"product,omitempty"`
+	// Transactions holds the value of the transactions edge.
+	Transactions []*Transaction `json:"transactions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // BranchOrErr returns the Branch value or an error if the edge
@@ -89,31 +91,31 @@ func (e AccountEdges) BranchOrErr() (*Branch, error) {
 	return nil, &NotLoadedError{edge: "branch"}
 }
 
-// OwnerOrErr returns the Owner value or an error if the edge
+// OwnersOrErr returns the Owners value or an error if the edge
 // was not loaded in eager-loading.
-func (e AccountEdges) OwnerOrErr() ([]*Entity, error) {
+func (e AccountEdges) OwnersOrErr() ([]*Entity, error) {
 	if e.loadedTypes[1] {
-		return e.Owner, nil
+		return e.Owners, nil
 	}
-	return nil, &NotLoadedError{edge: "owner"}
+	return nil, &NotLoadedError{edge: "owners"}
 }
 
-// PreferenceOrErr returns the Preference value or an error if the edge
+// PreferencesOrErr returns the Preferences value or an error if the edge
 // was not loaded in eager-loading.
-func (e AccountEdges) PreferenceOrErr() ([]*Preference, error) {
+func (e AccountEdges) PreferencesOrErr() ([]*Preference, error) {
 	if e.loadedTypes[2] {
-		return e.Preference, nil
+		return e.Preferences, nil
 	}
-	return nil, &NotLoadedError{edge: "preference"}
+	return nil, &NotLoadedError{edge: "preferences"}
 }
 
-// RoutingnumberOrErr returns the Routingnumber value or an error if the edge
+// RoutingnumbersOrErr returns the Routingnumbers value or an error if the edge
 // was not loaded in eager-loading.
-func (e AccountEdges) RoutingnumberOrErr() ([]*RoutingNumber, error) {
+func (e AccountEdges) RoutingnumbersOrErr() ([]*RoutingNumber, error) {
 	if e.loadedTypes[3] {
-		return e.Routingnumber, nil
+		return e.Routingnumbers, nil
 	}
-	return nil, &NotLoadedError{edge: "routingnumber"}
+	return nil, &NotLoadedError{edge: "routingnumbers"}
 }
 
 // ProductOrErr returns the Product value or an error if the edge
@@ -128,6 +130,15 @@ func (e AccountEdges) ProductOrErr() (*Product, error) {
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
+}
+
+// TransactionsOrErr returns the Transactions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) TransactionsOrErr() ([]*Transaction, error) {
+	if e.loadedTypes[5] {
+		return e.Transactions, nil
+	}
+	return nil, &NotLoadedError{edge: "transactions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -290,24 +301,29 @@ func (a *Account) QueryBranch() *BranchQuery {
 	return (&AccountClient{config: a.config}).QueryBranch(a)
 }
 
-// QueryOwner queries the "owner" edge of the Account entity.
-func (a *Account) QueryOwner() *EntityQuery {
-	return (&AccountClient{config: a.config}).QueryOwner(a)
+// QueryOwners queries the "owners" edge of the Account entity.
+func (a *Account) QueryOwners() *EntityQuery {
+	return (&AccountClient{config: a.config}).QueryOwners(a)
 }
 
-// QueryPreference queries the "preference" edge of the Account entity.
-func (a *Account) QueryPreference() *PreferenceQuery {
-	return (&AccountClient{config: a.config}).QueryPreference(a)
+// QueryPreferences queries the "preferences" edge of the Account entity.
+func (a *Account) QueryPreferences() *PreferenceQuery {
+	return (&AccountClient{config: a.config}).QueryPreferences(a)
 }
 
-// QueryRoutingnumber queries the "routingnumber" edge of the Account entity.
-func (a *Account) QueryRoutingnumber() *RoutingNumberQuery {
-	return (&AccountClient{config: a.config}).QueryRoutingnumber(a)
+// QueryRoutingnumbers queries the "routingnumbers" edge of the Account entity.
+func (a *Account) QueryRoutingnumbers() *RoutingNumberQuery {
+	return (&AccountClient{config: a.config}).QueryRoutingnumbers(a)
 }
 
 // QueryProduct queries the "product" edge of the Account entity.
 func (a *Account) QueryProduct() *ProductQuery {
 	return (&AccountClient{config: a.config}).QueryProduct(a)
+}
+
+// QueryTransactions queries the "transactions" edge of the Account entity.
+func (a *Account) QueryTransactions() *TransactionQuery {
+	return (&AccountClient{config: a.config}).QueryTransactions(a)
 }
 
 // Update returns a builder for updating this Account.

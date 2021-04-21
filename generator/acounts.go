@@ -59,7 +59,7 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 	}
 
 	// Add the owner
-	a.Update().AddOwner(e).Save(ctx)
+	a.Update().AddOwners(e).Save(ctx)
 
 	// Add one or more preferences
 	for i := 0; i < f.Number(1, 8); i++ {
@@ -71,7 +71,7 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		if err != nil {
 			return nil, fmt.Errorf("failed creating preference: %w", err)
 		}
-		a.Update().AddPreference(pref).Save(ctx)
+		a.Update().AddPreferences(pref).Save(ctx)
 	}
 
 	// Add one or more routing numbers
@@ -84,7 +84,7 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		if err != nil {
 			return nil, fmt.Errorf("failed creating routing number: %w", err)
 		}
-		a.Update().AddRoutingnumber(rtn).Save(ctx)
+		a.Update().AddRoutingnumbers(rtn).Save(ctx)
 	}
 
 	return a, nil

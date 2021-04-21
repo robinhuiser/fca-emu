@@ -1710,25 +1710,25 @@ func HasBranchWith(preds ...predicate.Branch) predicate.Account {
 	})
 }
 
-// HasOwner applies the HasEdge predicate on the "owner" edge.
-func HasOwner() predicate.Account {
+// HasOwners applies the HasEdge predicate on the "owners" edge.
+func HasOwners() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(OwnerTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, OwnerTable, OwnerPrimaryKey...),
+			sqlgraph.To(OwnersTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, OwnersTable, OwnersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
-func HasOwnerWith(preds ...predicate.Entity) predicate.Account {
+// HasOwnersWith applies the HasEdge predicate on the "owners" edge with a given conditions (other predicates).
+func HasOwnersWith(preds ...predicate.Entity) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(OwnerInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, OwnerTable, OwnerPrimaryKey...),
+			sqlgraph.To(OwnersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, OwnersTable, OwnersPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1738,25 +1738,25 @@ func HasOwnerWith(preds ...predicate.Entity) predicate.Account {
 	})
 }
 
-// HasPreference applies the HasEdge predicate on the "preference" edge.
-func HasPreference() predicate.Account {
+// HasPreferences applies the HasEdge predicate on the "preferences" edge.
+func HasPreferences() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PreferenceTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, PreferenceTable, PreferenceColumn),
+			sqlgraph.To(PreferencesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferencesTable, PreferencesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasPreferenceWith applies the HasEdge predicate on the "preference" edge with a given conditions (other predicates).
-func HasPreferenceWith(preds ...predicate.Preference) predicate.Account {
+// HasPreferencesWith applies the HasEdge predicate on the "preferences" edge with a given conditions (other predicates).
+func HasPreferencesWith(preds ...predicate.Preference) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PreferenceInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, PreferenceTable, PreferenceColumn),
+			sqlgraph.To(PreferencesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PreferencesTable, PreferencesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1766,25 +1766,25 @@ func HasPreferenceWith(preds ...predicate.Preference) predicate.Account {
 	})
 }
 
-// HasRoutingnumber applies the HasEdge predicate on the "routingnumber" edge.
-func HasRoutingnumber() predicate.Account {
+// HasRoutingnumbers applies the HasEdge predicate on the "routingnumbers" edge.
+func HasRoutingnumbers() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(RoutingnumberTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumberTable, RoutingnumberColumn),
+			sqlgraph.To(RoutingnumbersTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumbersTable, RoutingnumbersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRoutingnumberWith applies the HasEdge predicate on the "routingnumber" edge with a given conditions (other predicates).
-func HasRoutingnumberWith(preds ...predicate.RoutingNumber) predicate.Account {
+// HasRoutingnumbersWith applies the HasEdge predicate on the "routingnumbers" edge with a given conditions (other predicates).
+func HasRoutingnumbersWith(preds ...predicate.RoutingNumber) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(RoutingnumberInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumberTable, RoutingnumberColumn),
+			sqlgraph.To(RoutingnumbersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RoutingnumbersTable, RoutingnumbersColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1813,6 +1813,34 @@ func HasProductWith(preds ...predicate.Product) predicate.Account {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ProductInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, ProductTable, ProductColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTransactions applies the HasEdge predicate on the "transactions" edge.
+func HasTransactions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TransactionsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TransactionsTable, TransactionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTransactionsWith applies the HasEdge predicate on the "transactions" edge with a given conditions (other predicates).
+func HasTransactionsWith(preds ...predicate.Transaction) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TransactionsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TransactionsTable, TransactionsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

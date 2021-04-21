@@ -19,8 +19,8 @@ type EntityTaxInformation struct {
 	// Type holds the value of the "type" field.
 	Type entitytaxinformation.Type `json:"type,omitempty"`
 	// TaxId holds the value of the "taxId" field.
-	TaxId                         string `json:"taxId,omitempty"`
-	entity_entity_tax_information *uuid.UUID
+	TaxId                     string `json:"taxId,omitempty"`
+	entity_tax_specifications *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +32,7 @@ func (*EntityTaxInformation) scanValues(columns []string) ([]interface{}, error)
 			values[i] = &sql.NullInt64{}
 		case entitytaxinformation.FieldType, entitytaxinformation.FieldTaxId:
 			values[i] = &sql.NullString{}
-		case entitytaxinformation.ForeignKeys[0]: // entity_entity_tax_information
+		case entitytaxinformation.ForeignKeys[0]: // entity_tax_specifications
 			values[i] = &uuid.UUID{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type EntityTaxInformation", columns[i])
@@ -69,9 +69,9 @@ func (eti *EntityTaxInformation) assignValues(columns []string, values []interfa
 			}
 		case entitytaxinformation.ForeignKeys[0]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field entity_entity_tax_information", values[i])
+				return fmt.Errorf("unexpected type %T for field entity_tax_specifications", values[i])
 			} else if value != nil {
-				eti.entity_entity_tax_information = value
+				eti.entity_tax_specifications = value
 			}
 		}
 	}

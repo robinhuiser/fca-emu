@@ -45,14 +45,16 @@ const (
 	FieldURL = "url"
 	// EdgeBranch holds the string denoting the branch edge name in mutations.
 	EdgeBranch = "branch"
-	// EdgeOwner holds the string denoting the owner edge name in mutations.
-	EdgeOwner = "owner"
-	// EdgePreference holds the string denoting the preference edge name in mutations.
-	EdgePreference = "preference"
-	// EdgeRoutingnumber holds the string denoting the routingnumber edge name in mutations.
-	EdgeRoutingnumber = "routingnumber"
+	// EdgeOwners holds the string denoting the owners edge name in mutations.
+	EdgeOwners = "owners"
+	// EdgePreferences holds the string denoting the preferences edge name in mutations.
+	EdgePreferences = "preferences"
+	// EdgeRoutingnumbers holds the string denoting the routingnumbers edge name in mutations.
+	EdgeRoutingnumbers = "routingnumbers"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
+	// EdgeTransactions holds the string denoting the transactions edge name in mutations.
+	EdgeTransactions = "transactions"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// BranchTable is the table the holds the branch relation/edge.
@@ -62,25 +64,25 @@ const (
 	BranchInverseTable = "branches"
 	// BranchColumn is the table column denoting the branch relation/edge.
 	BranchColumn = "account_branch"
-	// OwnerTable is the table the holds the owner relation/edge. The primary key declared below.
-	OwnerTable = "account_owner"
-	// OwnerInverseTable is the table name for the Entity entity.
+	// OwnersTable is the table the holds the owners relation/edge. The primary key declared below.
+	OwnersTable = "account_owners"
+	// OwnersInverseTable is the table name for the Entity entity.
 	// It exists in this package in order to avoid circular dependency with the "entity" package.
-	OwnerInverseTable = "entities"
-	// PreferenceTable is the table the holds the preference relation/edge.
-	PreferenceTable = "preferences"
-	// PreferenceInverseTable is the table name for the Preference entity.
+	OwnersInverseTable = "entities"
+	// PreferencesTable is the table the holds the preferences relation/edge.
+	PreferencesTable = "preferences"
+	// PreferencesInverseTable is the table name for the Preference entity.
 	// It exists in this package in order to avoid circular dependency with the "preference" package.
-	PreferenceInverseTable = "preferences"
-	// PreferenceColumn is the table column denoting the preference relation/edge.
-	PreferenceColumn = "account_preference"
-	// RoutingnumberTable is the table the holds the routingnumber relation/edge.
-	RoutingnumberTable = "routing_numbers"
-	// RoutingnumberInverseTable is the table name for the RoutingNumber entity.
+	PreferencesInverseTable = "preferences"
+	// PreferencesColumn is the table column denoting the preferences relation/edge.
+	PreferencesColumn = "account_preferences"
+	// RoutingnumbersTable is the table the holds the routingnumbers relation/edge.
+	RoutingnumbersTable = "routing_numbers"
+	// RoutingnumbersInverseTable is the table name for the RoutingNumber entity.
 	// It exists in this package in order to avoid circular dependency with the "routingnumber" package.
-	RoutingnumberInverseTable = "routing_numbers"
-	// RoutingnumberColumn is the table column denoting the routingnumber relation/edge.
-	RoutingnumberColumn = "account_routingnumber"
+	RoutingnumbersInverseTable = "routing_numbers"
+	// RoutingnumbersColumn is the table column denoting the routingnumbers relation/edge.
+	RoutingnumbersColumn = "account_routingnumbers"
 	// ProductTable is the table the holds the product relation/edge.
 	ProductTable = "accounts"
 	// ProductInverseTable is the table name for the Product entity.
@@ -88,6 +90,13 @@ const (
 	ProductInverseTable = "products"
 	// ProductColumn is the table column denoting the product relation/edge.
 	ProductColumn = "account_product"
+	// TransactionsTable is the table the holds the transactions relation/edge.
+	TransactionsTable = "transactions"
+	// TransactionsInverseTable is the table name for the Transaction entity.
+	// It exists in this package in order to avoid circular dependency with the "transaction" package.
+	TransactionsInverseTable = "transactions"
+	// TransactionsColumn is the table column denoting the transactions relation/edge.
+	TransactionsColumn = "account_transactions"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -119,9 +128,9 @@ var ForeignKeys = []string{
 }
 
 var (
-	// OwnerPrimaryKey and OwnerColumn2 are the table columns denoting the
-	// primary key for the owner relation (M2M).
-	OwnerPrimaryKey = []string{"account_id", "entity_id"}
+	// OwnersPrimaryKey and OwnersColumn2 are the table columns denoting the
+	// primary key for the owners relation (M2M).
+	OwnersPrimaryKey = []string{"account_id", "entity_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -20,6 +20,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // AccountQuery is the builder for querying Account entities.
@@ -31,12 +32,13 @@ type AccountQuery struct {
 	fields     []string
 	predicates []predicate.Account
 	// eager-loading edges.
-	withBranch        *BranchQuery
-	withOwner         *EntityQuery
-	withPreference    *PreferenceQuery
-	withRoutingnumber *RoutingNumberQuery
-	withProduct       *ProductQuery
-	withFKs           bool
+	withBranch         *BranchQuery
+	withOwners         *EntityQuery
+	withPreferences    *PreferenceQuery
+	withRoutingnumbers *RoutingNumberQuery
+	withProduct        *ProductQuery
+	withTransactions   *TransactionQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -88,8 +90,8 @@ func (aq *AccountQuery) QueryBranch() *BranchQuery {
 	return query
 }
 
-// QueryOwner chains the current query on the "owner" edge.
-func (aq *AccountQuery) QueryOwner() *EntityQuery {
+// QueryOwners chains the current query on the "owners" edge.
+func (aq *AccountQuery) QueryOwners() *EntityQuery {
 	query := &EntityQuery{config: aq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -102,7 +104,7 @@ func (aq *AccountQuery) QueryOwner() *EntityQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(entity.Table, entity.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnersTable, account.OwnersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -110,8 +112,8 @@ func (aq *AccountQuery) QueryOwner() *EntityQuery {
 	return query
 }
 
-// QueryPreference chains the current query on the "preference" edge.
-func (aq *AccountQuery) QueryPreference() *PreferenceQuery {
+// QueryPreferences chains the current query on the "preferences" edge.
+func (aq *AccountQuery) QueryPreferences() *PreferenceQuery {
 	query := &PreferenceQuery{config: aq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -124,7 +126,7 @@ func (aq *AccountQuery) QueryPreference() *PreferenceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(preference.Table, preference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferenceTable, account.PreferenceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferencesTable, account.PreferencesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -132,8 +134,8 @@ func (aq *AccountQuery) QueryPreference() *PreferenceQuery {
 	return query
 }
 
-// QueryRoutingnumber chains the current query on the "routingnumber" edge.
-func (aq *AccountQuery) QueryRoutingnumber() *RoutingNumberQuery {
+// QueryRoutingnumbers chains the current query on the "routingnumbers" edge.
+func (aq *AccountQuery) QueryRoutingnumbers() *RoutingNumberQuery {
 	query := &RoutingNumberQuery{config: aq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -146,7 +148,7 @@ func (aq *AccountQuery) QueryRoutingnumber() *RoutingNumberQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(routingnumber.Table, routingnumber.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumberTable, account.RoutingnumberColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumbersTable, account.RoutingnumbersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -169,6 +171,28 @@ func (aq *AccountQuery) QueryProduct() *ProductQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, account.ProductTable, account.ProductColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTransactions chains the current query on the "transactions" edge.
+func (aq *AccountQuery) QueryTransactions() *TransactionQuery {
+	query := &TransactionQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(transaction.Table, transaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.TransactionsTable, account.TransactionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -352,16 +376,17 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:            aq.config,
-		limit:             aq.limit,
-		offset:            aq.offset,
-		order:             append([]OrderFunc{}, aq.order...),
-		predicates:        append([]predicate.Account{}, aq.predicates...),
-		withBranch:        aq.withBranch.Clone(),
-		withOwner:         aq.withOwner.Clone(),
-		withPreference:    aq.withPreference.Clone(),
-		withRoutingnumber: aq.withRoutingnumber.Clone(),
-		withProduct:       aq.withProduct.Clone(),
+		config:             aq.config,
+		limit:              aq.limit,
+		offset:             aq.offset,
+		order:              append([]OrderFunc{}, aq.order...),
+		predicates:         append([]predicate.Account{}, aq.predicates...),
+		withBranch:         aq.withBranch.Clone(),
+		withOwners:         aq.withOwners.Clone(),
+		withPreferences:    aq.withPreferences.Clone(),
+		withRoutingnumbers: aq.withRoutingnumbers.Clone(),
+		withProduct:        aq.withProduct.Clone(),
+		withTransactions:   aq.withTransactions.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -379,36 +404,36 @@ func (aq *AccountQuery) WithBranch(opts ...func(*BranchQuery)) *AccountQuery {
 	return aq
 }
 
-// WithOwner tells the query-builder to eager-load the nodes that are connected to
-// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithOwner(opts ...func(*EntityQuery)) *AccountQuery {
+// WithOwners tells the query-builder to eager-load the nodes that are connected to
+// the "owners" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithOwners(opts ...func(*EntityQuery)) *AccountQuery {
 	query := &EntityQuery{config: aq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withOwner = query
+	aq.withOwners = query
 	return aq
 }
 
-// WithPreference tells the query-builder to eager-load the nodes that are connected to
-// the "preference" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithPreference(opts ...func(*PreferenceQuery)) *AccountQuery {
+// WithPreferences tells the query-builder to eager-load the nodes that are connected to
+// the "preferences" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithPreferences(opts ...func(*PreferenceQuery)) *AccountQuery {
 	query := &PreferenceQuery{config: aq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withPreference = query
+	aq.withPreferences = query
 	return aq
 }
 
-// WithRoutingnumber tells the query-builder to eager-load the nodes that are connected to
-// the "routingnumber" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithRoutingnumber(opts ...func(*RoutingNumberQuery)) *AccountQuery {
+// WithRoutingnumbers tells the query-builder to eager-load the nodes that are connected to
+// the "routingnumbers" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithRoutingnumbers(opts ...func(*RoutingNumberQuery)) *AccountQuery {
 	query := &RoutingNumberQuery{config: aq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withRoutingnumber = query
+	aq.withRoutingnumbers = query
 	return aq
 }
 
@@ -420,6 +445,17 @@ func (aq *AccountQuery) WithProduct(opts ...func(*ProductQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withProduct = query
+	return aq
+}
+
+// WithTransactions tells the query-builder to eager-load the nodes that are connected to
+// the "transactions" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithTransactions(opts ...func(*TransactionQuery)) *AccountQuery {
+	query := &TransactionQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withTransactions = query
 	return aq
 }
 
@@ -489,12 +525,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		nodes       = []*Account{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			aq.withBranch != nil,
-			aq.withOwner != nil,
-			aq.withPreference != nil,
-			aq.withRoutingnumber != nil,
+			aq.withOwners != nil,
+			aq.withPreferences != nil,
+			aq.withRoutingnumbers != nil,
 			aq.withProduct != nil,
+			aq.withTransactions != nil,
 		}
 	)
 	if aq.withBranch != nil || aq.withProduct != nil {
@@ -549,13 +586,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		}
 	}
 
-	if query := aq.withOwner; query != nil {
+	if query := aq.withOwners; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		ids := make(map[uuid.UUID]*Account, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
-			node.Edges.Owner = []*Entity{}
+			node.Edges.Owners = []*Entity{}
 		}
 		var (
 			edgeids []uuid.UUID
@@ -564,11 +601,11 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
 				Inverse: false,
-				Table:   account.OwnerTable,
-				Columns: account.OwnerPrimaryKey,
+				Table:   account.OwnersTable,
+				Columns: account.OwnersPrimaryKey,
 			},
 			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(account.OwnerPrimaryKey[0], fks...))
+				s.Where(sql.InValues(account.OwnersPrimaryKey[0], fks...))
 			},
 
 			ScanValues: func() [2]interface{} {
@@ -595,7 +632,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 			},
 		}
 		if err := sqlgraph.QueryEdges(ctx, aq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "owner": %w`, err)
+			return nil, fmt.Errorf(`query edges "owners": %w`, err)
 		}
 		query.Where(entity.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
@@ -605,69 +642,69 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		for _, n := range neighbors {
 			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "owner" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected "owners" node returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Owner = append(nodes[i].Edges.Owner, n)
+				nodes[i].Edges.Owners = append(nodes[i].Edges.Owners, n)
 			}
 		}
 	}
 
-	if query := aq.withPreference; query != nil {
+	if query := aq.withPreferences; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Account)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Preference = []*Preference{}
+			nodes[i].Edges.Preferences = []*Preference{}
 		}
 		query.withFKs = true
 		query.Where(predicate.Preference(func(s *sql.Selector) {
-			s.Where(sql.InValues(account.PreferenceColumn, fks...))
+			s.Where(sql.InValues(account.PreferencesColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.account_preference
+			fk := n.account_preferences
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "account_preference" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "account_preferences" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "account_preference" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "account_preferences" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Preference = append(node.Edges.Preference, n)
+			node.Edges.Preferences = append(node.Edges.Preferences, n)
 		}
 	}
 
-	if query := aq.withRoutingnumber; query != nil {
+	if query := aq.withRoutingnumbers; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[uuid.UUID]*Account)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Routingnumber = []*RoutingNumber{}
+			nodes[i].Edges.Routingnumbers = []*RoutingNumber{}
 		}
 		query.withFKs = true
 		query.Where(predicate.RoutingNumber(func(s *sql.Selector) {
-			s.Where(sql.InValues(account.RoutingnumberColumn, fks...))
+			s.Where(sql.InValues(account.RoutingnumbersColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.account_routingnumber
+			fk := n.account_routingnumbers
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "account_routingnumber" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "account_routingnumbers" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "account_routingnumber" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "account_routingnumbers" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Routingnumber = append(node.Edges.Routingnumber, n)
+			node.Edges.Routingnumbers = append(node.Edges.Routingnumbers, n)
 		}
 	}
 
@@ -694,6 +731,35 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 			for i := range nodes {
 				nodes[i].Edges.Product = n
 			}
+		}
+	}
+
+	if query := aq.withTransactions; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Account)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Transactions = []*Transaction{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Transaction(func(s *sql.Selector) {
+			s.Where(sql.InValues(account.TransactionsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.account_transactions
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "account_transactions" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_transactions" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Transactions = append(node.Edges.Transactions, n)
 		}
 	}
 

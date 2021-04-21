@@ -35,6 +35,19 @@ func (f BankFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The BinaryItemFunc type is an adapter to allow the use of ordinary
+// function as BinaryItem mutator.
+type BinaryItemFunc func(context.Context, *ent.BinaryItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BinaryItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BinaryItemMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BinaryItemMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The BranchFunc type is an adapter to allow the use of ordinary
 // function as Branch mutator.
 type BranchFunc func(context.Context, *ent.BranchMutation) (ent.Value, error)
@@ -161,6 +174,19 @@ func (f RoutingNumberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	mv, ok := m.(*ent.RoutingNumberMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RoutingNumberMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TransactionFunc type is an adapter to allow the use of ordinary
+// function as Transaction mutator.
+type TransactionFunc func(context.Context, *ent.TransactionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TransactionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TransactionMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TransactionMutation", m)
 	}
 	return f(ctx, mv)
 }

@@ -25,8 +25,8 @@ type EntityContactPoint struct {
 	// Suffix holds the value of the "suffix" field.
 	Suffix string `json:"suffix,omitempty"`
 	// Value holds the value of the "value" field.
-	Value                        string `json:"value,omitempty"`
-	entity_entity_contact_points *uuid.UUID
+	Value                 string `json:"value,omitempty"`
+	entity_contact_points *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -38,7 +38,7 @@ func (*EntityContactPoint) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullInt64{}
 		case entitycontactpoint.FieldPrefix, entitycontactpoint.FieldName, entitycontactpoint.FieldType, entitycontactpoint.FieldSuffix, entitycontactpoint.FieldValue:
 			values[i] = &sql.NullString{}
-		case entitycontactpoint.ForeignKeys[0]: // entity_entity_contact_points
+		case entitycontactpoint.ForeignKeys[0]: // entity_contact_points
 			values[i] = &uuid.UUID{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type EntityContactPoint", columns[i])
@@ -93,9 +93,9 @@ func (ecp *EntityContactPoint) assignValues(columns []string, values []interface
 			}
 		case entitycontactpoint.ForeignKeys[0]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field entity_entity_contact_points", values[i])
+				return fmt.Errorf("unexpected type %T for field entity_contact_points", values[i])
 			} else if value != nil {
-				ecp.entity_entity_contact_points = value
+				ecp.entity_contact_points = value
 			}
 		}
 	}

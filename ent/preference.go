@@ -19,9 +19,9 @@ type Preference struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Value holds the value of the "value" field.
-	Value                     string `json:"value,omitempty"`
-	account_preference        *uuid.UUID
-	entity_entity_preferences *uuid.UUID
+	Value               string `json:"value,omitempty"`
+	account_preferences *uuid.UUID
+	entity_preferences  *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -33,9 +33,9 @@ func (*Preference) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullInt64{}
 		case preference.FieldName, preference.FieldValue:
 			values[i] = &sql.NullString{}
-		case preference.ForeignKeys[0]: // account_preference
+		case preference.ForeignKeys[0]: // account_preferences
 			values[i] = &uuid.UUID{}
-		case preference.ForeignKeys[1]: // entity_entity_preferences
+		case preference.ForeignKeys[1]: // entity_preferences
 			values[i] = &uuid.UUID{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Preference", columns[i])
@@ -72,15 +72,15 @@ func (pr *Preference) assignValues(columns []string, values []interface{}) error
 			}
 		case preference.ForeignKeys[0]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field account_preference", values[i])
+				return fmt.Errorf("unexpected type %T for field account_preferences", values[i])
 			} else if value != nil {
-				pr.account_preference = value
+				pr.account_preferences = value
 			}
 		case preference.ForeignKeys[1]:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field entity_entity_preferences", values[i])
+				return fmt.Errorf("unexpected type %T for field entity_preferences", values[i])
 			} else if value != nil {
-				pr.entity_entity_preferences = value
+				pr.entity_preferences = value
 			}
 		}
 	}

@@ -25,8 +25,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "preferences"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"account_preference",
-	"entity_entity_preferences",
+	"account_preferences",
+	"entity_preferences",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

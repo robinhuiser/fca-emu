@@ -26,6 +26,7 @@ type config struct {
 type hooks struct {
 	Account              []ent.Hook
 	Bank                 []ent.Hook
+	BinaryItem           []ent.Hook
 	Branch               []ent.Hook
 	Card                 []ent.Hook
 	CardNetwork          []ent.Hook
@@ -36,6 +37,7 @@ type hooks struct {
 	Preference           []ent.Hook
 	Product              []ent.Hook
 	RoutingNumber        []ent.Hook
+	Transaction          []ent.Hook
 }
 
 // Options applies the options on the config object.

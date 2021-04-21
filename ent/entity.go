@@ -46,14 +46,14 @@ type Entity struct {
 
 // EntityEdges holds the relations/edges for other nodes in the graph.
 type EntityEdges struct {
-	// EntityTaxInformation holds the value of the entityTaxInformation edge.
-	EntityTaxInformation []*EntityTaxInformation `json:"entityTaxInformation,omitempty"`
-	// EntityAddresses holds the value of the entityAddresses edge.
-	EntityAddresses []*EntityAddress `json:"entityAddresses,omitempty"`
-	// EntityPreferences holds the value of the entityPreferences edge.
-	EntityPreferences []*Preference `json:"entityPreferences,omitempty"`
-	// EntityContactPoints holds the value of the entityContactPoints edge.
-	EntityContactPoints []*EntityContactPoint `json:"entityContactPoints,omitempty"`
+	// TaxSpecifications holds the value of the taxSpecifications edge.
+	TaxSpecifications []*EntityTaxInformation `json:"taxSpecifications,omitempty"`
+	// Addresses holds the value of the addresses edge.
+	Addresses []*EntityAddress `json:"addresses,omitempty"`
+	// Preferences holds the value of the preferences edge.
+	Preferences []*Preference `json:"preferences,omitempty"`
+	// ContactPoints holds the value of the contactPoints edge.
+	ContactPoints []*EntityContactPoint `json:"contactPoints,omitempty"`
 	// OwnsAccount holds the value of the owns_account edge.
 	OwnsAccount []*Account `json:"owns_account,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -61,40 +61,40 @@ type EntityEdges struct {
 	loadedTypes [5]bool
 }
 
-// EntityTaxInformationOrErr returns the EntityTaxInformation value or an error if the edge
+// TaxSpecificationsOrErr returns the TaxSpecifications value or an error if the edge
 // was not loaded in eager-loading.
-func (e EntityEdges) EntityTaxInformationOrErr() ([]*EntityTaxInformation, error) {
+func (e EntityEdges) TaxSpecificationsOrErr() ([]*EntityTaxInformation, error) {
 	if e.loadedTypes[0] {
-		return e.EntityTaxInformation, nil
+		return e.TaxSpecifications, nil
 	}
-	return nil, &NotLoadedError{edge: "entityTaxInformation"}
+	return nil, &NotLoadedError{edge: "taxSpecifications"}
 }
 
-// EntityAddressesOrErr returns the EntityAddresses value or an error if the edge
+// AddressesOrErr returns the Addresses value or an error if the edge
 // was not loaded in eager-loading.
-func (e EntityEdges) EntityAddressesOrErr() ([]*EntityAddress, error) {
+func (e EntityEdges) AddressesOrErr() ([]*EntityAddress, error) {
 	if e.loadedTypes[1] {
-		return e.EntityAddresses, nil
+		return e.Addresses, nil
 	}
-	return nil, &NotLoadedError{edge: "entityAddresses"}
+	return nil, &NotLoadedError{edge: "addresses"}
 }
 
-// EntityPreferencesOrErr returns the EntityPreferences value or an error if the edge
+// PreferencesOrErr returns the Preferences value or an error if the edge
 // was not loaded in eager-loading.
-func (e EntityEdges) EntityPreferencesOrErr() ([]*Preference, error) {
+func (e EntityEdges) PreferencesOrErr() ([]*Preference, error) {
 	if e.loadedTypes[2] {
-		return e.EntityPreferences, nil
+		return e.Preferences, nil
 	}
-	return nil, &NotLoadedError{edge: "entityPreferences"}
+	return nil, &NotLoadedError{edge: "preferences"}
 }
 
-// EntityContactPointsOrErr returns the EntityContactPoints value or an error if the edge
+// ContactPointsOrErr returns the ContactPoints value or an error if the edge
 // was not loaded in eager-loading.
-func (e EntityEdges) EntityContactPointsOrErr() ([]*EntityContactPoint, error) {
+func (e EntityEdges) ContactPointsOrErr() ([]*EntityContactPoint, error) {
 	if e.loadedTypes[3] {
-		return e.EntityContactPoints, nil
+		return e.ContactPoints, nil
 	}
-	return nil, &NotLoadedError{edge: "entityContactPoints"}
+	return nil, &NotLoadedError{edge: "contactPoints"}
 }
 
 // OwnsAccountOrErr returns the OwnsAccount value or an error if the edge
@@ -211,24 +211,24 @@ func (e *Entity) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
-// QueryEntityTaxInformation queries the "entityTaxInformation" edge of the Entity entity.
-func (e *Entity) QueryEntityTaxInformation() *EntityTaxInformationQuery {
-	return (&EntityClient{config: e.config}).QueryEntityTaxInformation(e)
+// QueryTaxSpecifications queries the "taxSpecifications" edge of the Entity entity.
+func (e *Entity) QueryTaxSpecifications() *EntityTaxInformationQuery {
+	return (&EntityClient{config: e.config}).QueryTaxSpecifications(e)
 }
 
-// QueryEntityAddresses queries the "entityAddresses" edge of the Entity entity.
-func (e *Entity) QueryEntityAddresses() *EntityAddressQuery {
-	return (&EntityClient{config: e.config}).QueryEntityAddresses(e)
+// QueryAddresses queries the "addresses" edge of the Entity entity.
+func (e *Entity) QueryAddresses() *EntityAddressQuery {
+	return (&EntityClient{config: e.config}).QueryAddresses(e)
 }
 
-// QueryEntityPreferences queries the "entityPreferences" edge of the Entity entity.
-func (e *Entity) QueryEntityPreferences() *PreferenceQuery {
-	return (&EntityClient{config: e.config}).QueryEntityPreferences(e)
+// QueryPreferences queries the "preferences" edge of the Entity entity.
+func (e *Entity) QueryPreferences() *PreferenceQuery {
+	return (&EntityClient{config: e.config}).QueryPreferences(e)
 }
 
-// QueryEntityContactPoints queries the "entityContactPoints" edge of the Entity entity.
-func (e *Entity) QueryEntityContactPoints() *EntityContactPointQuery {
-	return (&EntityClient{config: e.config}).QueryEntityContactPoints(e)
+// QueryContactPoints queries the "contactPoints" edge of the Entity entity.
+func (e *Entity) QueryContactPoints() *EntityContactPointQuery {
+	return (&EntityClient{config: e.config}).QueryContactPoints(e)
 }
 
 // QueryOwnsAccount queries the "owns_account" edge of the Entity entity.

@@ -12,6 +12,9 @@ type Account func(*sql.Selector)
 // Bank is the predicate function for bank builders.
 type Bank func(*sql.Selector)
 
+// BinaryItem is the predicate function for binaryitem builders.
+type BinaryItem func(*sql.Selector)
+
 // Branch is the predicate function for branch builders.
 type Branch func(*sql.Selector)
 
@@ -41,3 +44,6 @@ type Product func(*sql.Selector)
 
 // RoutingNumber is the predicate function for routingnumber builders.
 type RoutingNumber func(*sql.Selector)
+
+// Transaction is the predicate function for transaction builders.
+type Transaction func(*sql.Selector)

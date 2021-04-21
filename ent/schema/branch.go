@@ -29,7 +29,7 @@ func (Branch) Fields() []ent.Field {
 // Edges of the Branch.
 func (Branch) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("branch_owner", Bank.Type).
+		edge.From("owner", Bank.Type).
 			Ref("branches").
 			Unique(),
 	}

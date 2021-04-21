@@ -965,25 +965,25 @@ func LongitudeLTE(v float64) predicate.Branch {
 	})
 }
 
-// HasBranchOwner applies the HasEdge predicate on the "branch_owner" edge.
-func HasBranchOwner() predicate.Branch {
+// HasOwner applies the HasEdge predicate on the "owner" edge.
+func HasOwner() predicate.Branch {
 	return predicate.Branch(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BranchOwnerTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BranchOwnerTable, BranchOwnerColumn),
+			sqlgraph.To(OwnerTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasBranchOwnerWith applies the HasEdge predicate on the "branch_owner" edge with a given conditions (other predicates).
-func HasBranchOwnerWith(preds ...predicate.Bank) predicate.Branch {
+// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
+func HasOwnerWith(preds ...predicate.Bank) predicate.Branch {
 	return predicate.Branch(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BranchOwnerInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BranchOwnerTable, BranchOwnerColumn),
+			sqlgraph.To(OwnerInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

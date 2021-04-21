@@ -44,10 +44,11 @@ func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("branch", Branch.Type).
 			Unique(),
-		edge.To("owner", Entity.Type),
-		edge.To("preference", Preference.Type),
-		edge.To("routingnumber", RoutingNumber.Type),
+		edge.To("owners", Entity.Type),
+		edge.To("preferences", Preference.Type),
+		edge.To("routingnumbers", RoutingNumber.Type),
 		edge.To("product", Product.Type).
 			Unique(),
+		edge.To("transactions", Transaction.Type),
 	}
 }

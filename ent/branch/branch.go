@@ -23,17 +23,17 @@ const (
 	FieldLatitude = "latitude"
 	// FieldLongitude holds the string denoting the longitude field in the database.
 	FieldLongitude = "longitude"
-	// EdgeBranchOwner holds the string denoting the branch_owner edge name in mutations.
-	EdgeBranchOwner = "branch_owner"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// Table holds the table name of the branch in the database.
 	Table = "branches"
-	// BranchOwnerTable is the table the holds the branch_owner relation/edge.
-	BranchOwnerTable = "branches"
-	// BranchOwnerInverseTable is the table name for the Bank entity.
+	// OwnerTable is the table the holds the owner relation/edge.
+	OwnerTable = "branches"
+	// OwnerInverseTable is the table name for the Bank entity.
 	// It exists in this package in order to avoid circular dependency with the "bank" package.
-	BranchOwnerInverseTable = "banks"
-	// BranchOwnerColumn is the table column denoting the branch_owner relation/edge.
-	BranchOwnerColumn = "bank_branches"
+	OwnerInverseTable = "banks"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "bank_branches"
 )
 
 // Columns holds all SQL columns for branch fields.

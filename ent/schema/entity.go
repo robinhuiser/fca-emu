@@ -34,10 +34,10 @@ func (Entity) Fields() []ent.Field {
 // Edges of the Entity.
 func (Entity) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("entityTaxInformation", EntityTaxInformation.Type),
-		edge.To("entityAddresses", EntityAddress.Type),
-		edge.To("entityPreferences", Preference.Type),
-		edge.To("entityContactPoints", EntityContactPoint.Type),
-		edge.From("owns_account", Account.Type).Ref("owner"),
+		edge.To("taxSpecifications", EntityTaxInformation.Type),
+		edge.To("addresses", EntityAddress.Type),
+		edge.To("preferences", Preference.Type),
+		edge.To("contactPoints", EntityContactPoint.Type),
+		edge.From("owns_account", Account.Type).Ref("owners"),
 	}
 }

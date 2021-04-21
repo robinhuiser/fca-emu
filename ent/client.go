@@ -12,6 +12,7 @@ import (
 
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/bank"
+	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/branch"
 	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
@@ -22,6 +23,7 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -37,6 +39,8 @@ type Client struct {
 	Account *AccountClient
 	// Bank is the client for interacting with the Bank builders.
 	Bank *BankClient
+	// BinaryItem is the client for interacting with the BinaryItem builders.
+	BinaryItem *BinaryItemClient
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
 	// Card is the client for interacting with the Card builders.
@@ -57,6 +61,8 @@ type Client struct {
 	Product *ProductClient
 	// RoutingNumber is the client for interacting with the RoutingNumber builders.
 	RoutingNumber *RoutingNumberClient
+	// Transaction is the client for interacting with the Transaction builders.
+	Transaction *TransactionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -72,6 +78,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
 	c.Bank = NewBankClient(c.config)
+	c.BinaryItem = NewBinaryItemClient(c.config)
 	c.Branch = NewBranchClient(c.config)
 	c.Card = NewCardClient(c.config)
 	c.CardNetwork = NewCardNetworkClient(c.config)
@@ -82,6 +89,7 @@ func (c *Client) init() {
 	c.Preference = NewPreferenceClient(c.config)
 	c.Product = NewProductClient(c.config)
 	c.RoutingNumber = NewRoutingNumberClient(c.config)
+	c.Transaction = NewTransactionClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -117,6 +125,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:               cfg,
 		Account:              NewAccountClient(cfg),
 		Bank:                 NewBankClient(cfg),
+		BinaryItem:           NewBinaryItemClient(cfg),
 		Branch:               NewBranchClient(cfg),
 		Card:                 NewCardClient(cfg),
 		CardNetwork:          NewCardNetworkClient(cfg),
@@ -127,6 +136,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Preference:           NewPreferenceClient(cfg),
 		Product:              NewProductClient(cfg),
 		RoutingNumber:        NewRoutingNumberClient(cfg),
+		Transaction:          NewTransactionClient(cfg),
 	}, nil
 }
 
@@ -147,6 +157,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:               cfg,
 		Account:              NewAccountClient(cfg),
 		Bank:                 NewBankClient(cfg),
+		BinaryItem:           NewBinaryItemClient(cfg),
 		Branch:               NewBranchClient(cfg),
 		Card:                 NewCardClient(cfg),
 		CardNetwork:          NewCardNetworkClient(cfg),
@@ -157,6 +168,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Preference:           NewPreferenceClient(cfg),
 		Product:              NewProductClient(cfg),
 		RoutingNumber:        NewRoutingNumberClient(cfg),
+		Transaction:          NewTransactionClient(cfg),
 	}, nil
 }
 
@@ -188,6 +200,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Account.Use(hooks...)
 	c.Bank.Use(hooks...)
+	c.BinaryItem.Use(hooks...)
 	c.Branch.Use(hooks...)
 	c.Card.Use(hooks...)
 	c.CardNetwork.Use(hooks...)
@@ -198,6 +211,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Preference.Use(hooks...)
 	c.Product.Use(hooks...)
 	c.RoutingNumber.Use(hooks...)
+	c.Transaction.Use(hooks...)
 }
 
 // AccountClient is a client for the Account schema.
@@ -299,15 +313,15 @@ func (c *AccountClient) QueryBranch(a *Account) *BranchQuery {
 	return query
 }
 
-// QueryOwner queries the owner edge of a Account.
-func (c *AccountClient) QueryOwner(a *Account) *EntityQuery {
+// QueryOwners queries the owners edge of a Account.
+func (c *AccountClient) QueryOwners(a *Account) *EntityQuery {
 	query := &EntityQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(entity.Table, entity.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnerTable, account.OwnerPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, account.OwnersTable, account.OwnersPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -315,15 +329,15 @@ func (c *AccountClient) QueryOwner(a *Account) *EntityQuery {
 	return query
 }
 
-// QueryPreference queries the preference edge of a Account.
-func (c *AccountClient) QueryPreference(a *Account) *PreferenceQuery {
+// QueryPreferences queries the preferences edge of a Account.
+func (c *AccountClient) QueryPreferences(a *Account) *PreferenceQuery {
 	query := &PreferenceQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(preference.Table, preference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferenceTable, account.PreferenceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PreferencesTable, account.PreferencesColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -331,15 +345,15 @@ func (c *AccountClient) QueryPreference(a *Account) *PreferenceQuery {
 	return query
 }
 
-// QueryRoutingnumber queries the routingnumber edge of a Account.
-func (c *AccountClient) QueryRoutingnumber(a *Account) *RoutingNumberQuery {
+// QueryRoutingnumbers queries the routingnumbers edge of a Account.
+func (c *AccountClient) QueryRoutingnumbers(a *Account) *RoutingNumberQuery {
 	query := &RoutingNumberQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(routingnumber.Table, routingnumber.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumberTable, account.RoutingnumberColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RoutingnumbersTable, account.RoutingnumbersColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -356,6 +370,22 @@ func (c *AccountClient) QueryProduct(a *Account) *ProductQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, account.ProductTable, account.ProductColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTransactions queries the transactions edge of a Account.
+func (c *AccountClient) QueryTransactions(a *Account) *TransactionQuery {
+	query := &TransactionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(transaction.Table, transaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.TransactionsTable, account.TransactionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -472,6 +502,94 @@ func (c *BankClient) Hooks() []Hook {
 	return c.hooks.Bank
 }
 
+// BinaryItemClient is a client for the BinaryItem schema.
+type BinaryItemClient struct {
+	config
+}
+
+// NewBinaryItemClient returns a client for the BinaryItem from the given config.
+func NewBinaryItemClient(c config) *BinaryItemClient {
+	return &BinaryItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `binaryitem.Hooks(f(g(h())))`.
+func (c *BinaryItemClient) Use(hooks ...Hook) {
+	c.hooks.BinaryItem = append(c.hooks.BinaryItem, hooks...)
+}
+
+// Create returns a create builder for BinaryItem.
+func (c *BinaryItemClient) Create() *BinaryItemCreate {
+	mutation := newBinaryItemMutation(c.config, OpCreate)
+	return &BinaryItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BinaryItem entities.
+func (c *BinaryItemClient) CreateBulk(builders ...*BinaryItemCreate) *BinaryItemCreateBulk {
+	return &BinaryItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BinaryItem.
+func (c *BinaryItemClient) Update() *BinaryItemUpdate {
+	mutation := newBinaryItemMutation(c.config, OpUpdate)
+	return &BinaryItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BinaryItemClient) UpdateOne(bi *BinaryItem) *BinaryItemUpdateOne {
+	mutation := newBinaryItemMutation(c.config, OpUpdateOne, withBinaryItem(bi))
+	return &BinaryItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BinaryItemClient) UpdateOneID(id int) *BinaryItemUpdateOne {
+	mutation := newBinaryItemMutation(c.config, OpUpdateOne, withBinaryItemID(id))
+	return &BinaryItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BinaryItem.
+func (c *BinaryItemClient) Delete() *BinaryItemDelete {
+	mutation := newBinaryItemMutation(c.config, OpDelete)
+	return &BinaryItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *BinaryItemClient) DeleteOne(bi *BinaryItem) *BinaryItemDeleteOne {
+	return c.DeleteOneID(bi.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *BinaryItemClient) DeleteOneID(id int) *BinaryItemDeleteOne {
+	builder := c.Delete().Where(binaryitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BinaryItemDeleteOne{builder}
+}
+
+// Query returns a query builder for BinaryItem.
+func (c *BinaryItemClient) Query() *BinaryItemQuery {
+	return &BinaryItemQuery{config: c.config}
+}
+
+// Get returns a BinaryItem entity by its id.
+func (c *BinaryItemClient) Get(ctx context.Context, id int) (*BinaryItem, error) {
+	return c.Query().Where(binaryitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BinaryItemClient) GetX(ctx context.Context, id int) *BinaryItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BinaryItemClient) Hooks() []Hook {
+	return c.hooks.BinaryItem
+}
+
 // BranchClient is a client for the Branch schema.
 type BranchClient struct {
 	config
@@ -555,15 +673,15 @@ func (c *BranchClient) GetX(ctx context.Context, id int) *Branch {
 	return obj
 }
 
-// QueryBranchOwner queries the branch_owner edge of a Branch.
-func (c *BranchClient) QueryBranchOwner(b *Branch) *BankQuery {
+// QueryOwner queries the owner edge of a Branch.
+func (c *BranchClient) QueryOwner(b *Branch) *BankQuery {
 	query := &BankQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := b.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(branch.Table, branch.FieldID, id),
 			sqlgraph.To(bank.Table, bank.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, branch.BranchOwnerTable, branch.BranchOwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, branch.OwnerTable, branch.OwnerColumn),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -851,15 +969,15 @@ func (c *EntityClient) GetX(ctx context.Context, id uuid.UUID) *Entity {
 	return obj
 }
 
-// QueryEntityTaxInformation queries the entityTaxInformation edge of a Entity.
-func (c *EntityClient) QueryEntityTaxInformation(e *Entity) *EntityTaxInformationQuery {
+// QueryTaxSpecifications queries the taxSpecifications edge of a Entity.
+func (c *EntityClient) QueryTaxSpecifications(e *Entity) *EntityTaxInformationQuery {
 	query := &EntityTaxInformationQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, id),
 			sqlgraph.To(entitytaxinformation.Table, entitytaxinformation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityTaxInformationTable, entity.EntityTaxInformationColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.TaxSpecificationsTable, entity.TaxSpecificationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -867,15 +985,15 @@ func (c *EntityClient) QueryEntityTaxInformation(e *Entity) *EntityTaxInformatio
 	return query
 }
 
-// QueryEntityAddresses queries the entityAddresses edge of a Entity.
-func (c *EntityClient) QueryEntityAddresses(e *Entity) *EntityAddressQuery {
+// QueryAddresses queries the addresses edge of a Entity.
+func (c *EntityClient) QueryAddresses(e *Entity) *EntityAddressQuery {
 	query := &EntityAddressQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, id),
 			sqlgraph.To(entityaddress.Table, entityaddress.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityAddressesTable, entity.EntityAddressesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.AddressesTable, entity.AddressesColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -883,15 +1001,15 @@ func (c *EntityClient) QueryEntityAddresses(e *Entity) *EntityAddressQuery {
 	return query
 }
 
-// QueryEntityPreferences queries the entityPreferences edge of a Entity.
-func (c *EntityClient) QueryEntityPreferences(e *Entity) *PreferenceQuery {
+// QueryPreferences queries the preferences edge of a Entity.
+func (c *EntityClient) QueryPreferences(e *Entity) *PreferenceQuery {
 	query := &PreferenceQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, id),
 			sqlgraph.To(preference.Table, preference.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityPreferencesTable, entity.EntityPreferencesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.PreferencesTable, entity.PreferencesColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -899,15 +1017,15 @@ func (c *EntityClient) QueryEntityPreferences(e *Entity) *PreferenceQuery {
 	return query
 }
 
-// QueryEntityContactPoints queries the entityContactPoints edge of a Entity.
-func (c *EntityClient) QueryEntityContactPoints(e *Entity) *EntityContactPointQuery {
+// QueryContactPoints queries the contactPoints edge of a Entity.
+func (c *EntityClient) QueryContactPoints(e *Entity) *EntityContactPointQuery {
 	query := &EntityContactPointQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(entity.Table, entity.FieldID, id),
 			sqlgraph.To(entitycontactpoint.Table, entitycontactpoint.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, entity.EntityContactPointsTable, entity.EntityContactPointsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, entity.ContactPointsTable, entity.ContactPointsColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1462,4 +1580,108 @@ func (c *RoutingNumberClient) GetX(ctx context.Context, id int) *RoutingNumber {
 // Hooks returns the client hooks.
 func (c *RoutingNumberClient) Hooks() []Hook {
 	return c.hooks.RoutingNumber
+}
+
+// TransactionClient is a client for the Transaction schema.
+type TransactionClient struct {
+	config
+}
+
+// NewTransactionClient returns a client for the Transaction from the given config.
+func NewTransactionClient(c config) *TransactionClient {
+	return &TransactionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `transaction.Hooks(f(g(h())))`.
+func (c *TransactionClient) Use(hooks ...Hook) {
+	c.hooks.Transaction = append(c.hooks.Transaction, hooks...)
+}
+
+// Create returns a create builder for Transaction.
+func (c *TransactionClient) Create() *TransactionCreate {
+	mutation := newTransactionMutation(c.config, OpCreate)
+	return &TransactionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Transaction entities.
+func (c *TransactionClient) CreateBulk(builders ...*TransactionCreate) *TransactionCreateBulk {
+	return &TransactionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Transaction.
+func (c *TransactionClient) Update() *TransactionUpdate {
+	mutation := newTransactionMutation(c.config, OpUpdate)
+	return &TransactionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TransactionClient) UpdateOne(t *Transaction) *TransactionUpdateOne {
+	mutation := newTransactionMutation(c.config, OpUpdateOne, withTransaction(t))
+	return &TransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TransactionClient) UpdateOneID(id uuid.UUID) *TransactionUpdateOne {
+	mutation := newTransactionMutation(c.config, OpUpdateOne, withTransactionID(id))
+	return &TransactionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Transaction.
+func (c *TransactionClient) Delete() *TransactionDelete {
+	mutation := newTransactionMutation(c.config, OpDelete)
+	return &TransactionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *TransactionClient) DeleteOne(t *Transaction) *TransactionDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *TransactionClient) DeleteOneID(id uuid.UUID) *TransactionDeleteOne {
+	builder := c.Delete().Where(transaction.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TransactionDeleteOne{builder}
+}
+
+// Query returns a query builder for Transaction.
+func (c *TransactionClient) Query() *TransactionQuery {
+	return &TransactionQuery{config: c.config}
+}
+
+// Get returns a Transaction entity by its id.
+func (c *TransactionClient) Get(ctx context.Context, id uuid.UUID) (*Transaction, error) {
+	return c.Query().Where(transaction.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TransactionClient) GetX(ctx context.Context, id uuid.UUID) *Transaction {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryImages queries the images edge of a Transaction.
+func (c *TransactionClient) QueryImages(t *Transaction) *BinaryItemQuery {
+	query := &BinaryItemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(transaction.Table, transaction.FieldID, id),
+			sqlgraph.To(binaryitem.Table, binaryitem.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, transaction.ImagesTable, transaction.ImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TransactionClient) Hooks() []Hook {
+	return c.hooks.Transaction
 }
