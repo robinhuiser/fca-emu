@@ -258,7 +258,7 @@ var (
 	ProductsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"SAVING", "LOAN", "DEPOSIT", "CHECKING"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SAVING", "LOAN", "DEPOSIT", "CHECKING", "INVESTMENT"}},
 		{Name: "type_name", Type: field.TypeString},
 		{Name: "sub_type", Type: field.TypeString},
 		{Name: "sub_type_name", Type: field.TypeString},
