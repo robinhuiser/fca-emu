@@ -75,7 +75,7 @@ services:
     environment:
       DB_VENDOR: postgres
       DB_HOST: postgres
-      DB_DATABASE_NAME: finite
+      DB_DATABASE_NAME: fca
       DB_USER_NAME: emulator
       DB_USER_PASSWORD: secret
       FCA_SECRET: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
@@ -84,5 +84,5 @@ services:
       - 8080:8080  
 
 volumes:
-  postgres-volume:
+  mysql-volume:
 ~~~
