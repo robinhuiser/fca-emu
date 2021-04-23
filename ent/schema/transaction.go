@@ -25,18 +25,24 @@ func (Transaction) Fields() []ent.Field {
 		field.String("executedCurrencyCode").
 			MinLen(3).
 			MaxLen(3),
-		field.Float("exchangeRate"),
-		field.Float("originatingAmount"),
+		field.Float("exchangeRate").
+			Optional(),
+		field.Float("originatingAmount").
+			Optional(),
 		field.String("originatingCurrencyCode").
 			MinLen(3).
-			MaxLen(3),
+			MaxLen(3).
+			Optional(),
 		field.Enum("direction").
 			Values("DEBIT", "CREDIT"),
 		field.Float("runningBalance"),
 		field.Time("createdDate"),
-		field.Time("postedDate"),
-		field.Time("executedDate"),
-		field.Time("updatedDate"),
+		field.Time("postedDate").
+			Optional(),
+		field.Time("executedDate").
+			Optional(),
+		field.Time("updatedDate").
+			Optional(),
 		field.String("description").
 			Optional(),
 		field.String("memo").

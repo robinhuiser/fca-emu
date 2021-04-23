@@ -60,15 +60,39 @@ func (tc *TransactionCreate) SetExchangeRate(f float64) *TransactionCreate {
 	return tc
 }
 
+// SetNillableExchangeRate sets the "exchangeRate" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableExchangeRate(f *float64) *TransactionCreate {
+	if f != nil {
+		tc.SetExchangeRate(*f)
+	}
+	return tc
+}
+
 // SetOriginatingAmount sets the "originatingAmount" field.
 func (tc *TransactionCreate) SetOriginatingAmount(f float64) *TransactionCreate {
 	tc.mutation.SetOriginatingAmount(f)
 	return tc
 }
 
+// SetNillableOriginatingAmount sets the "originatingAmount" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableOriginatingAmount(f *float64) *TransactionCreate {
+	if f != nil {
+		tc.SetOriginatingAmount(*f)
+	}
+	return tc
+}
+
 // SetOriginatingCurrencyCode sets the "originatingCurrencyCode" field.
 func (tc *TransactionCreate) SetOriginatingCurrencyCode(s string) *TransactionCreate {
 	tc.mutation.SetOriginatingCurrencyCode(s)
+	return tc
+}
+
+// SetNillableOriginatingCurrencyCode sets the "originatingCurrencyCode" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableOriginatingCurrencyCode(s *string) *TransactionCreate {
+	if s != nil {
+		tc.SetOriginatingCurrencyCode(*s)
+	}
 	return tc
 }
 
@@ -96,15 +120,39 @@ func (tc *TransactionCreate) SetPostedDate(t time.Time) *TransactionCreate {
 	return tc
 }
 
+// SetNillablePostedDate sets the "postedDate" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillablePostedDate(t *time.Time) *TransactionCreate {
+	if t != nil {
+		tc.SetPostedDate(*t)
+	}
+	return tc
+}
+
 // SetExecutedDate sets the "executedDate" field.
 func (tc *TransactionCreate) SetExecutedDate(t time.Time) *TransactionCreate {
 	tc.mutation.SetExecutedDate(t)
 	return tc
 }
 
+// SetNillableExecutedDate sets the "executedDate" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableExecutedDate(t *time.Time) *TransactionCreate {
+	if t != nil {
+		tc.SetExecutedDate(*t)
+	}
+	return tc
+}
+
 // SetUpdatedDate sets the "updatedDate" field.
 func (tc *TransactionCreate) SetUpdatedDate(t time.Time) *TransactionCreate {
 	tc.mutation.SetUpdatedDate(t)
+	return tc
+}
+
+// SetNillableUpdatedDate sets the "updatedDate" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableUpdatedDate(t *time.Time) *TransactionCreate {
+	if t != nil {
+		tc.SetUpdatedDate(*t)
+	}
 	return tc
 }
 
@@ -402,15 +450,6 @@ func (tc *TransactionCreate) check() error {
 			return &ValidationError{Name: "executedCurrencyCode", err: fmt.Errorf("ent: validator failed for field \"executedCurrencyCode\": %w", err)}
 		}
 	}
-	if _, ok := tc.mutation.ExchangeRate(); !ok {
-		return &ValidationError{Name: "exchangeRate", err: errors.New("ent: missing required field \"exchangeRate\"")}
-	}
-	if _, ok := tc.mutation.OriginatingAmount(); !ok {
-		return &ValidationError{Name: "originatingAmount", err: errors.New("ent: missing required field \"originatingAmount\"")}
-	}
-	if _, ok := tc.mutation.OriginatingCurrencyCode(); !ok {
-		return &ValidationError{Name: "originatingCurrencyCode", err: errors.New("ent: missing required field \"originatingCurrencyCode\"")}
-	}
 	if v, ok := tc.mutation.OriginatingCurrencyCode(); ok {
 		if err := transaction.OriginatingCurrencyCodeValidator(v); err != nil {
 			return &ValidationError{Name: "originatingCurrencyCode", err: fmt.Errorf("ent: validator failed for field \"originatingCurrencyCode\": %w", err)}
@@ -429,15 +468,6 @@ func (tc *TransactionCreate) check() error {
 	}
 	if _, ok := tc.mutation.CreatedDate(); !ok {
 		return &ValidationError{Name: "createdDate", err: errors.New("ent: missing required field \"createdDate\"")}
-	}
-	if _, ok := tc.mutation.PostedDate(); !ok {
-		return &ValidationError{Name: "postedDate", err: errors.New("ent: missing required field \"postedDate\"")}
-	}
-	if _, ok := tc.mutation.ExecutedDate(); !ok {
-		return &ValidationError{Name: "executedDate", err: errors.New("ent: missing required field \"executedDate\"")}
-	}
-	if _, ok := tc.mutation.UpdatedDate(); !ok {
-		return &ValidationError{Name: "updatedDate", err: errors.New("ent: missing required field \"updatedDate\"")}
 	}
 	if _, ok := tc.mutation.Reversal(); !ok {
 		return &ValidationError{Name: "reversal", err: errors.New("ent: missing required field \"reversal\"")}

@@ -87,9 +87,23 @@ func (tu *TransactionUpdate) SetExchangeRate(f float64) *TransactionUpdate {
 	return tu
 }
 
+// SetNillableExchangeRate sets the "exchangeRate" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableExchangeRate(f *float64) *TransactionUpdate {
+	if f != nil {
+		tu.SetExchangeRate(*f)
+	}
+	return tu
+}
+
 // AddExchangeRate adds f to the "exchangeRate" field.
 func (tu *TransactionUpdate) AddExchangeRate(f float64) *TransactionUpdate {
 	tu.mutation.AddExchangeRate(f)
+	return tu
+}
+
+// ClearExchangeRate clears the value of the "exchangeRate" field.
+func (tu *TransactionUpdate) ClearExchangeRate() *TransactionUpdate {
+	tu.mutation.ClearExchangeRate()
 	return tu
 }
 
@@ -100,15 +114,43 @@ func (tu *TransactionUpdate) SetOriginatingAmount(f float64) *TransactionUpdate 
 	return tu
 }
 
+// SetNillableOriginatingAmount sets the "originatingAmount" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableOriginatingAmount(f *float64) *TransactionUpdate {
+	if f != nil {
+		tu.SetOriginatingAmount(*f)
+	}
+	return tu
+}
+
 // AddOriginatingAmount adds f to the "originatingAmount" field.
 func (tu *TransactionUpdate) AddOriginatingAmount(f float64) *TransactionUpdate {
 	tu.mutation.AddOriginatingAmount(f)
 	return tu
 }
 
+// ClearOriginatingAmount clears the value of the "originatingAmount" field.
+func (tu *TransactionUpdate) ClearOriginatingAmount() *TransactionUpdate {
+	tu.mutation.ClearOriginatingAmount()
+	return tu
+}
+
 // SetOriginatingCurrencyCode sets the "originatingCurrencyCode" field.
 func (tu *TransactionUpdate) SetOriginatingCurrencyCode(s string) *TransactionUpdate {
 	tu.mutation.SetOriginatingCurrencyCode(s)
+	return tu
+}
+
+// SetNillableOriginatingCurrencyCode sets the "originatingCurrencyCode" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableOriginatingCurrencyCode(s *string) *TransactionUpdate {
+	if s != nil {
+		tu.SetOriginatingCurrencyCode(*s)
+	}
+	return tu
+}
+
+// ClearOriginatingCurrencyCode clears the value of the "originatingCurrencyCode" field.
+func (tu *TransactionUpdate) ClearOriginatingCurrencyCode() *TransactionUpdate {
+	tu.mutation.ClearOriginatingCurrencyCode()
 	return tu
 }
 
@@ -143,15 +185,57 @@ func (tu *TransactionUpdate) SetPostedDate(t time.Time) *TransactionUpdate {
 	return tu
 }
 
+// SetNillablePostedDate sets the "postedDate" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillablePostedDate(t *time.Time) *TransactionUpdate {
+	if t != nil {
+		tu.SetPostedDate(*t)
+	}
+	return tu
+}
+
+// ClearPostedDate clears the value of the "postedDate" field.
+func (tu *TransactionUpdate) ClearPostedDate() *TransactionUpdate {
+	tu.mutation.ClearPostedDate()
+	return tu
+}
+
 // SetExecutedDate sets the "executedDate" field.
 func (tu *TransactionUpdate) SetExecutedDate(t time.Time) *TransactionUpdate {
 	tu.mutation.SetExecutedDate(t)
 	return tu
 }
 
+// SetNillableExecutedDate sets the "executedDate" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableExecutedDate(t *time.Time) *TransactionUpdate {
+	if t != nil {
+		tu.SetExecutedDate(*t)
+	}
+	return tu
+}
+
+// ClearExecutedDate clears the value of the "executedDate" field.
+func (tu *TransactionUpdate) ClearExecutedDate() *TransactionUpdate {
+	tu.mutation.ClearExecutedDate()
+	return tu
+}
+
 // SetUpdatedDate sets the "updatedDate" field.
 func (tu *TransactionUpdate) SetUpdatedDate(t time.Time) *TransactionUpdate {
 	tu.mutation.SetUpdatedDate(t)
+	return tu
+}
+
+// SetNillableUpdatedDate sets the "updatedDate" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableUpdatedDate(t *time.Time) *TransactionUpdate {
+	if t != nil {
+		tu.SetUpdatedDate(*t)
+	}
+	return tu
+}
+
+// ClearUpdatedDate clears the value of the "updatedDate" field.
+func (tu *TransactionUpdate) ClearUpdatedDate() *TransactionUpdate {
+	tu.mutation.ClearUpdatedDate()
 	return tu
 }
 
@@ -644,6 +728,12 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldExchangeRate,
 		})
 	}
+	if tu.mutation.ExchangeRateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Column: transaction.FieldExchangeRate,
+		})
+	}
 	if value, ok := tu.mutation.OriginatingAmount(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
@@ -658,10 +748,22 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldOriginatingAmount,
 		})
 	}
+	if tu.mutation.OriginatingAmountCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Column: transaction.FieldOriginatingAmount,
+		})
+	}
 	if value, ok := tu.mutation.OriginatingCurrencyCode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: transaction.FieldOriginatingCurrencyCode,
+		})
+	}
+	if tu.mutation.OriginatingCurrencyCodeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: transaction.FieldOriginatingCurrencyCode,
 		})
 	}
@@ -700,6 +802,12 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldPostedDate,
 		})
 	}
+	if tu.mutation.PostedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: transaction.FieldPostedDate,
+		})
+	}
 	if value, ok := tu.mutation.ExecutedDate(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -707,10 +815,22 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldExecutedDate,
 		})
 	}
+	if tu.mutation.ExecutedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: transaction.FieldExecutedDate,
+		})
+	}
 	if value, ok := tu.mutation.UpdatedDate(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: transaction.FieldUpdatedDate,
+		})
+	}
+	if tu.mutation.UpdatedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: transaction.FieldUpdatedDate,
 		})
 	}
@@ -1042,9 +1162,23 @@ func (tuo *TransactionUpdateOne) SetExchangeRate(f float64) *TransactionUpdateOn
 	return tuo
 }
 
+// SetNillableExchangeRate sets the "exchangeRate" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableExchangeRate(f *float64) *TransactionUpdateOne {
+	if f != nil {
+		tuo.SetExchangeRate(*f)
+	}
+	return tuo
+}
+
 // AddExchangeRate adds f to the "exchangeRate" field.
 func (tuo *TransactionUpdateOne) AddExchangeRate(f float64) *TransactionUpdateOne {
 	tuo.mutation.AddExchangeRate(f)
+	return tuo
+}
+
+// ClearExchangeRate clears the value of the "exchangeRate" field.
+func (tuo *TransactionUpdateOne) ClearExchangeRate() *TransactionUpdateOne {
+	tuo.mutation.ClearExchangeRate()
 	return tuo
 }
 
@@ -1055,15 +1189,43 @@ func (tuo *TransactionUpdateOne) SetOriginatingAmount(f float64) *TransactionUpd
 	return tuo
 }
 
+// SetNillableOriginatingAmount sets the "originatingAmount" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableOriginatingAmount(f *float64) *TransactionUpdateOne {
+	if f != nil {
+		tuo.SetOriginatingAmount(*f)
+	}
+	return tuo
+}
+
 // AddOriginatingAmount adds f to the "originatingAmount" field.
 func (tuo *TransactionUpdateOne) AddOriginatingAmount(f float64) *TransactionUpdateOne {
 	tuo.mutation.AddOriginatingAmount(f)
 	return tuo
 }
 
+// ClearOriginatingAmount clears the value of the "originatingAmount" field.
+func (tuo *TransactionUpdateOne) ClearOriginatingAmount() *TransactionUpdateOne {
+	tuo.mutation.ClearOriginatingAmount()
+	return tuo
+}
+
 // SetOriginatingCurrencyCode sets the "originatingCurrencyCode" field.
 func (tuo *TransactionUpdateOne) SetOriginatingCurrencyCode(s string) *TransactionUpdateOne {
 	tuo.mutation.SetOriginatingCurrencyCode(s)
+	return tuo
+}
+
+// SetNillableOriginatingCurrencyCode sets the "originatingCurrencyCode" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableOriginatingCurrencyCode(s *string) *TransactionUpdateOne {
+	if s != nil {
+		tuo.SetOriginatingCurrencyCode(*s)
+	}
+	return tuo
+}
+
+// ClearOriginatingCurrencyCode clears the value of the "originatingCurrencyCode" field.
+func (tuo *TransactionUpdateOne) ClearOriginatingCurrencyCode() *TransactionUpdateOne {
+	tuo.mutation.ClearOriginatingCurrencyCode()
 	return tuo
 }
 
@@ -1098,15 +1260,57 @@ func (tuo *TransactionUpdateOne) SetPostedDate(t time.Time) *TransactionUpdateOn
 	return tuo
 }
 
+// SetNillablePostedDate sets the "postedDate" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillablePostedDate(t *time.Time) *TransactionUpdateOne {
+	if t != nil {
+		tuo.SetPostedDate(*t)
+	}
+	return tuo
+}
+
+// ClearPostedDate clears the value of the "postedDate" field.
+func (tuo *TransactionUpdateOne) ClearPostedDate() *TransactionUpdateOne {
+	tuo.mutation.ClearPostedDate()
+	return tuo
+}
+
 // SetExecutedDate sets the "executedDate" field.
 func (tuo *TransactionUpdateOne) SetExecutedDate(t time.Time) *TransactionUpdateOne {
 	tuo.mutation.SetExecutedDate(t)
 	return tuo
 }
 
+// SetNillableExecutedDate sets the "executedDate" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableExecutedDate(t *time.Time) *TransactionUpdateOne {
+	if t != nil {
+		tuo.SetExecutedDate(*t)
+	}
+	return tuo
+}
+
+// ClearExecutedDate clears the value of the "executedDate" field.
+func (tuo *TransactionUpdateOne) ClearExecutedDate() *TransactionUpdateOne {
+	tuo.mutation.ClearExecutedDate()
+	return tuo
+}
+
 // SetUpdatedDate sets the "updatedDate" field.
 func (tuo *TransactionUpdateOne) SetUpdatedDate(t time.Time) *TransactionUpdateOne {
 	tuo.mutation.SetUpdatedDate(t)
+	return tuo
+}
+
+// SetNillableUpdatedDate sets the "updatedDate" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableUpdatedDate(t *time.Time) *TransactionUpdateOne {
+	if t != nil {
+		tuo.SetUpdatedDate(*t)
+	}
+	return tuo
+}
+
+// ClearUpdatedDate clears the value of the "updatedDate" field.
+func (tuo *TransactionUpdateOne) ClearUpdatedDate() *TransactionUpdateOne {
+	tuo.mutation.ClearUpdatedDate()
 	return tuo
 }
 
@@ -1604,6 +1808,12 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Column: transaction.FieldExchangeRate,
 		})
 	}
+	if tuo.mutation.ExchangeRateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Column: transaction.FieldExchangeRate,
+		})
+	}
 	if value, ok := tuo.mutation.OriginatingAmount(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeFloat64,
@@ -1618,10 +1828,22 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Column: transaction.FieldOriginatingAmount,
 		})
 	}
+	if tuo.mutation.OriginatingAmountCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Column: transaction.FieldOriginatingAmount,
+		})
+	}
 	if value, ok := tuo.mutation.OriginatingCurrencyCode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: transaction.FieldOriginatingCurrencyCode,
+		})
+	}
+	if tuo.mutation.OriginatingCurrencyCodeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: transaction.FieldOriginatingCurrencyCode,
 		})
 	}
@@ -1660,6 +1882,12 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Column: transaction.FieldPostedDate,
 		})
 	}
+	if tuo.mutation.PostedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: transaction.FieldPostedDate,
+		})
+	}
 	if value, ok := tuo.mutation.ExecutedDate(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -1667,10 +1895,22 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Column: transaction.FieldExecutedDate,
 		})
 	}
+	if tuo.mutation.ExecutedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: transaction.FieldExecutedDate,
+		})
+	}
 	if value, ok := tuo.mutation.UpdatedDate(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: transaction.FieldUpdatedDate,
+		})
+	}
+	if tuo.mutation.UpdatedDateCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: transaction.FieldUpdatedDate,
 		})
 	}

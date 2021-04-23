@@ -677,6 +677,20 @@ func ExchangeRateLTE(v float64) predicate.Transaction {
 	})
 }
 
+// ExchangeRateIsNil applies the IsNil predicate on the "exchangeRate" field.
+func ExchangeRateIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldExchangeRate)))
+	})
+}
+
+// ExchangeRateNotNil applies the NotNil predicate on the "exchangeRate" field.
+func ExchangeRateNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldExchangeRate)))
+	})
+}
+
 // OriginatingAmountEQ applies the EQ predicate on the "originatingAmount" field.
 func OriginatingAmountEQ(v float64) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
@@ -750,6 +764,20 @@ func OriginatingAmountLT(v float64) predicate.Transaction {
 func OriginatingAmountLTE(v float64) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldOriginatingAmount), v))
+	})
+}
+
+// OriginatingAmountIsNil applies the IsNil predicate on the "originatingAmount" field.
+func OriginatingAmountIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldOriginatingAmount)))
+	})
+}
+
+// OriginatingAmountNotNil applies the NotNil predicate on the "originatingAmount" field.
+func OriginatingAmountNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldOriginatingAmount)))
 	})
 }
 
@@ -847,6 +875,20 @@ func OriginatingCurrencyCodeHasPrefix(v string) predicate.Transaction {
 func OriginatingCurrencyCodeHasSuffix(v string) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.HasSuffix(s.C(FieldOriginatingCurrencyCode), v))
+	})
+}
+
+// OriginatingCurrencyCodeIsNil applies the IsNil predicate on the "originatingCurrencyCode" field.
+func OriginatingCurrencyCodeIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldOriginatingCurrencyCode)))
+	})
+}
+
+// OriginatingCurrencyCodeNotNil applies the NotNil predicate on the "originatingCurrencyCode" field.
+func OriginatingCurrencyCodeNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldOriginatingCurrencyCode)))
 	})
 }
 
@@ -1140,6 +1182,20 @@ func PostedDateLTE(v time.Time) predicate.Transaction {
 	})
 }
 
+// PostedDateIsNil applies the IsNil predicate on the "postedDate" field.
+func PostedDateIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPostedDate)))
+	})
+}
+
+// PostedDateNotNil applies the NotNil predicate on the "postedDate" field.
+func PostedDateNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPostedDate)))
+	})
+}
+
 // ExecutedDateEQ applies the EQ predicate on the "executedDate" field.
 func ExecutedDateEQ(v time.Time) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
@@ -1216,6 +1272,20 @@ func ExecutedDateLTE(v time.Time) predicate.Transaction {
 	})
 }
 
+// ExecutedDateIsNil applies the IsNil predicate on the "executedDate" field.
+func ExecutedDateIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldExecutedDate)))
+	})
+}
+
+// ExecutedDateNotNil applies the NotNil predicate on the "executedDate" field.
+func ExecutedDateNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldExecutedDate)))
+	})
+}
+
 // UpdatedDateEQ applies the EQ predicate on the "updatedDate" field.
 func UpdatedDateEQ(v time.Time) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
@@ -1289,6 +1359,20 @@ func UpdatedDateLT(v time.Time) predicate.Transaction {
 func UpdatedDateLTE(v time.Time) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedDate), v))
+	})
+}
+
+// UpdatedDateIsNil applies the IsNil predicate on the "updatedDate" field.
+func UpdatedDateIsNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldUpdatedDate)))
+	})
+}
+
+// UpdatedDateNotNil applies the NotNil predicate on the "updatedDate" field.
+func UpdatedDateNotNil() predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldUpdatedDate)))
 	})
 }
 

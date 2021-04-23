@@ -9171,10 +9171,24 @@ func (m *TransactionMutation) AddedExchangeRate() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearExchangeRate clears the value of the "exchangeRate" field.
+func (m *TransactionMutation) ClearExchangeRate() {
+	m.exchangeRate = nil
+	m.addexchangeRate = nil
+	m.clearedFields[transaction.FieldExchangeRate] = struct{}{}
+}
+
+// ExchangeRateCleared returns if the "exchangeRate" field was cleared in this mutation.
+func (m *TransactionMutation) ExchangeRateCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldExchangeRate]
+	return ok
+}
+
 // ResetExchangeRate resets all changes to the "exchangeRate" field.
 func (m *TransactionMutation) ResetExchangeRate() {
 	m.exchangeRate = nil
 	m.addexchangeRate = nil
+	delete(m.clearedFields, transaction.FieldExchangeRate)
 }
 
 // SetOriginatingAmount sets the "originatingAmount" field.
@@ -9227,10 +9241,24 @@ func (m *TransactionMutation) AddedOriginatingAmount() (r float64, exists bool) 
 	return *v, true
 }
 
+// ClearOriginatingAmount clears the value of the "originatingAmount" field.
+func (m *TransactionMutation) ClearOriginatingAmount() {
+	m.originatingAmount = nil
+	m.addoriginatingAmount = nil
+	m.clearedFields[transaction.FieldOriginatingAmount] = struct{}{}
+}
+
+// OriginatingAmountCleared returns if the "originatingAmount" field was cleared in this mutation.
+func (m *TransactionMutation) OriginatingAmountCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldOriginatingAmount]
+	return ok
+}
+
 // ResetOriginatingAmount resets all changes to the "originatingAmount" field.
 func (m *TransactionMutation) ResetOriginatingAmount() {
 	m.originatingAmount = nil
 	m.addoriginatingAmount = nil
+	delete(m.clearedFields, transaction.FieldOriginatingAmount)
 }
 
 // SetOriginatingCurrencyCode sets the "originatingCurrencyCode" field.
@@ -9264,9 +9292,22 @@ func (m *TransactionMutation) OldOriginatingCurrencyCode(ctx context.Context) (v
 	return oldValue.OriginatingCurrencyCode, nil
 }
 
+// ClearOriginatingCurrencyCode clears the value of the "originatingCurrencyCode" field.
+func (m *TransactionMutation) ClearOriginatingCurrencyCode() {
+	m.originatingCurrencyCode = nil
+	m.clearedFields[transaction.FieldOriginatingCurrencyCode] = struct{}{}
+}
+
+// OriginatingCurrencyCodeCleared returns if the "originatingCurrencyCode" field was cleared in this mutation.
+func (m *TransactionMutation) OriginatingCurrencyCodeCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldOriginatingCurrencyCode]
+	return ok
+}
+
 // ResetOriginatingCurrencyCode resets all changes to the "originatingCurrencyCode" field.
 func (m *TransactionMutation) ResetOriginatingCurrencyCode() {
 	m.originatingCurrencyCode = nil
+	delete(m.clearedFields, transaction.FieldOriginatingCurrencyCode)
 }
 
 // SetDirection sets the "direction" field.
@@ -9428,9 +9469,22 @@ func (m *TransactionMutation) OldPostedDate(ctx context.Context) (v time.Time, e
 	return oldValue.PostedDate, nil
 }
 
+// ClearPostedDate clears the value of the "postedDate" field.
+func (m *TransactionMutation) ClearPostedDate() {
+	m.postedDate = nil
+	m.clearedFields[transaction.FieldPostedDate] = struct{}{}
+}
+
+// PostedDateCleared returns if the "postedDate" field was cleared in this mutation.
+func (m *TransactionMutation) PostedDateCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldPostedDate]
+	return ok
+}
+
 // ResetPostedDate resets all changes to the "postedDate" field.
 func (m *TransactionMutation) ResetPostedDate() {
 	m.postedDate = nil
+	delete(m.clearedFields, transaction.FieldPostedDate)
 }
 
 // SetExecutedDate sets the "executedDate" field.
@@ -9464,9 +9518,22 @@ func (m *TransactionMutation) OldExecutedDate(ctx context.Context) (v time.Time,
 	return oldValue.ExecutedDate, nil
 }
 
+// ClearExecutedDate clears the value of the "executedDate" field.
+func (m *TransactionMutation) ClearExecutedDate() {
+	m.executedDate = nil
+	m.clearedFields[transaction.FieldExecutedDate] = struct{}{}
+}
+
+// ExecutedDateCleared returns if the "executedDate" field was cleared in this mutation.
+func (m *TransactionMutation) ExecutedDateCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldExecutedDate]
+	return ok
+}
+
 // ResetExecutedDate resets all changes to the "executedDate" field.
 func (m *TransactionMutation) ResetExecutedDate() {
 	m.executedDate = nil
+	delete(m.clearedFields, transaction.FieldExecutedDate)
 }
 
 // SetUpdatedDate sets the "updatedDate" field.
@@ -9500,9 +9567,22 @@ func (m *TransactionMutation) OldUpdatedDate(ctx context.Context) (v time.Time, 
 	return oldValue.UpdatedDate, nil
 }
 
+// ClearUpdatedDate clears the value of the "updatedDate" field.
+func (m *TransactionMutation) ClearUpdatedDate() {
+	m.updatedDate = nil
+	m.clearedFields[transaction.FieldUpdatedDate] = struct{}{}
+}
+
+// UpdatedDateCleared returns if the "updatedDate" field was cleared in this mutation.
+func (m *TransactionMutation) UpdatedDateCleared() bool {
+	_, ok := m.clearedFields[transaction.FieldUpdatedDate]
+	return ok
+}
+
 // ResetUpdatedDate resets all changes to the "updatedDate" field.
 func (m *TransactionMutation) ResetUpdatedDate() {
 	m.updatedDate = nil
+	delete(m.clearedFields, transaction.FieldUpdatedDate)
 }
 
 // SetDescription sets the "description" field.
@@ -10862,6 +10942,24 @@ func (m *TransactionMutation) ClearedFields() []string {
 	if m.FieldCleared(transaction.FieldSequenceInDay) {
 		fields = append(fields, transaction.FieldSequenceInDay)
 	}
+	if m.FieldCleared(transaction.FieldExchangeRate) {
+		fields = append(fields, transaction.FieldExchangeRate)
+	}
+	if m.FieldCleared(transaction.FieldOriginatingAmount) {
+		fields = append(fields, transaction.FieldOriginatingAmount)
+	}
+	if m.FieldCleared(transaction.FieldOriginatingCurrencyCode) {
+		fields = append(fields, transaction.FieldOriginatingCurrencyCode)
+	}
+	if m.FieldCleared(transaction.FieldPostedDate) {
+		fields = append(fields, transaction.FieldPostedDate)
+	}
+	if m.FieldCleared(transaction.FieldExecutedDate) {
+		fields = append(fields, transaction.FieldExecutedDate)
+	}
+	if m.FieldCleared(transaction.FieldUpdatedDate) {
+		fields = append(fields, transaction.FieldUpdatedDate)
+	}
 	if m.FieldCleared(transaction.FieldDescription) {
 		fields = append(fields, transaction.FieldDescription)
 	}
@@ -10917,6 +11015,24 @@ func (m *TransactionMutation) ClearField(name string) error {
 	switch name {
 	case transaction.FieldSequenceInDay:
 		m.ClearSequenceInDay()
+		return nil
+	case transaction.FieldExchangeRate:
+		m.ClearExchangeRate()
+		return nil
+	case transaction.FieldOriginatingAmount:
+		m.ClearOriginatingAmount()
+		return nil
+	case transaction.FieldOriginatingCurrencyCode:
+		m.ClearOriginatingCurrencyCode()
+		return nil
+	case transaction.FieldPostedDate:
+		m.ClearPostedDate()
+		return nil
+	case transaction.FieldExecutedDate:
+		m.ClearExecutedDate()
+		return nil
+	case transaction.FieldUpdatedDate:
+		m.ClearUpdatedDate()
 		return nil
 	case transaction.FieldDescription:
 		m.ClearDescription()
