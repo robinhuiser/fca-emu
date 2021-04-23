@@ -18,12 +18,17 @@ func (Entity) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
 		field.Time("dateCreated"),
-		field.String("firstname").Optional(),
-		field.String("lastname").Optional(),
-		field.String("fullname").Optional(),
+		field.String("firstname").
+			Optional(),
+		field.String("lastname").
+			Optional(),
+		field.String("fullname").
+			Optional(),
 		field.Time("dateOfBirth"),
-		field.Bool("active").Default(true),
-		field.Enum("type").Values("PERSON", "ORGANIZATION", "CORPORATE"),
+		field.Bool("active").
+			Default(true),
+		field.Enum("type").
+			Values("PERSON", "BUSINESS", "SYSTEM"),
 		field.Time("lastLoginDate"),
 		field.String("username"),
 		field.String("token"),

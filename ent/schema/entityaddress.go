@@ -17,7 +17,7 @@ func (EntityAddress) Fields() []ent.Field {
 		field.String("city"),
 		field.String("postalCode"),
 		field.String("state"),
-		field.Enum("type").Values("BUSINESS", "PRIVATE", "MAILBOX"),
+		field.Enum("type").Values("BUSINESS", "RESIDENTIAL", "POBOX"),
 		field.String("line1"),
 		field.String("line2").Optional(),
 		field.String("line3").Optional(),

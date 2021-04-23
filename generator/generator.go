@@ -51,10 +51,10 @@ func Generate(ents int, branches int, c *ent.Client) error {
 			log.Printf("created entity (%s) with id %s", strings.ToLower(e.Type.String()), e.ID)
 
 			switch a := e.Type.String(); a {
-			case "ORGANIZATION":
-				accts = f.Number(2, 5)
-			case "CORPORATE":
+			case "BUSINESS":
 				accts = f.Number(3, 10)
+			case "SYSTEM":
+				accts = f.Number(2, 5)
 			default:
 				accts = f.Number(1, 3)
 			}

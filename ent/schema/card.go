@@ -14,12 +14,14 @@ type Card struct {
 // Fields of the Card.
 func (Card) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("type").Values("CREDIT", "DEBIT"),
+		field.Enum("type").
+			Values("CREDIT", "DEBIT", "LOYALTY"),
 		field.String("number"),
 		field.Time("startDate"),
 		field.Time("expiryDate"),
 		field.String("holderName"),
-		field.Enum("status").Values("LOCKED", "BLOCKED", "OK"),
+		field.Enum("status").
+			Values("LOCKED", "OPERATIONAL"),
 		field.String("url"),
 	}
 }

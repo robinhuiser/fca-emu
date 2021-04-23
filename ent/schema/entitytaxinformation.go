@@ -13,7 +13,8 @@ type EntityTaxInformation struct {
 // Fields of the TaxInformation.
 func (EntityTaxInformation) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("type").Values("SSN"),
+		field.Enum("type").
+			Values("SSN", "EIN", "ITIN", "ATIN", "OTHER"),
 		field.String("taxId"),
 	}
 }

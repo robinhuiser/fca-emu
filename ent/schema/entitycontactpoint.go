@@ -15,7 +15,7 @@ func (EntityContactPoint) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("prefix").Optional(),
 		field.String("name"),
-		field.Enum("type").Values("SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"),
+		field.Enum("type").Values("SMS", "EMAIL", "VOICE"),
 		field.String("suffix").Optional(),
 		field.String("value"),
 	}

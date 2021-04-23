@@ -126,9 +126,9 @@ type Type string
 
 // Type values.
 const (
-	TypePERSON       Type = "PERSON"
-	TypeORGANIZATION Type = "ORGANIZATION"
-	TypeCORPORATE    Type = "CORPORATE"
+	TypePERSON   Type = "PERSON"
+	TypeBUSINESS Type = "BUSINESS"
+	TypeSYSTEM   Type = "SYSTEM"
 )
 
 func (_type Type) String() string {
@@ -138,7 +138,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypePERSON, TypeORGANIZATION, TypeCORPORATE:
+	case TypePERSON, TypeBUSINESS, TypeSYSTEM:
 		return nil
 	default:
 		return fmt.Errorf("entity: invalid enum value for type field: %q", _type)

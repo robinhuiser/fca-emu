@@ -118,12 +118,12 @@ var (
 	// CardsColumns holds the columns for the "cards" table.
 	CardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"CREDIT", "DEBIT"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"CREDIT", "DEBIT", "LOYALTY"}},
 		{Name: "number", Type: field.TypeString},
 		{Name: "start_date", Type: field.TypeTime},
 		{Name: "expiry_date", Type: field.TypeTime},
 		{Name: "holder_name", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"LOCKED", "BLOCKED", "OK"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"LOCKED", "OPERATIONAL"}},
 		{Name: "url", Type: field.TypeString},
 		{Name: "card_network", Type: field.TypeInt, Nullable: true},
 	}
@@ -163,7 +163,7 @@ var (
 		{Name: "fullname", Type: field.TypeString, Nullable: true},
 		{Name: "date_of_birth", Type: field.TypeTime},
 		{Name: "active", Type: field.TypeBool, Default: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"PERSON", "ORGANIZATION", "CORPORATE"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"PERSON", "BUSINESS", "SYSTEM"}},
 		{Name: "last_login_date", Type: field.TypeTime},
 		{Name: "username", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
@@ -183,7 +183,7 @@ var (
 		{Name: "city", Type: field.TypeString},
 		{Name: "postal_code", Type: field.TypeString},
 		{Name: "state", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"BUSINESS", "PRIVATE", "MAILBOX"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"BUSINESS", "RESIDENTIAL", "POBOX"}},
 		{Name: "line1", Type: field.TypeString},
 		{Name: "line2", Type: field.TypeString, Nullable: true},
 		{Name: "line3", Type: field.TypeString, Nullable: true},
@@ -209,7 +209,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "prefix", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"SMS", "EMAIL", "PHONE", "WHATSAPP", "SKYPE"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SMS", "EMAIL", "VOICE"}},
 		{Name: "suffix", Type: field.TypeString, Nullable: true},
 		{Name: "value", Type: field.TypeString},
 		{Name: "entity_contact_points", Type: field.TypeUUID, Nullable: true},
@@ -231,7 +231,7 @@ var (
 	// EntityTaxInformationsColumns holds the columns for the "entity_tax_informations" table.
 	EntityTaxInformationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"SSN"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"SSN", "EIN", "ITIN", "ATIN", "OTHER"}},
 		{Name: "tax_id", Type: field.TypeString},
 		{Name: "entity_tax_specifications", Type: field.TypeUUID, Nullable: true},
 	}

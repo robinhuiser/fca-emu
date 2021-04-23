@@ -76,8 +76,9 @@ type Type string
 
 // Type values.
 const (
-	TypeCREDIT Type = "CREDIT"
-	TypeDEBIT  Type = "DEBIT"
+	TypeCREDIT  Type = "CREDIT"
+	TypeDEBIT   Type = "DEBIT"
+	TypeLOYALTY Type = "LOYALTY"
 )
 
 func (_type Type) String() string {
@@ -87,7 +88,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeCREDIT, TypeDEBIT:
+	case TypeCREDIT, TypeDEBIT, TypeLOYALTY:
 		return nil
 	default:
 		return fmt.Errorf("card: invalid enum value for type field: %q", _type)
@@ -99,9 +100,8 @@ type Status string
 
 // Status values.
 const (
-	StatusLOCKED  Status = "LOCKED"
-	StatusBLOCKED Status = "BLOCKED"
-	StatusOK      Status = "OK"
+	StatusLOCKED      Status = "LOCKED"
+	StatusOPERATIONAL Status = "OPERATIONAL"
 )
 
 func (s Status) String() string {
@@ -111,7 +111,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusLOCKED, StatusBLOCKED, StatusOK:
+	case StatusLOCKED, StatusOPERATIONAL:
 		return nil
 	default:
 		return fmt.Errorf("card: invalid enum value for status field: %q", s)

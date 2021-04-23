@@ -61,11 +61,9 @@ type Type string
 
 // Type values.
 const (
-	TypeSMS      Type = "SMS"
-	TypeEMAIL    Type = "EMAIL"
-	TypePHONE    Type = "PHONE"
-	TypeWHATSAPP Type = "WHATSAPP"
-	TypeSKYPE    Type = "SKYPE"
+	TypeSMS   Type = "SMS"
+	TypeEMAIL Type = "EMAIL"
+	TypeVOICE Type = "VOICE"
 )
 
 func (_type Type) String() string {
@@ -75,7 +73,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeSMS, TypeEMAIL, TypePHONE, TypeWHATSAPP, TypeSKYPE:
+	case TypeSMS, TypeEMAIL, TypeVOICE:
 		return nil
 	default:
 		return fmt.Errorf("entitycontactpoint: invalid enum value for type field: %q", _type)
