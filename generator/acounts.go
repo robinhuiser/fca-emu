@@ -3,13 +3,23 @@ package generator
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"reflect"
 	"strconv"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
+
+// Account Type to Product map
+var atp = map[string]string{
+	"DDA": "CHECKING",
+	"NOW": "SAVING",
+	"MMA": "INVESTMENT",
+}
 
 func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker, e *ent.Entity) (*ent.Account, error) {
 
@@ -26,14 +36,15 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 	}
 
 	// Retrieve available products
-	pr, err := client.Product.Query().All(ctx)
+	act := randomAccountType(f)
+	pr, err := client.Product.Query().Where(product.TypeEQ(product.Type(atp[act]))).All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed retrieving available products: %w", err)
 	}
 
 	a, err := client.Account.
 		Create().
-		SetType(randomAccountType(f)).
+		SetType(act).
 		SetNumber(ra).
 		SetName(f.FirstName() + " " + f.LastName()).
 		SetTitle(randomAccountTitle(f)).
@@ -91,8 +102,8 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 }
 
 func randomAccountType(f *gofakeit.Faker) string {
-	at := []string{"DDA", "NOW", "MMA"}
-	return at[f.Number(0, len(at)-1)]
+	keys := reflect.ValueOf(atp).MapKeys()
+	return keys[rand.Intn(len(keys))].String()
 }
 
 func randomRoutingNumberType(f *gofakeit.Faker) routingnumber.Type {
@@ -114,3 +125,7 @@ func randomAccountNumber(f *gofakeit.Faker) string {
 	return strconv.Itoa(f.Number(10000, 99999)) +
 		strconv.Itoa(f.Number(100000, 999999))
 }
+
+// func randomAccountProduct(at string) string {
+
+// }

@@ -25,6 +25,9 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		{"CHK02", "CHECKING", "Checking Account", "CHK-BRONZE", "Bronze Checking"},
 		{"CHK03", "CHECKING", "Checking Account", "CHK-SILVER", "Silver Checking"},
 		{"CHK04", "CHECKING", "Checking Account", "CHK-GOLD", "Gold Checking"},
+		{"INV01", "INVESTMENT", "Investment Account", "INV-BASIC", "Basic Investments"},
+		{"INV02", "INVESTMENT", "Investment Account", "INV-BUFFET", "Warren's Investments"},
+		{"INV03", "INVESTMENT", "Investment Account", "INV-ACKMAN", "Bill's Investments"},
 	}
 
 	// Create products
