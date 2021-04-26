@@ -74,4 +74,7 @@ $ goreleaser --rm-dist
 $ docker save -o fca-emu_${TAG}_Docker_x86_64.tar \
     tecdigitalacr.azurecr.io/utils/fca-emu:v${TAG} && \
     gzip fca-emu_${TAG}_Docker_x86_64.tar
+
+# Lines of code written
+$ gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go
 ~~~
