@@ -15,8 +15,17 @@ const (
 	FieldContent = "content"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
+	// EdgeTransaction holds the string denoting the transaction edge name in mutations.
+	EdgeTransaction = "transaction"
 	// Table holds the table name of the binaryitem in the database.
 	Table = "binary_items"
+	// TransactionTable is the table the holds the transaction relation/edge.
+	TransactionTable = "binary_items"
+	// TransactionInverseTable is the table name for the Transaction entity.
+	// It exists in this package in order to avoid circular dependency with the "transaction" package.
+	TransactionInverseTable = "transactions"
+	// TransactionColumn is the table column denoting the transaction relation/edge.
+	TransactionColumn = "transaction_images"
 )
 
 // Columns holds all SQL columns for binaryitem fields.

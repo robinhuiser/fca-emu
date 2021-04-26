@@ -69,13 +69,11 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 	for i := 0; i < f.Number(1, 2); i++ {
 		a, err := client.EntityAddress.
 			Create().
-			SetCountry("Unites States of America").
+			SetCountry("US").
 			SetCity(f.City()).
 			SetPostalCode(f.Zip()).
-			SetState(f.State()).
-			SetLine1(f.StreetNumber()).
-			SetLine2(f.StreetName()).
-			SetLine3(f.StreetSuffix()).
+			SetState(f.StateAbr()).
+			SetLine1((f.StreetNumber()) + " " + f.StreetName() + " " + f.StreetSuffix()).
 			SetType(address_type).
 			SetPrimary(primary_address).
 			Save(ctx)

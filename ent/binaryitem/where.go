@@ -4,6 +4,7 @@ package binaryitem
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 )
 
@@ -305,6 +306,20 @@ func LengthLTE(v int) predicate.BinaryItem {
 	})
 }
 
+// LengthIsNil applies the IsNil predicate on the "length" field.
+func LengthIsNil() predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldLength)))
+	})
+}
+
+// LengthNotNil applies the NotNil predicate on the "length" field.
+func LengthNotNil() predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldLength)))
+	})
+}
+
 // ContentEQ applies the EQ predicate on the "content" field.
 func ContentEQ(v []byte) predicate.BinaryItem {
 	return predicate.BinaryItem(func(s *sql.Selector) {
@@ -478,6 +493,20 @@ func URLHasSuffix(v string) predicate.BinaryItem {
 	})
 }
 
+// URLIsNil applies the IsNil predicate on the "url" field.
+func URLIsNil() predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldURL)))
+	})
+}
+
+// URLNotNil applies the NotNil predicate on the "url" field.
+func URLNotNil() predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldURL)))
+	})
+}
+
 // URLEqualFold applies the EqualFold predicate on the "url" field.
 func URLEqualFold(v string) predicate.BinaryItem {
 	return predicate.BinaryItem(func(s *sql.Selector) {
@@ -489,6 +518,34 @@ func URLEqualFold(v string) predicate.BinaryItem {
 func URLContainsFold(v string) predicate.BinaryItem {
 	return predicate.BinaryItem(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldURL), v))
+	})
+}
+
+// HasTransaction applies the HasEdge predicate on the "transaction" edge.
+func HasTransaction() predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TransactionTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TransactionTable, TransactionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTransactionWith applies the HasEdge predicate on the "transaction" edge with a given conditions (other predicates).
+func HasTransactionWith(preds ...predicate.Transaction) predicate.BinaryItem {
+	return predicate.BinaryItem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TransactionInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TransactionTable, TransactionColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

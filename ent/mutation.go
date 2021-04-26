@@ -2285,18 +2285,20 @@ func (m *BankMutation) ResetEdge(name string) error {
 // BinaryItemMutation represents an operation that mutates the BinaryItem nodes in the graph.
 type BinaryItemMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	format        *string
-	length        *int
-	addlength     *int
-	content       *[]byte
-	url           *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*BinaryItem, error)
-	predicates    []predicate.BinaryItem
+	op                 Op
+	typ                string
+	id                 *int
+	format             *string
+	length             *int
+	addlength          *int
+	content            *[]byte
+	url                *string
+	clearedFields      map[string]struct{}
+	transaction        *uuid.UUID
+	clearedtransaction bool
+	done               bool
+	oldValue           func(context.Context) (*BinaryItem, error)
+	predicates         []predicate.BinaryItem
 }
 
 var _ ent.Mutation = (*BinaryItemMutation)(nil)
@@ -2464,10 +2466,24 @@ func (m *BinaryItemMutation) AddedLength() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearLength clears the value of the "length" field.
+func (m *BinaryItemMutation) ClearLength() {
+	m.length = nil
+	m.addlength = nil
+	m.clearedFields[binaryitem.FieldLength] = struct{}{}
+}
+
+// LengthCleared returns if the "length" field was cleared in this mutation.
+func (m *BinaryItemMutation) LengthCleared() bool {
+	_, ok := m.clearedFields[binaryitem.FieldLength]
+	return ok
+}
+
 // ResetLength resets all changes to the "length" field.
 func (m *BinaryItemMutation) ResetLength() {
 	m.length = nil
 	m.addlength = nil
+	delete(m.clearedFields, binaryitem.FieldLength)
 }
 
 // SetContent sets the "content" field.
@@ -2537,9 +2553,61 @@ func (m *BinaryItemMutation) OldURL(ctx context.Context) (v string, err error) {
 	return oldValue.URL, nil
 }
 
+// ClearURL clears the value of the "url" field.
+func (m *BinaryItemMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[binaryitem.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *BinaryItemMutation) URLCleared() bool {
+	_, ok := m.clearedFields[binaryitem.FieldURL]
+	return ok
+}
+
 // ResetURL resets all changes to the "url" field.
 func (m *BinaryItemMutation) ResetURL() {
 	m.url = nil
+	delete(m.clearedFields, binaryitem.FieldURL)
+}
+
+// SetTransactionID sets the "transaction" edge to the Transaction entity by id.
+func (m *BinaryItemMutation) SetTransactionID(id uuid.UUID) {
+	m.transaction = &id
+}
+
+// ClearTransaction clears the "transaction" edge to the Transaction entity.
+func (m *BinaryItemMutation) ClearTransaction() {
+	m.clearedtransaction = true
+}
+
+// TransactionCleared returns if the "transaction" edge to the Transaction entity was cleared.
+func (m *BinaryItemMutation) TransactionCleared() bool {
+	return m.clearedtransaction
+}
+
+// TransactionID returns the "transaction" edge ID in the mutation.
+func (m *BinaryItemMutation) TransactionID() (id uuid.UUID, exists bool) {
+	if m.transaction != nil {
+		return *m.transaction, true
+	}
+	return
+}
+
+// TransactionIDs returns the "transaction" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TransactionID instead. It exists only for internal usage by the builders.
+func (m *BinaryItemMutation) TransactionIDs() (ids []uuid.UUID) {
+	if id := m.transaction; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTransaction resets all changes to the "transaction" edge.
+func (m *BinaryItemMutation) ResetTransaction() {
+	m.transaction = nil
+	m.clearedtransaction = false
 }
 
 // Op returns the operation name.
@@ -2683,7 +2751,14 @@ func (m *BinaryItemMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *BinaryItemMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(binaryitem.FieldLength) {
+		fields = append(fields, binaryitem.FieldLength)
+	}
+	if m.FieldCleared(binaryitem.FieldURL) {
+		fields = append(fields, binaryitem.FieldURL)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2696,6 +2771,14 @@ func (m *BinaryItemMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *BinaryItemMutation) ClearField(name string) error {
+	switch name {
+	case binaryitem.FieldLength:
+		m.ClearLength()
+		return nil
+	case binaryitem.FieldURL:
+		m.ClearURL()
+		return nil
+	}
 	return fmt.Errorf("unknown BinaryItem nullable field %s", name)
 }
 
@@ -2721,49 +2804,77 @@ func (m *BinaryItemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BinaryItemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.transaction != nil {
+		edges = append(edges, binaryitem.EdgeTransaction)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *BinaryItemMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case binaryitem.EdgeTransaction:
+		if id := m.transaction; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BinaryItemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *BinaryItemMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BinaryItemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedtransaction {
+		edges = append(edges, binaryitem.EdgeTransaction)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *BinaryItemMutation) EdgeCleared(name string) bool {
+	switch name {
+	case binaryitem.EdgeTransaction:
+		return m.clearedtransaction
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *BinaryItemMutation) ClearEdge(name string) error {
+	switch name {
+	case binaryitem.EdgeTransaction:
+		m.ClearTransaction()
+		return nil
+	}
 	return fmt.Errorf("unknown BinaryItem unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *BinaryItemMutation) ResetEdge(name string) error {
+	switch name {
+	case binaryitem.EdgeTransaction:
+		m.ResetTransaction()
+		return nil
+	}
 	return fmt.Errorf("unknown BinaryItem edge %s", name)
 }
 
@@ -8833,6 +8944,8 @@ type TransactionMutation struct {
 	images                  map[int]struct{}
 	removedimages           map[int]struct{}
 	clearedimages           bool
+	account                 *uuid.UUID
+	clearedaccount          bool
 	done                    bool
 	oldValue                func(context.Context) (*Transaction, error)
 	predicates              []predicate.Transaction
@@ -10389,6 +10502,45 @@ func (m *TransactionMutation) ResetImages() {
 	m.removedimages = nil
 }
 
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *TransactionMutation) SetAccountID(id uuid.UUID) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *TransactionMutation) ClearAccount() {
+	m.clearedaccount = true
+}
+
+// AccountCleared returns if the "account" edge to the Account entity was cleared.
+func (m *TransactionMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *TransactionMutation) AccountID() (id uuid.UUID, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *TransactionMutation) AccountIDs() (ids []uuid.UUID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *TransactionMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
 // Op returns the operation name.
 func (m *TransactionMutation) Op() Op {
 	return m.op
@@ -11171,9 +11323,12 @@ func (m *TransactionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TransactionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.images != nil {
 		edges = append(edges, transaction.EdgeImages)
+	}
+	if m.account != nil {
+		edges = append(edges, transaction.EdgeAccount)
 	}
 	return edges
 }
@@ -11188,13 +11343,17 @@ func (m *TransactionMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case transaction.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TransactionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedimages != nil {
 		edges = append(edges, transaction.EdgeImages)
 	}
@@ -11217,9 +11376,12 @@ func (m *TransactionMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TransactionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedimages {
 		edges = append(edges, transaction.EdgeImages)
+	}
+	if m.clearedaccount {
+		edges = append(edges, transaction.EdgeAccount)
 	}
 	return edges
 }
@@ -11230,6 +11392,8 @@ func (m *TransactionMutation) EdgeCleared(name string) bool {
 	switch name {
 	case transaction.EdgeImages:
 		return m.clearedimages
+	case transaction.EdgeAccount:
+		return m.clearedaccount
 	}
 	return false
 }
@@ -11238,6 +11402,9 @@ func (m *TransactionMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *TransactionMutation) ClearEdge(name string) error {
 	switch name {
+	case transaction.EdgeAccount:
+		m.ClearAccount()
+		return nil
 	}
 	return fmt.Errorf("unknown Transaction unique edge %s", name)
 }
@@ -11248,6 +11415,9 @@ func (m *TransactionMutation) ResetEdge(name string) error {
 	switch name {
 	case transaction.EdgeImages:
 		m.ResetImages()
+		return nil
+	case transaction.EdgeAccount:
+		m.ResetAccount()
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction edge %s", name)

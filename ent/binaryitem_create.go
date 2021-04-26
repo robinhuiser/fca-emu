@@ -9,7 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // BinaryItemCreate is the builder for creating a BinaryItem entity.
@@ -31,6 +33,14 @@ func (bic *BinaryItemCreate) SetLength(i int) *BinaryItemCreate {
 	return bic
 }
 
+// SetNillableLength sets the "length" field if the given value is not nil.
+func (bic *BinaryItemCreate) SetNillableLength(i *int) *BinaryItemCreate {
+	if i != nil {
+		bic.SetLength(*i)
+	}
+	return bic
+}
+
 // SetContent sets the "content" field.
 func (bic *BinaryItemCreate) SetContent(b []byte) *BinaryItemCreate {
 	bic.mutation.SetContent(b)
@@ -41,6 +51,33 @@ func (bic *BinaryItemCreate) SetContent(b []byte) *BinaryItemCreate {
 func (bic *BinaryItemCreate) SetURL(s string) *BinaryItemCreate {
 	bic.mutation.SetURL(s)
 	return bic
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (bic *BinaryItemCreate) SetNillableURL(s *string) *BinaryItemCreate {
+	if s != nil {
+		bic.SetURL(*s)
+	}
+	return bic
+}
+
+// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
+func (bic *BinaryItemCreate) SetTransactionID(id uuid.UUID) *BinaryItemCreate {
+	bic.mutation.SetTransactionID(id)
+	return bic
+}
+
+// SetNillableTransactionID sets the "transaction" edge to the Transaction entity by ID if the given value is not nil.
+func (bic *BinaryItemCreate) SetNillableTransactionID(id *uuid.UUID) *BinaryItemCreate {
+	if id != nil {
+		bic = bic.SetTransactionID(*id)
+	}
+	return bic
+}
+
+// SetTransaction sets the "transaction" edge to the Transaction entity.
+func (bic *BinaryItemCreate) SetTransaction(t *Transaction) *BinaryItemCreate {
+	return bic.SetTransactionID(t.ID)
 }
 
 // Mutation returns the BinaryItemMutation object of the builder.
@@ -102,14 +139,8 @@ func (bic *BinaryItemCreate) check() error {
 			return &ValidationError{Name: "format", err: fmt.Errorf("ent: validator failed for field \"format\": %w", err)}
 		}
 	}
-	if _, ok := bic.mutation.Length(); !ok {
-		return &ValidationError{Name: "length", err: errors.New("ent: missing required field \"length\"")}
-	}
 	if _, ok := bic.mutation.Content(); !ok {
 		return &ValidationError{Name: "content", err: errors.New("ent: missing required field \"content\"")}
-	}
-	if _, ok := bic.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New("ent: missing required field \"url\"")}
 	}
 	return nil
 }
@@ -169,6 +200,26 @@ func (bic *BinaryItemCreate) createSpec() (*BinaryItem, *sqlgraph.CreateSpec) {
 			Column: binaryitem.FieldURL,
 		})
 		_node.URL = value
+	}
+	if nodes := bic.mutation.TransactionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   binaryitem.TransactionTable,
+			Columns: []string{binaryitem.TransactionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.transaction_images = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

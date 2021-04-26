@@ -55,7 +55,6 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 		Query().
 		Where(account.ID(u)).
 		Only(ctx)
-
 	// Error if none or more than one results are returned
 	if err != nil {
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil

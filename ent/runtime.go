@@ -82,6 +82,14 @@ func init() {
 			return nil
 		}
 	}()
+	// transactionDescReversal is the schema descriptor for reversal field.
+	transactionDescReversal := transactionFields[24].Descriptor()
+	// transaction.DefaultReversal holds the default value on creation for the reversal field.
+	transaction.DefaultReversal = transactionDescReversal.Default.(bool)
+	// transactionDescReversed is the schema descriptor for reversed field.
+	transactionDescReversed := transactionFields[26].Descriptor()
+	// transaction.DefaultReversed holds the default value on creation for the reversed field.
+	transaction.DefaultReversed = transactionDescReversed.Default.(bool)
 	// transactionDescID is the schema descriptor for id field.
 	transactionDescID := transactionFields[0].Descriptor()
 	// transaction.DefaultID holds the default value on creation for the id field.

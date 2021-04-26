@@ -585,6 +585,22 @@ func (c *BinaryItemClient) GetX(ctx context.Context, id int) *BinaryItem {
 	return obj
 }
 
+// QueryTransaction queries the transaction edge of a BinaryItem.
+func (c *BinaryItemClient) QueryTransaction(bi *BinaryItem) *TransactionQuery {
+	query := &TransactionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := bi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(binaryitem.Table, binaryitem.FieldID, id),
+			sqlgraph.To(transaction.Table, transaction.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, binaryitem.TransactionTable, binaryitem.TransactionColumn),
+		)
+		fromV = sqlgraph.Neighbors(bi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *BinaryItemClient) Hooks() []Hook {
 	return c.hooks.BinaryItem
@@ -1674,6 +1690,22 @@ func (c *TransactionClient) QueryImages(t *Transaction) *BinaryItemQuery {
 			sqlgraph.From(transaction.Table, transaction.FieldID, id),
 			sqlgraph.To(binaryitem.Table, binaryitem.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, transaction.ImagesTable, transaction.ImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a Transaction.
+func (c *TransactionClient) QueryAccount(t *Transaction) *AccountQuery {
+	query := &AccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(transaction.Table, transaction.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, transaction.AccountTable, transaction.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

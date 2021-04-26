@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -37,13 +38,19 @@ func (BinaryItem) Fields() []ent.Field {
 				}
 				return nil
 			}),
-		field.Int("length"),
+		field.Int("length").
+			Optional(),
 		field.Bytes("content"),
-		field.String("url"),
+		field.String("url").
+			Optional(),
 	}
 }
 
 // Edges of the BinaryItem.
 func (BinaryItem) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("transaction", Transaction.Type).
+			Ref("images").
+			Unique(),
+	}
 }

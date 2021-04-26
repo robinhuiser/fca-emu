@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
@@ -83,9 +84,11 @@ type Transaction struct {
 type TransactionEdges struct {
 	// Images holds the value of the images edge.
 	Images []*BinaryItem `json:"images,omitempty"`
+	// Account holds the value of the account edge.
+	Account *Account `json:"account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ImagesOrErr returns the Images value or an error if the edge
@@ -95,6 +98,20 @@ func (e TransactionEdges) ImagesOrErr() ([]*BinaryItem, error) {
 		return e.Images, nil
 	}
 	return nil, &NotLoadedError{edge: "images"}
+}
+
+// AccountOrErr returns the Account value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TransactionEdges) AccountOrErr() (*Account, error) {
+	if e.loadedTypes[1] {
+		if e.Account == nil {
+			// The edge account was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: account.Label}
+		}
+		return e.Account, nil
+	}
+	return nil, &NotLoadedError{edge: "account"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -319,6 +336,11 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 // QueryImages queries the "images" edge of the Transaction entity.
 func (t *Transaction) QueryImages() *BinaryItemQuery {
 	return (&TransactionClient{config: t.config}).QueryImages(t)
+}
+
+// QueryAccount queries the "account" edge of the Transaction entity.
+func (t *Transaction) QueryAccount() *AccountQuery {
+	return (&TransactionClient{config: t.config}).QueryAccount(t)
 }
 
 // Update returns a builder for updating this Transaction.

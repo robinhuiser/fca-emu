@@ -71,6 +71,8 @@ const (
 	FieldURL = "url"
 	// EdgeImages holds the string denoting the images edge name in mutations.
 	EdgeImages = "images"
+	// EdgeAccount holds the string denoting the account edge name in mutations.
+	EdgeAccount = "account"
 	// Table holds the table name of the transaction in the database.
 	Table = "transactions"
 	// ImagesTable is the table the holds the images relation/edge.
@@ -80,6 +82,13 @@ const (
 	ImagesInverseTable = "binary_items"
 	// ImagesColumn is the table column denoting the images relation/edge.
 	ImagesColumn = "transaction_images"
+	// AccountTable is the table the holds the account relation/edge.
+	AccountTable = "transactions"
+	// AccountInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountInverseTable = "accounts"
+	// AccountColumn is the table column denoting the account relation/edge.
+	AccountColumn = "account_transactions"
 )
 
 // Columns holds all SQL columns for transaction fields.
@@ -141,6 +150,10 @@ var (
 	ExecutedCurrencyCodeValidator func(string) error
 	// OriginatingCurrencyCodeValidator is a validator for the "originatingCurrencyCode" field. It is called by the builders before save.
 	OriginatingCurrencyCodeValidator func(string) error
+	// DefaultReversal holds the default value on creation for the "reversal" field.
+	DefaultReversal bool
+	// DefaultReversed holds the default value on creation for the "reversed" field.
+	DefaultReversed bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

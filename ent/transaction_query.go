@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
@@ -27,8 +28,9 @@ type TransactionQuery struct {
 	fields     []string
 	predicates []predicate.Transaction
 	// eager-loading edges.
-	withImages *BinaryItemQuery
-	withFKs    bool
+	withImages  *BinaryItemQuery
+	withAccount *AccountQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -73,6 +75,28 @@ func (tq *TransactionQuery) QueryImages() *BinaryItemQuery {
 			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
 			sqlgraph.To(binaryitem.Table, binaryitem.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, transaction.ImagesTable, transaction.ImagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAccount chains the current query on the "account" edge.
+func (tq *TransactionQuery) QueryAccount() *AccountQuery {
+	query := &AccountQuery{config: tq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, transaction.AccountTable, transaction.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -256,12 +280,13 @@ func (tq *TransactionQuery) Clone() *TransactionQuery {
 		return nil
 	}
 	return &TransactionQuery{
-		config:     tq.config,
-		limit:      tq.limit,
-		offset:     tq.offset,
-		order:      append([]OrderFunc{}, tq.order...),
-		predicates: append([]predicate.Transaction{}, tq.predicates...),
-		withImages: tq.withImages.Clone(),
+		config:      tq.config,
+		limit:       tq.limit,
+		offset:      tq.offset,
+		order:       append([]OrderFunc{}, tq.order...),
+		predicates:  append([]predicate.Transaction{}, tq.predicates...),
+		withImages:  tq.withImages.Clone(),
+		withAccount: tq.withAccount.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -276,6 +301,17 @@ func (tq *TransactionQuery) WithImages(opts ...func(*BinaryItemQuery)) *Transact
 		opt(query)
 	}
 	tq.withImages = query
+	return tq
+}
+
+// WithAccount tells the query-builder to eager-load the nodes that are connected to
+// the "account" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TransactionQuery) WithAccount(opts ...func(*AccountQuery)) *TransactionQuery {
+	query := &AccountQuery{config: tq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withAccount = query
 	return tq
 }
 
@@ -345,10 +381,14 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) 
 		nodes       = []*Transaction{}
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			tq.withImages != nil,
+			tq.withAccount != nil,
 		}
 	)
+	if tq.withAccount != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, transaction.ForeignKeys...)
 	}
@@ -398,6 +438,32 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) 
 				return nil, fmt.Errorf(`unexpected foreign-key "transaction_images" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Images = append(node.Edges.Images, n)
+		}
+	}
+
+	if query := tq.withAccount; query != nil {
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Transaction)
+		for i := range nodes {
+			fk := nodes[i].account_transactions
+			if fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(account.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_transactions" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Account = n
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/divan/num2words"
@@ -18,9 +19,15 @@ import (
 //go:embed imgs/bank-of-pi-logo.png
 var logo embed.FS
 
-func renderCheck(f *gofakeit.Faker, fullname string, street string, city string, pc string, amount float64, designated string, memo string) (bytes.Buffer, error) {
+func renderCheckAsPDF(f *gofakeit.Faker, createdDate time.Time, fullname string, street string, city string, pc string, state string, amount float64, designated string, memo string) (bytes.Buffer, string, error) {
 	m := pdf.NewMaroto(consts.Landscape, consts.A3)
 	l, _ := logo.ReadFile("imgs/bank-of-pi-logo.png")
+	checkNumber := strconv.Itoa(f.Number(100000000, 999999999)) +
+		strconv.Itoa(f.Number(100000000, 999999999)) +
+		strconv.Itoa(f.Number(1000, 9999))
+
+	// Check was written 5 days before the transaction was created
+	checkDate := createdDate.AddDate(0, 0, -5)
 
 	// Title row
 	m.Row(60, func() {
@@ -58,7 +65,7 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 				Size: 15,
 				Top:  10,
 			})
-			m.Text(city+" "+pc, props.Text{
+			m.Text(city+", "+state+" "+pc, props.Text{
 				Size: 15,
 				Top:  16,
 			})
@@ -75,7 +82,7 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 		})
 
 		m.Col(2, func() {
-			m.Text(" 07/01/2018", props.Text{
+			m.Text(checkDate.Format("02/01/2006"), props.Text{
 				Size:   25,
 				Top:    6,
 				Family: consts.Courier,
@@ -100,8 +107,8 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 			})
 		})
 		m.ColSpace(1)
-		m.Col(4, func() {
-			m.Text(designated, props.Text{
+		m.Col(6, func() {
+			m.Text(cutOffString(36, designated), props.Text{
 				Size:   25,
 				Top:    4,
 				Family: consts.Courier,
@@ -111,7 +118,6 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 				Top:  12,
 			})
 		})
-		m.ColSpace(2)
 		m.Col(1, func() {
 			m.Text("$", props.Text{
 				Size:  25,
@@ -120,7 +126,7 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 			})
 		})
 		m.Col(2, func() {
-			m.Text(fmt.Sprintf("  %.2f", amount), props.Text{
+			m.Text(fmt.Sprintf("  %.2f", math.Abs(amount)), props.Text{
 				Size:   25,
 				Top:    4,
 				Family: consts.Courier,
@@ -137,7 +143,7 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 	// Amount in words
 	m.Row(40, func() {
 		m.ColSpace(1)
-		ipart, decpart := math.Modf(amount)
+		ipart, decpart := math.Modf(math.Abs(amount))
 		c := 0
 
 		cnts := "cents"
@@ -182,7 +188,7 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 			})
 		})
 		m.Col(4, func() {
-			m.Text(memo, props.Text{
+			m.Text(cutOffString(24, memo), props.Text{
 				Size:   25,
 				Top:    4,
 				Family: consts.Courier,
@@ -218,14 +224,11 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 	// Barcode
 	m.Row(50, func() {
 		m.Col(12, func() {
-			code := strconv.Itoa(f.Number(100000000, 999999999)) +
-				"\t\t\t" + strconv.Itoa(f.Number(100000000, 999999999)) +
-				"\t\t\t" + strconv.Itoa(f.Number(1000, 9999))
-			_ = m.Barcode(code, props.Barcode{
+			_ = m.Barcode(checkNumber, props.Barcode{
 				Center:  true,
 				Percent: 40,
 			})
-			m.Text(code, props.Text{
+			m.Text(checkNumber, props.Text{
 				Size:   17,
 				Align:  consts.Center,
 				Family: consts.Courier,
@@ -236,7 +239,14 @@ func renderCheck(f *gofakeit.Faker, fullname string, street string, city string,
 
 	r, err := m.Output()
 	if err != nil {
-		return bytes.Buffer{}, fmt.Errorf("failed to serialize: %w", err)
+		return bytes.Buffer{}, "", fmt.Errorf("failed to serialize: %w", err)
 	}
-	return r, nil
+	return r, checkNumber, nil
+}
+
+func cutOffString(l int, s string) string {
+	if len(s) > l {
+		return s[0:(l-3)] + "..."
+	}
+	return s
 }

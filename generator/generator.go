@@ -65,14 +65,13 @@ func Generate(ents int, branches int, c *ent.Client) error {
 				if err != nil {
 					return err
 				}
-				log.Printf("  > added account with Id %s", a.ID)
 
 				// Generate for each account x number of transactions
-				// t, err := populateRandomTransactions(context.Background(), c, f, a)
-				// if err != nil {
-				// 	return err
-				// }
-				// log.Printf("    > generated %d transacions", len(t))
+				t, err := populateRandomTransactions(context.Background(), c, f, a)
+				if err != nil {
+					return err
+				}
+				log.Printf("  > added account (%s) with Id %s - %d transactions", a.Type, a.ID, len(t))
 			}
 		}
 	}

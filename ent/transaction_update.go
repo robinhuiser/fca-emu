@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
@@ -459,6 +461,14 @@ func (tu *TransactionUpdate) SetReversal(b bool) *TransactionUpdate {
 	return tu
 }
 
+// SetNillableReversal sets the "reversal" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableReversal(b *bool) *TransactionUpdate {
+	if b != nil {
+		tu.SetReversal(*b)
+	}
+	return tu
+}
+
 // SetReversalFor sets the "reversalFor" field.
 func (tu *TransactionUpdate) SetReversalFor(s string) *TransactionUpdate {
 	tu.mutation.SetReversalFor(s)
@@ -482,6 +492,14 @@ func (tu *TransactionUpdate) ClearReversalFor() *TransactionUpdate {
 // SetReversed sets the "reversed" field.
 func (tu *TransactionUpdate) SetReversed(b bool) *TransactionUpdate {
 	tu.mutation.SetReversed(b)
+	return tu
+}
+
+// SetNillableReversed sets the "reversed" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableReversed(b *bool) *TransactionUpdate {
+	if b != nil {
+		tu.SetReversed(*b)
+	}
 	return tu
 }
 
@@ -540,6 +558,25 @@ func (tu *TransactionUpdate) AddImages(b ...*BinaryItem) *TransactionUpdate {
 	return tu.AddImageIDs(ids...)
 }
 
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (tu *TransactionUpdate) SetAccountID(id uuid.UUID) *TransactionUpdate {
+	tu.mutation.SetAccountID(id)
+	return tu
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableAccountID(id *uuid.UUID) *TransactionUpdate {
+	if id != nil {
+		tu = tu.SetAccountID(*id)
+	}
+	return tu
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (tu *TransactionUpdate) SetAccount(a *Account) *TransactionUpdate {
+	return tu.SetAccountID(a.ID)
+}
+
 // Mutation returns the TransactionMutation object of the builder.
 func (tu *TransactionUpdate) Mutation() *TransactionMutation {
 	return tu.mutation
@@ -564,6 +601,12 @@ func (tu *TransactionUpdate) RemoveImages(b ...*BinaryItem) *TransactionUpdate {
 		ids[i] = b[i].ID
 	}
 	return tu.RemoveImageIDs(ids...)
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (tu *TransactionUpdate) ClearAccount() *TransactionUpdate {
+	tu.mutation.ClearAccount()
+	return tu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1085,6 +1128,41 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.AccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   transaction.AccountTable,
+			Columns: []string{transaction.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   transaction.AccountTable,
+			Columns: []string{transaction.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{transaction.Label}
@@ -1534,6 +1612,14 @@ func (tuo *TransactionUpdateOne) SetReversal(b bool) *TransactionUpdateOne {
 	return tuo
 }
 
+// SetNillableReversal sets the "reversal" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableReversal(b *bool) *TransactionUpdateOne {
+	if b != nil {
+		tuo.SetReversal(*b)
+	}
+	return tuo
+}
+
 // SetReversalFor sets the "reversalFor" field.
 func (tuo *TransactionUpdateOne) SetReversalFor(s string) *TransactionUpdateOne {
 	tuo.mutation.SetReversalFor(s)
@@ -1557,6 +1643,14 @@ func (tuo *TransactionUpdateOne) ClearReversalFor() *TransactionUpdateOne {
 // SetReversed sets the "reversed" field.
 func (tuo *TransactionUpdateOne) SetReversed(b bool) *TransactionUpdateOne {
 	tuo.mutation.SetReversed(b)
+	return tuo
+}
+
+// SetNillableReversed sets the "reversed" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableReversed(b *bool) *TransactionUpdateOne {
+	if b != nil {
+		tuo.SetReversed(*b)
+	}
 	return tuo
 }
 
@@ -1615,6 +1709,25 @@ func (tuo *TransactionUpdateOne) AddImages(b ...*BinaryItem) *TransactionUpdateO
 	return tuo.AddImageIDs(ids...)
 }
 
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (tuo *TransactionUpdateOne) SetAccountID(id uuid.UUID) *TransactionUpdateOne {
+	tuo.mutation.SetAccountID(id)
+	return tuo
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableAccountID(id *uuid.UUID) *TransactionUpdateOne {
+	if id != nil {
+		tuo = tuo.SetAccountID(*id)
+	}
+	return tuo
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (tuo *TransactionUpdateOne) SetAccount(a *Account) *TransactionUpdateOne {
+	return tuo.SetAccountID(a.ID)
+}
+
 // Mutation returns the TransactionMutation object of the builder.
 func (tuo *TransactionUpdateOne) Mutation() *TransactionMutation {
 	return tuo.mutation
@@ -1639,6 +1752,12 @@ func (tuo *TransactionUpdateOne) RemoveImages(b ...*BinaryItem) *TransactionUpda
 		ids[i] = b[i].ID
 	}
 	return tuo.RemoveImageIDs(ids...)
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (tuo *TransactionUpdateOne) ClearAccount() *TransactionUpdateOne {
+	tuo.mutation.ClearAccount()
+	return tuo
 }
 
 // Save executes the query and returns the updated Transaction entity.
@@ -2157,6 +2276,41 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: binaryitem.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.AccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   transaction.AccountTable,
+			Columns: []string{transaction.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   transaction.AccountTable,
+			Columns: []string{transaction.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
 				},
 			},
 		}

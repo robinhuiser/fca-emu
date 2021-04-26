@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
@@ -302,6 +303,14 @@ func (tc *TransactionCreate) SetReversal(b bool) *TransactionCreate {
 	return tc
 }
 
+// SetNillableReversal sets the "reversal" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableReversal(b *bool) *TransactionCreate {
+	if b != nil {
+		tc.SetReversal(*b)
+	}
+	return tc
+}
+
 // SetReversalFor sets the "reversalFor" field.
 func (tc *TransactionCreate) SetReversalFor(s string) *TransactionCreate {
 	tc.mutation.SetReversalFor(s)
@@ -319,6 +328,14 @@ func (tc *TransactionCreate) SetNillableReversalFor(s *string) *TransactionCreat
 // SetReversed sets the "reversed" field.
 func (tc *TransactionCreate) SetReversed(b bool) *TransactionCreate {
 	tc.mutation.SetReversed(b)
+	return tc
+}
+
+// SetNillableReversed sets the "reversed" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableReversed(b *bool) *TransactionCreate {
+	if b != nil {
+		tc.SetReversed(*b)
+	}
 	return tc
 }
 
@@ -369,6 +386,25 @@ func (tc *TransactionCreate) AddImages(b ...*BinaryItem) *TransactionCreate {
 		ids[i] = b[i].ID
 	}
 	return tc.AddImageIDs(ids...)
+}
+
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (tc *TransactionCreate) SetAccountID(id uuid.UUID) *TransactionCreate {
+	tc.mutation.SetAccountID(id)
+	return tc
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (tc *TransactionCreate) SetNillableAccountID(id *uuid.UUID) *TransactionCreate {
+	if id != nil {
+		tc = tc.SetAccountID(*id)
+	}
+	return tc
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (tc *TransactionCreate) SetAccount(a *Account) *TransactionCreate {
+	return tc.SetAccountID(a.ID)
 }
 
 // Mutation returns the TransactionMutation object of the builder.
@@ -423,6 +459,14 @@ func (tc *TransactionCreate) SaveX(ctx context.Context) *Transaction {
 
 // defaults sets the default values of the builder before save.
 func (tc *TransactionCreate) defaults() {
+	if _, ok := tc.mutation.Reversal(); !ok {
+		v := transaction.DefaultReversal
+		tc.mutation.SetReversal(v)
+	}
+	if _, ok := tc.mutation.Reversed(); !ok {
+		v := transaction.DefaultReversed
+		tc.mutation.SetReversed(v)
+	}
 	if _, ok := tc.mutation.ID(); !ok {
 		v := transaction.DefaultID()
 		tc.mutation.SetID(v)
@@ -745,6 +789,26 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   transaction.AccountTable,
+			Columns: []string{transaction.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.account_transactions = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

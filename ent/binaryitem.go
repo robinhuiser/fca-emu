@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // BinaryItem is the model entity for the BinaryItem schema.
@@ -23,8 +24,34 @@ type BinaryItem struct {
 	// Content holds the value of the "content" field.
 	Content []byte `json:"content,omitempty"`
 	// URL holds the value of the "url" field.
-	URL                string `json:"url,omitempty"`
+	URL string `json:"url,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the BinaryItemQuery when eager-loading is set.
+	Edges              BinaryItemEdges `json:"edges"`
 	transaction_images *uuid.UUID
+}
+
+// BinaryItemEdges holds the relations/edges for other nodes in the graph.
+type BinaryItemEdges struct {
+	// Transaction holds the value of the transaction edge.
+	Transaction *Transaction `json:"transaction,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// TransactionOrErr returns the Transaction value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e BinaryItemEdges) TransactionOrErr() (*Transaction, error) {
+	if e.loadedTypes[0] {
+		if e.Transaction == nil {
+			// The edge transaction was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: transaction.Label}
+		}
+		return e.Transaction, nil
+	}
+	return nil, &NotLoadedError{edge: "transaction"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,6 +121,11 @@ func (bi *BinaryItem) assignValues(columns []string, values []interface{}) error
 		}
 	}
 	return nil
+}
+
+// QueryTransaction queries the "transaction" edge of the BinaryItem entity.
+func (bi *BinaryItem) QueryTransaction() *TransactionQuery {
+	return (&BinaryItemClient{config: bi.config}).QueryTransaction(bi)
 }
 
 // Update returns a builder for updating this BinaryItem.

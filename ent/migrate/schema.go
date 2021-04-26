@@ -69,9 +69,9 @@ var (
 	BinaryItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "format", Type: field.TypeString},
-		{Name: "length", Type: field.TypeInt},
+		{Name: "length", Type: field.TypeInt, Nullable: true},
 		{Name: "content", Type: field.TypeBytes},
-		{Name: "url", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "transaction_images", Type: field.TypeUUID, Nullable: true},
 	}
 	// BinaryItemsTable holds the schema information for the "binary_items" table.
@@ -341,9 +341,9 @@ var (
 		{Name: "latitude", Type: field.TypeFloat64, Nullable: true},
 		{Name: "longitude", Type: field.TypeFloat64, Nullable: true},
 		{Name: "merchant_code", Type: field.TypeString, Nullable: true},
-		{Name: "reversal", Type: field.TypeBool},
+		{Name: "reversal", Type: field.TypeBool, Default: false},
 		{Name: "reversal_for", Type: field.TypeString, Nullable: true},
-		{Name: "reversed", Type: field.TypeBool},
+		{Name: "reversed", Type: field.TypeBool, Default: false},
 		{Name: "reversed_by", Type: field.TypeString, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "account_transactions", Type: field.TypeUUID, Nullable: true},

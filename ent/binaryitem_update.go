@@ -9,8 +9,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // BinaryItemUpdate is the builder for updating BinaryItem entities.
@@ -39,9 +41,23 @@ func (biu *BinaryItemUpdate) SetLength(i int) *BinaryItemUpdate {
 	return biu
 }
 
+// SetNillableLength sets the "length" field if the given value is not nil.
+func (biu *BinaryItemUpdate) SetNillableLength(i *int) *BinaryItemUpdate {
+	if i != nil {
+		biu.SetLength(*i)
+	}
+	return biu
+}
+
 // AddLength adds i to the "length" field.
 func (biu *BinaryItemUpdate) AddLength(i int) *BinaryItemUpdate {
 	biu.mutation.AddLength(i)
+	return biu
+}
+
+// ClearLength clears the value of the "length" field.
+func (biu *BinaryItemUpdate) ClearLength() *BinaryItemUpdate {
+	biu.mutation.ClearLength()
 	return biu
 }
 
@@ -57,9 +73,48 @@ func (biu *BinaryItemUpdate) SetURL(s string) *BinaryItemUpdate {
 	return biu
 }
 
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (biu *BinaryItemUpdate) SetNillableURL(s *string) *BinaryItemUpdate {
+	if s != nil {
+		biu.SetURL(*s)
+	}
+	return biu
+}
+
+// ClearURL clears the value of the "url" field.
+func (biu *BinaryItemUpdate) ClearURL() *BinaryItemUpdate {
+	biu.mutation.ClearURL()
+	return biu
+}
+
+// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
+func (biu *BinaryItemUpdate) SetTransactionID(id uuid.UUID) *BinaryItemUpdate {
+	biu.mutation.SetTransactionID(id)
+	return biu
+}
+
+// SetNillableTransactionID sets the "transaction" edge to the Transaction entity by ID if the given value is not nil.
+func (biu *BinaryItemUpdate) SetNillableTransactionID(id *uuid.UUID) *BinaryItemUpdate {
+	if id != nil {
+		biu = biu.SetTransactionID(*id)
+	}
+	return biu
+}
+
+// SetTransaction sets the "transaction" edge to the Transaction entity.
+func (biu *BinaryItemUpdate) SetTransaction(t *Transaction) *BinaryItemUpdate {
+	return biu.SetTransactionID(t.ID)
+}
+
 // Mutation returns the BinaryItemMutation object of the builder.
 func (biu *BinaryItemUpdate) Mutation() *BinaryItemMutation {
 	return biu.mutation
+}
+
+// ClearTransaction clears the "transaction" edge to the Transaction entity.
+func (biu *BinaryItemUpdate) ClearTransaction() *BinaryItemUpdate {
+	biu.mutation.ClearTransaction()
+	return biu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -168,6 +223,12 @@ func (biu *BinaryItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: binaryitem.FieldLength,
 		})
 	}
+	if biu.mutation.LengthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: binaryitem.FieldLength,
+		})
+	}
 	if value, ok := biu.mutation.Content(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBytes,
@@ -181,6 +242,47 @@ func (biu *BinaryItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Value:  value,
 			Column: binaryitem.FieldURL,
 		})
+	}
+	if biu.mutation.URLCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: binaryitem.FieldURL,
+		})
+	}
+	if biu.mutation.TransactionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   binaryitem.TransactionTable,
+			Columns: []string{binaryitem.TransactionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biu.mutation.TransactionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   binaryitem.TransactionTable,
+			Columns: []string{binaryitem.TransactionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, biu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -213,9 +315,23 @@ func (biuo *BinaryItemUpdateOne) SetLength(i int) *BinaryItemUpdateOne {
 	return biuo
 }
 
+// SetNillableLength sets the "length" field if the given value is not nil.
+func (biuo *BinaryItemUpdateOne) SetNillableLength(i *int) *BinaryItemUpdateOne {
+	if i != nil {
+		biuo.SetLength(*i)
+	}
+	return biuo
+}
+
 // AddLength adds i to the "length" field.
 func (biuo *BinaryItemUpdateOne) AddLength(i int) *BinaryItemUpdateOne {
 	biuo.mutation.AddLength(i)
+	return biuo
+}
+
+// ClearLength clears the value of the "length" field.
+func (biuo *BinaryItemUpdateOne) ClearLength() *BinaryItemUpdateOne {
+	biuo.mutation.ClearLength()
 	return biuo
 }
 
@@ -231,9 +347,48 @@ func (biuo *BinaryItemUpdateOne) SetURL(s string) *BinaryItemUpdateOne {
 	return biuo
 }
 
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (biuo *BinaryItemUpdateOne) SetNillableURL(s *string) *BinaryItemUpdateOne {
+	if s != nil {
+		biuo.SetURL(*s)
+	}
+	return biuo
+}
+
+// ClearURL clears the value of the "url" field.
+func (biuo *BinaryItemUpdateOne) ClearURL() *BinaryItemUpdateOne {
+	biuo.mutation.ClearURL()
+	return biuo
+}
+
+// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
+func (biuo *BinaryItemUpdateOne) SetTransactionID(id uuid.UUID) *BinaryItemUpdateOne {
+	biuo.mutation.SetTransactionID(id)
+	return biuo
+}
+
+// SetNillableTransactionID sets the "transaction" edge to the Transaction entity by ID if the given value is not nil.
+func (biuo *BinaryItemUpdateOne) SetNillableTransactionID(id *uuid.UUID) *BinaryItemUpdateOne {
+	if id != nil {
+		biuo = biuo.SetTransactionID(*id)
+	}
+	return biuo
+}
+
+// SetTransaction sets the "transaction" edge to the Transaction entity.
+func (biuo *BinaryItemUpdateOne) SetTransaction(t *Transaction) *BinaryItemUpdateOne {
+	return biuo.SetTransactionID(t.ID)
+}
+
 // Mutation returns the BinaryItemMutation object of the builder.
 func (biuo *BinaryItemUpdateOne) Mutation() *BinaryItemMutation {
 	return biuo.mutation
+}
+
+// ClearTransaction clears the "transaction" edge to the Transaction entity.
+func (biuo *BinaryItemUpdateOne) ClearTransaction() *BinaryItemUpdateOne {
+	biuo.mutation.ClearTransaction()
+	return biuo
 }
 
 // Save executes the query and returns the updated BinaryItem entity.
@@ -347,6 +502,12 @@ func (biuo *BinaryItemUpdateOne) sqlSave(ctx context.Context) (_node *BinaryItem
 			Column: binaryitem.FieldLength,
 		})
 	}
+	if biuo.mutation.LengthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: binaryitem.FieldLength,
+		})
+	}
 	if value, ok := biuo.mutation.Content(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBytes,
@@ -360,6 +521,47 @@ func (biuo *BinaryItemUpdateOne) sqlSave(ctx context.Context) (_node *BinaryItem
 			Value:  value,
 			Column: binaryitem.FieldURL,
 		})
+	}
+	if biuo.mutation.URLCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: binaryitem.FieldURL,
+		})
+	}
+	if biuo.mutation.TransactionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   binaryitem.TransactionTable,
+			Columns: []string{binaryitem.TransactionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biuo.mutation.TransactionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   binaryitem.TransactionTable,
+			Columns: []string{binaryitem.TransactionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &BinaryItem{config: biuo.config}
 	_spec.Assign = _node.assignValues

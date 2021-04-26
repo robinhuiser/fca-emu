@@ -63,10 +63,12 @@ func (Transaction) Fields() []ent.Field {
 			Optional(),
 		field.String("merchantCode").
 			Optional(),
-		field.Bool("reversal"),
+		field.Bool("reversal").
+			Default(false),
 		field.String("reversalFor").
 			Optional(),
-		field.Bool("reversed"),
+		field.Bool("reversed").
+			Default(false),
 		field.String("reversedBy").
 			Optional(),
 		field.String("url").
@@ -78,5 +80,8 @@ func (Transaction) Fields() []ent.Field {
 func (Transaction) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("images", BinaryItem.Type),
+		edge.From("account", Account.Type).
+			Ref("transactions").
+			Unique(),
 	}
 }

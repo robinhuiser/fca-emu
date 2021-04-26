@@ -12,8 +12,16 @@ package finite
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/util"
 )
 
 // TransactionsApiService is a service that implents the logic for the TransactionsApiServicer
@@ -29,23 +37,6 @@ func NewTransactionsApiService() TransactionsApiServicer {
 
 // GetAccountTransaction - Return a given accounts transaction
 func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, accountId string, transactionId string, mask bool, inline bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountTransaction with the required logic for this service method.
-	// Add api_transactions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, Transaction{}) or use other options such as http.Ok ...
-	//return Response(200, Transaction{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountTransaction method not implemented")
 }
@@ -98,25 +89,61 @@ func (s *TransactionsApiService) GetAccountTransactionImages(ctx context.Context
 
 // GetAccountTransactions - Return a accounts transactions
 func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, accountId string, mask bool, startDateTime string, endDateTime string, reversedInRunning bool, limit int32, cursor string, status TransactionStatus, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountTransactions with the required logic for this service method.
-	// Add api_transactions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, TransactionsList{}) or use other options such as http.Ok ...
-	//return Response(200, TransactionsList{}), nil
+	// Parse and verify UUID
+	u, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Parse limit
+	maxresults := parseLimit(limit)
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Parse cursor
+	offset, err := parseCursor(cursor)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	// Lookup the account
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(u)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	// Retrieve the transactions
+	trs, err := rs.QueryTransactions().Offset(offset).Limit(maxresults).All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	if len(trs) == 0 {
+		return Response(404, setErrorResponse("No (more) transactions found")), nil
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountTransactions method not implemented")
+	transactions := []Transaction{}
+	for _, tr := range trs {
+		tran, err := mapTransaction(rs, tr, mask, enhance, offset, maxresults, ctx)
+		if err != nil {
+			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		}
+		transactions = append(transactions, tran)
+	}
+
+	t := TransactionsList{
+		Status:       true,
+		TotalItems:   int32(len(trs)),
+		NextCursor:   base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(len(trs) + offset))),
+		Transactions: transactions,
+	}
+
+	return Response(200, t), nil
 }
 
 // SearchTransactions - Search for transactions
@@ -137,4 +164,82 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit i
 	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchTransactions method not implemented")
+}
+
+func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, offset int, rssize int, ctx context.Context) (Transaction, error) {
+
+	// Get the entity related to the account
+	e, err := acct.QueryOwners().Only(ctx)
+	if err != nil {
+		return Transaction{}, fmt.Errorf("%v", err)
+	}
+
+	// Get  the checks related to the transaction
+	imgs, err := tr.QueryImages().All(ctx)
+	if err != nil {
+		return Transaction{}, fmt.Errorf("%v", err)
+	}
+
+	imageList := BinaryItemList{}
+	images := []BinaryItem{}
+
+	if len(imgs) > 0 {
+		for _, img := range imgs {
+			i := BinaryItem{
+				Format: img.Format,
+				Length: int32(img.Length),
+				ItemId: strconv.Itoa(img.ID),
+				URI: FiniteUri{
+					URL: img.URL,
+				},
+				Content: string(img.Content),
+			}
+			images = append(images, i)
+		}
+		imageList = BinaryItemList{
+			Status:     true,
+			Binaries:   images,
+			TotalItems: int32(len(imgs)),
+		}
+	}
+
+	t := Transaction{
+		EntityId:                e.ID.String(),
+		AccountId:               acct.ID.String(),
+		Id:                      tr.ID.String(),
+		SequenceInDay:           int32(tr.SequenceInDay),
+		Status:                  TransactionStatus(tr.Status),
+		ExecutedAmount:          float32(tr.ExecutedAmount),
+		ExecutedCurrencyCode:    tr.ExecutedCurrencyCode,
+		ExchangeRate:            float32(tr.ExchangeRate),
+		OriginatingAmount:       float32(tr.OriginatingAmount),
+		OriginatingCurrencyCode: tr.OriginatingCurrencyCode,
+		Direction:               tr.Direction.String(),
+		RunningBalance:          float32(tr.RunningBalance),
+		CreatedDate:             isValidBankDate(tr.CreatedDate.Format(util.APIDateFormat)),
+		ExecutedDate:            isValidBankDate(tr.ExecutedDate.Format(util.APIDateFormat)),
+		PostedDate:              isValidBankDate(tr.PostedDate.Format(util.APIDateFormat)),
+		UpdatedDate:             isValidBankDate(tr.UpdatedDate.Format(util.APIDateFormat)),
+		Description:             tr.Description,
+		Memo:                    isEnhanced(en, tr.Memo),
+		Group:                   isEnhanced(en, tr.Group),
+		Type:                    isEnhanced(en, tr.Type),
+		MainCategory:            isEnhanced(en, tr.MainCategory),
+		SubCategory:             isEnhanced(en, tr.SubCategory),
+		CheckNumber:             tr.CheckNumber,
+		Images:                  imageList,
+		Latitude:                isEnhanced(en, fmt.Sprintf("%f", tr.Latitude)),
+		Longitude:               isEnhanced(en, fmt.Sprintf("%f", tr.Longitude)),
+		MerchantCode:            isEnhanced(en, tr.MerchantCode),
+		Reversal:                tr.Reversal,
+		ReversalFor:             tr.ReversalFor,
+		Reversed:                tr.Reversed,
+		ReversedBy:              tr.ReversedBy,
+		Transactor:              Transactor{},
+		URI: FiniteUri{
+			URL: tr.URL,
+		},
+	}
+
+	return t, nil
 }

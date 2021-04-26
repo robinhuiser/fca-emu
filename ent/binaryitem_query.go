@@ -11,8 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
 // BinaryItemQuery is the builder for querying BinaryItem entities.
@@ -23,7 +25,9 @@ type BinaryItemQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.BinaryItem
-	withFKs    bool
+	// eager-loading edges.
+	withTransaction *TransactionQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -51,6 +55,28 @@ func (biq *BinaryItemQuery) Offset(offset int) *BinaryItemQuery {
 func (biq *BinaryItemQuery) Order(o ...OrderFunc) *BinaryItemQuery {
 	biq.order = append(biq.order, o...)
 	return biq
+}
+
+// QueryTransaction chains the current query on the "transaction" edge.
+func (biq *BinaryItemQuery) QueryTransaction() *TransactionQuery {
+	query := &TransactionQuery{config: biq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := biq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := biq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(binaryitem.Table, binaryitem.FieldID, selector),
+			sqlgraph.To(transaction.Table, transaction.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, binaryitem.TransactionTable, binaryitem.TransactionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(biq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first BinaryItem entity from the query.
@@ -229,15 +255,27 @@ func (biq *BinaryItemQuery) Clone() *BinaryItemQuery {
 		return nil
 	}
 	return &BinaryItemQuery{
-		config:     biq.config,
-		limit:      biq.limit,
-		offset:     biq.offset,
-		order:      append([]OrderFunc{}, biq.order...),
-		predicates: append([]predicate.BinaryItem{}, biq.predicates...),
+		config:          biq.config,
+		limit:           biq.limit,
+		offset:          biq.offset,
+		order:           append([]OrderFunc{}, biq.order...),
+		predicates:      append([]predicate.BinaryItem{}, biq.predicates...),
+		withTransaction: biq.withTransaction.Clone(),
 		// clone intermediate query.
 		sql:  biq.sql.Clone(),
 		path: biq.path,
 	}
+}
+
+// WithTransaction tells the query-builder to eager-load the nodes that are connected to
+// the "transaction" edge. The optional arguments are used to configure the query builder of the edge.
+func (biq *BinaryItemQuery) WithTransaction(opts ...func(*TransactionQuery)) *BinaryItemQuery {
+	query := &TransactionQuery{config: biq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	biq.withTransaction = query
+	return biq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -303,10 +341,16 @@ func (biq *BinaryItemQuery) prepareQuery(ctx context.Context) error {
 
 func (biq *BinaryItemQuery) sqlAll(ctx context.Context) ([]*BinaryItem, error) {
 	var (
-		nodes   = []*BinaryItem{}
-		withFKs = biq.withFKs
-		_spec   = biq.querySpec()
+		nodes       = []*BinaryItem{}
+		withFKs     = biq.withFKs
+		_spec       = biq.querySpec()
+		loadedTypes = [1]bool{
+			biq.withTransaction != nil,
+		}
 	)
+	if biq.withTransaction != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, binaryitem.ForeignKeys...)
 	}
@@ -320,6 +364,7 @@ func (biq *BinaryItemQuery) sqlAll(ctx context.Context) ([]*BinaryItem, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, biq.driver, _spec); err != nil {
@@ -328,6 +373,33 @@ func (biq *BinaryItemQuery) sqlAll(ctx context.Context) ([]*BinaryItem, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := biq.withTransaction; query != nil {
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*BinaryItem)
+		for i := range nodes {
+			fk := nodes[i].transaction_images
+			if fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(transaction.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "transaction_images" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Transaction = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 

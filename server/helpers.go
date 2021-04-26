@@ -11,7 +11,9 @@
 package finite
 
 import (
+	"encoding/base64"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -52,6 +54,14 @@ func isMasked(b bool, s string) string {
 	}
 }
 
+func isEnhanced(b bool, s string) string {
+	if b {
+		return s
+	} else {
+		return ""
+	}
+}
+
 func isValidBankDate(d string) string {
 	b, _ := time.Parse(util.APIDateFormat, "1974-01-01T00:00:00")
 	t, err := time.Parse(util.APIDateFormat, d)
@@ -66,4 +76,26 @@ func isValidUUID(u string) string {
 		return ""
 	}
 	return u
+}
+
+func parseCursor(cursor string) (int, error) {
+	offset := 0
+	if len(cursor) > 0 {
+		decoded, err := base64.StdEncoding.DecodeString(cursor)
+		if err != nil {
+			return 0, fmt.Errorf("%v", err)
+		}
+		offset, err = strconv.Atoi(string(decoded))
+		if err != nil {
+			return 0, fmt.Errorf("%v", err)
+		}
+	}
+	return offset, nil
+}
+
+func parseLimit(l int32) int {
+	if l == 0 {
+		return 10
+	}
+	return int(l)
 }
