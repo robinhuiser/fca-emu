@@ -16,6 +16,7 @@ For more information, please visit [https://www.trexis.net](https://www.trexis.n
 * [Golang](https://golang.org/) 1.16.x - `brew install go`
 * [ent.](https://entgo.io/) - `go get entgo.io/ent/cmd/ent`
 * [GoReleaser](https://github.com/goreleaser/goreleaser) - `brew install goreleaser/tap/goreleaser && brew install goreleaser`
+* [k6](https://k6.io/) 0.31.x - `brew install k6`
 
 ## Configuration
 

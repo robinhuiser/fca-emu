@@ -77,3 +77,20 @@ tasks:
             -C {{.SWAGGER_UI_DIST_DIR}} \
             swagger-ui-${SWAGGER_UI_VERSION}/dist
       - sed -i '' 's/https:\/\/petstore.swagger.io\/v2\/swagger.json/\/api\/openapi.yaml/g' {{.SWAGGER_UI_DIST_DIR}}/index.html
+
+  smoke-test:
+    desc: Runs the functional API tests
+    summary:
+      Provide ENTITY_ID as argument.
+    cmds:
+      - cmd: test ! -z "{{.ENTITY_ID}}" || (echo "Please provide ENTITY_ID"; exit 1)
+      - k6 run --vus 1 --iterations 1 --no-color -e ENTITY_ID={{.ENTITY_ID}} ./smoketest.js
+
+  performance-test:
+    desc: Runs the performance API tests
+    summary:
+      Provide ENTITY_ID as argument.
+    cmds:
+      - cmd: test ! -z "{{.ENTITY_ID}}" || (echo "Please provide ENTITY_ID"; exit 1)
+      - k6 run --vus 5 --duration 5m --no-color -e ENTITY_ID={{.ENTITY_ID}} ./smoketest.js
+

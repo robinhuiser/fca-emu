@@ -4,3 +4,5 @@ To build CGO cross platform using native components (such as sqlite3):
 - https://github.com/goreleaser/goreleaser/issues/708
 
 Create Docker (no CGO - headaches with )
+
+

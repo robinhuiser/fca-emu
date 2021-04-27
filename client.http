@@ -5,14 +5,13 @@
 @mask = true
 @enhance = false
 @limit = 20
-@entity_fields = 
+
 
 #
 # Test data
-@account_id = 31f25ee8-cd19-4946-9c3a-febdb6a6fda3
-@product_type = CHECKING
 @entity_id = 1ba18e19-abc3-4590-ac3c-60ea9b4c1cec
-
+@account_id = b3483c72-caef-40cb-8d54-d1243027debc
+@product_type = CHECKING
 
 ### 
 
@@ -43,8 +42,23 @@ X-TRACE-ID: {{$guid}}
 
 ###
 
+# Get transactions for an account
+# @name accountTransactions
+@tranStartDate =
+@tranEndDate = 
+@tranRevRunning = 
+@tranStatus = 
+GET {{base_url}}/v1/account/{{account_id}}/transactions?mask={{mask}}&enhance={{enhance}}&limit={{limit}}&startDateTime={{tranStartDate}}&endDateTime={{tranEndDate}}&reversedInRunning={{tranRevRunning}}&status={{tranStatus}}
+# GET {{base_url}}/v1/account/{{account_id}}/transactions?limit=10&cursor=NTAwMA==
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
 # Get accounts for an entity
 # @name entityAccounts
+@entity_fields = 
 GET {{base_url}}/v1/entity/{{entity_id}}/accounts?limit={{limit}}&fields={{entity_fields}}&mask={{mask}}&enhance={{enhance}}
 Accept: application/json
 X-TOKEN: {{access_token}}

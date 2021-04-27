@@ -36,7 +36,7 @@
 
 | Method | URL | Status |
 |--- |--- |--- |
-| GET |  `/cloud/v1/account/{accountId}/transactions` | Next release |
+| GET |  `/cloud/v1/account/{accountId}/transactions` | Implemented |
 | GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}` | Next release |
 | GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}/images` | Next release |
 | GET | `/cloud/v1/account/{accountId}/image/{itemId}` | Next release |
