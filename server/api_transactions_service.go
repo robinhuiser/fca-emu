@@ -21,6 +21,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/ent/binaryitem"
+	"github.com/robinhuiser/fca-emu/ent/transaction"
 	"github.com/robinhuiser/fca-emu/util"
 )
 
@@ -37,54 +39,147 @@ func NewTransactionsApiService() TransactionsApiServicer {
 
 // GetAccountTransaction - Return a given accounts transaction
 func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, accountId string, transactionId string, mask bool, inline bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountTransaction method not implemented")
+	// Parse and verify UUID
+	ua, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Parse and verify UUID
+	ut, err := uuid.Parse(transactionId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Lookup the account
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(ua)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Retrieve the transaction
+	tr, err := rs.QueryTransactions().Where(transaction.ID(ut)).Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse("Transaction not found")), nil
+	}
+
+	tran, err := mapTransaction(rs, tr, mask, enhance, inline, ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	return Response(200, tran), nil
 }
 
 // GetAccountTransactionImage - Return a given image
 func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context, accountId string, itemId string, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountTransactionImage with the required logic for this service method.
-	// Add api_transactions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Parse and verify UUID
+	ua, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Parse and validate itemId
+	i, err := strconv.Atoi(itemId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	// Lookup the account
+	_, err = clt.Account.
+		Query().
+		Where(account.ID(ua)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	// Lookup the image
+	img, err := clt.BinaryItem.
+		Query().
+		Where(binaryitem.ID(i)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountTransactionImage method not implemented")
+	// Verify if the image belongs to a transaction of the provided account
+	tr, err := img.QueryTransaction().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	ac, err := tr.QueryAccount().Only(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	if ac.ID != ua {
+		return Response(500, setErrorResponse("Image does not belong to account")), nil
+	}
+
+	return Response(200, img.Content), nil
 }
 
 // GetAccountTransactionImages - Return the binary images for a given transaction
 func (s *TransactionsApiService) GetAccountTransactionImages(ctx context.Context, accountId string, transactionId string, mask bool, inline bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountTransactionImages with the required logic for this service method.
-	// Add api_transactions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, BinaryItemList{}) or use other options such as http.Ok ...
-	//return Response(200, BinaryItemList{}), nil
+	// Parse and verify UUID
+	ua, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Parse and verify UUID
+	ut, err := uuid.Parse(transactionId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Lookup the account
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(ua)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	// Retrieve the transaction
+	tr, err := rs.QueryTransactions().Where(transaction.ID(ut)).Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse("Transaction not found")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	imgs, err := tr.QueryImages().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	imageList := getTransactionImages(imgs, inline)
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountTransactionImages method not implemented")
+	return Response(200, imageList), nil
 }
 
 // GetAccountTransactions - Return a accounts transactions
@@ -129,7 +224,7 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 
 	transactions := []Transaction{}
 	for _, tr := range trs {
-		tran, err := mapTransaction(rs, tr, mask, enhance, offset, maxresults, ctx)
+		tran, err := mapTransaction(rs, tr, mask, enhance, false, ctx)
 		if err != nil {
 			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 		}
@@ -166,7 +261,50 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit i
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchTransactions method not implemented")
 }
 
-func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, offset int, rssize int, ctx context.Context) (Transaction, error) {
+// Supporting functions
+func mapImage(img *ent.BinaryItem, inline bool) BinaryItem {
+	return BinaryItem{
+		Format: img.Format,
+		Length: int32(img.Length),
+		ItemId: strconv.Itoa(img.ID),
+		URI: FiniteUri{
+			URL: img.URL,
+		},
+		Content: string(inlineContent(inline, img.Content)),
+	}
+}
+
+func inlineContent(i bool, content []byte) []byte {
+	if i {
+		return content
+	}
+	return nil
+}
+
+func mapImageList(images []BinaryItem) BinaryItemList {
+	return BinaryItemList{
+		Status:     true,
+		Binaries:   images,
+		TotalItems: int32(len(images)),
+	}
+}
+
+func getTransactionImages(imgs []*ent.BinaryItem, inline bool) BinaryItemList {
+	imageList := BinaryItemList{}
+	images := []BinaryItem{}
+
+	if len(imgs) > 0 {
+		for _, img := range imgs {
+			i := mapImage(img, inline)
+			images = append(images, i)
+		}
+		imageList = mapImageList(images)
+	}
+
+	return imageList
+}
+
+func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, inline bool, ctx context.Context) (Transaction, error) {
 
 	// Get the entity related to the account
 	e, err := acct.QueryOwners().Only(ctx)
@@ -179,29 +317,7 @@ func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, 
 	if err != nil {
 		return Transaction{}, fmt.Errorf("%v", err)
 	}
-
-	imageList := BinaryItemList{}
-	images := []BinaryItem{}
-
-	if len(imgs) > 0 {
-		for _, img := range imgs {
-			i := BinaryItem{
-				Format: img.Format,
-				Length: int32(img.Length),
-				ItemId: strconv.Itoa(img.ID),
-				URI: FiniteUri{
-					URL: img.URL,
-				},
-				Content: string(img.Content),
-			}
-			images = append(images, i)
-		}
-		imageList = BinaryItemList{
-			Status:     true,
-			Binaries:   images,
-			TotalItems: int32(len(imgs)),
-		}
-	}
+	imageList := getTransactionImages(imgs, inline)
 
 	t := Transaction{
 		EntityId:                e.ID.String(),

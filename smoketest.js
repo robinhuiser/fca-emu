@@ -6,7 +6,10 @@ export let options = {
   duration: '5s', // for 5 seconds
 
   thresholds: {
-    http_req_duration: ['p(99)<400'], // 99% of requests must complete below 200ms
+    // 95% of requests must finish within 200ms, 99% within 400, and 99.9% within 1.5s.
+    http_req_duration: ['p(95) < 200', 'p(99) < 400', 'p(99.9) < 1500'],
+    // The error rate must be lower than 1%.
+    http_req_failed: ['rate<0.01'], 
   },
 };
 
@@ -16,6 +19,7 @@ const ENTITY_ID = `${__ENV.ENTITY_ID}`;
 const MASK = false
 const ENHANCE = false
 const LIMIT = 20
+const INLINE = true
 
 export default () => {
   let authHeaders = {
@@ -63,28 +67,28 @@ export default () => {
   });
 
   // For each account...
-  getEntityAccountsListJSON.accounts.forEach(function (arrayItem){
+  getEntityAccountsListJSON.accounts.forEach(function (accountItem){
 
     // Get account info
-    let getAccountRes = http.get(`${BASE_URL}/v1/account/${arrayItem.id}?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
+    let getAccountRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
     let getAccountJSON = JSON.parse(getAccountRes.body);
     check(getAccountRes, {
       "GetAccount: status is 200": (r) => r.status === 200,
       "GetAccount: http version is 1.1": (r) => r.proto === "HTTP/1.1",
-      "GetAccount: has valid account ID": (r) => getAccountJSON.id === `${arrayItem.id}`,
+      "GetAccount: has valid account ID": (r) => getAccountJSON.id === `${accountItem.id}`,
     });
 
     // Get account details
-    let getAccountDetailsRes = http.get(`${BASE_URL}/v1/account/${arrayItem.id}/details?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
+    let getAccountDetailsRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/details?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
     let getAccountDetailsJSON = JSON.parse(getAccountDetailsRes.body);
     check(getAccountDetailsRes, {
       "GetAccountDetails: status is 200": (r) => r.status === 200,
       "GetAccountDetails: http version is 1.1": (r) => r.proto === "HTTP/1.1",
-      "GetAccountDetails: has valid account ID": (r) => getAccountDetailsJSON.id === `${arrayItem.id}`,
+      "GetAccountDetails: has valid account ID": (r) => getAccountDetailsJSON.id === `${accountItem.id}`,
     });
 
     // Get account balances
-    let getAccountBalancesRes = http.get(`${BASE_URL}/v1/account/${arrayItem.id}/balances?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
+    let getAccountBalancesRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/balances?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
     let getAccountBalancesJSON = JSON.parse(getAccountBalancesRes.body);
     check(getAccountBalancesRes, {
       "GetAccountBalances: status is 200": (r) => r.status === 200,
@@ -94,12 +98,45 @@ export default () => {
     });
 
     // Get transactions for account
-    let getAccountTransactionsRes = http.get(`${BASE_URL}/v1/account/${arrayItem.id}/transactions?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, authHeaders);
+    let getAccountTransactionsRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/transactions?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, authHeaders);
     let getAccountTransactionsJSON = JSON.parse(getAccountTransactionsRes.body);
     check(getAccountTransactionsRes, {
       "GetAccountTransactions: status is 200": (r) => r.status === 200,
       "GetAccountTransactions: http version is 1.1": (r) => r.proto === "HTTP/1.1",
       "GetEntityAccountsList: has one or more transactions": (r) => getAccountTransactionsJSON.totalItems > 0,
+    });
+
+    getAccountTransactionsJSON.transactions.forEach(function (transactionItem){
+      // Get transaction details for each transaction
+      let getAccountTransactionRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/transaction/${transactionItem.id}?mask=${MASK}&enhance=${ENHANCE}&inline=${INLINE}`, authHeaders);
+      let getAccountTransactionJSON = JSON.parse(getAccountTransactionRes.body);
+      check(getAccountTransactionRes, {
+        "GetAccountTransaction: status is 200": (r) => r.status === 200,
+        "GetAccountTransaction: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+        "GetAccountTransaction: has valid account ID": (r) => getAccountTransactionJSON.accountId === `${accountItem.id}`,
+        "GetAccountTransaction: has valid entity ID": (r) => getAccountTransactionJSON.entityId === ENTITY_ID,
+        "GetAccountTransaction: has valid ID": (r) => getAccountTransactionJSON.id === `${transactionItem.id}`,
+      });
+
+      // Get images for each transaction
+      let getAccountTransactionImagesRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/transaction/${transactionItem.id}/images?mask=${MASK}&enhance=${ENHANCE}&inline=${INLINE}`, authHeaders);
+      let getAccountTransactionImagesJSON = JSON.parse(getAccountTransactionImagesRes.body);
+      if (getAccountTransactionImagesJSON.totalItems > 0) {
+        check(getAccountTransactionImagesRes, {
+          "GetAccountTransactionImages: status is 200": (r) => r.status === 200,
+          "GetAccountTransactionImages: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+          "GetAccountTransactionImages: has one or more images": (r) => getAccountTransactionImagesJSON.binaries.length > 0,
+        });
+
+        // Get (first) image based upon account_id and image_id
+        let imageId = getAccountTransactionImagesJSON.binaries[0].itemId
+        let getAccountTransactionImageRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/image/${imageId}`, authHeaders);
+        let getAccountTransactionImageJSON = JSON.parse(getAccountTransactionImageRes.body);
+        check(getAccountTransactionImageRes, {
+          "GetAccountTransactionImage: status is 200": (r) => r.status === 200,
+          "GetAccountTransactionImage: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+        });
+      }
     });
   })
 };
