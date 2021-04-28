@@ -84,7 +84,7 @@ tasks:
       Provide ENTITY_ID as argument.
     cmds:
       - cmd: test ! -z "{{.ENTITY_ID}}" || (echo "Please provide ENTITY_ID"; exit 1)
-      - k6 run --vus 1 --iterations 1 --no-color -e ENTITY_ID={{.ENTITY_ID}} ./smoketest.js
+      - k6 run --vus 1 --no-thresholds --iterations 1 --no-color -e ENTITY_ID={{.ENTITY_ID}} ./smoketest.js
 
   performance-test:
     desc: Runs the performance API tests
