@@ -4,14 +4,17 @@
 @access_token = {{$dotenv FCA_SECRET}}
 @mask = true
 @enhance = false
-@limit = 20
+@limit = 30
+@inline = true
 
 
 #
 # Test data
-@entity_id = 1ba18e19-abc3-4590-ac3c-60ea9b4c1cec
-@account_id = b3483c72-caef-40cb-8d54-d1243027debc
+@entity_id = 2fc88c4c-43ea-43c3-8d55-8fcb0be5f00d
+@account_id = fe75c2b1-c15f-45f4-8ed6-df257b2105f1
+@transaction_id = 0336d253-ab6f-4db7-991b-a94eb867f17f
 @product_type = CHECKING
+@image_id = 468
 
 ### 
 
@@ -49,7 +52,43 @@ X-TRACE-ID: {{$guid}}
 @tranRevRunning = 
 @tranStatus = 
 GET {{base_url}}/v1/account/{{account_id}}/transactions?mask={{mask}}&enhance={{enhance}}&limit={{limit}}&startDateTime={{tranStartDate}}&endDateTime={{tranEndDate}}&reversedInRunning={{tranRevRunning}}&status={{tranStatus}}
-# GET {{base_url}}/v1/account/{{account_id}}/transactions?limit=10&cursor=NTAwMA==
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get transaction details
+# @name accountTransactionDetails
+# @inline = false
+GET {{base_url}}/v1/account/{{account_id}}/transaction/{{transaction_id}}?mask={{mask}}&enhance={{enhance}}&inline={{inline}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get transaction images
+# @name accountTransactionImages
+GET {{base_url}}/v1/account/{{account_id}}/transaction/{{transaction_id}}/images?mask={{mask}}&enhance={{enhance}}&inline={{inline}}
+Accept: application/json
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get image
+# @name image
+GET {{base_url}}/v1/account/{{account_id}}/image/{{image_id}}
+Accept: application/pdf
+X-TOKEN: {{access_token}}
+X-TRACE-ID: {{$guid}}
+
+###
+
+# Get cards
+# @name image
+GET {{base_url}}/v1/account/{{account_id}}/cards?mask={{mask}}&enhance={{enhance}}
 Accept: application/json
 X-TOKEN: {{access_token}}
 X-TRACE-ID: {{$guid}}
