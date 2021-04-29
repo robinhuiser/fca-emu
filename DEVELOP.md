@@ -77,5 +77,12 @@ $ docker save -o fca-emu_${TAG}_Docker_x86_64.tar \
     gzip fca-emu_${TAG}_Docker_x86_64.tar
 
 # Lines of code written
-$ gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go
+$ echo "Lines of written code:" > source_stats-${TAG}.txt && \
+   gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> source_stats-${TAG}.txt && \
+   echo >> source_stats-${TAG}.txt && \
+   echo "Total lines of code (incl. generated):" >> source_stats-${TAG}.txt && \
+   gocloc . >> source_stats-${TAG}.txt
+
+# Smoke tests
+$ task smoke-test ENTITY_ID=<id> > smoke_tests-${TAG}.txt 
 ~~~

@@ -1,3 +1,7 @@
 *.log
 finite-mock-serverdist/
 dist
+
+*.tar.gz
+smoke_tests-*.txt
+source_stats-*.txt
