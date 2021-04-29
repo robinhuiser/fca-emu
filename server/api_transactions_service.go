@@ -86,11 +86,6 @@ func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context,
 		return Response(401, setErrorResponse("Invalid token")), nil
 	}
 
-	// Validate X-Token
-	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
-	}
-
 	// Parse and verify UUID
 	ua, err := uuid.Parse(accountId)
 	if err != nil {
