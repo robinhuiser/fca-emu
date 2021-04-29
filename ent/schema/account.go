@@ -29,7 +29,8 @@ func (Account) Fields() []ent.Field {
 		field.Time("dateClosed").
 			Optional(),
 		field.String("currencyCode"),
-		field.String("status"),
+		field.Enum("status").
+			Values("OPEN", "CLOSED", "BLOCKED"),
 		field.String("source"),
 		field.Bool("interestReporting"),
 		field.Float32("currentBalance"),

@@ -21,11 +21,11 @@ func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofa
 
 	// Define the AVERAGE number of TRANSACTIONS per MONTH per account TYPE
 	nrTrans := map[string]int{
-		"SAVING":     2,  // Reg-D limit = 6
-		"LOAN":       1,  // Once a month downpayment, 2x per year extra payment
-		"DEPOSIT":    2,  // Same as savings
-		"CHECKING":   72, // Includes debit, credit, or prepaid cards, cash (ATM), paper checks, electronic
-		"INVESTMENT": 2,  // Same as savings
+		product.TypeSAVING.String():     2, // Reg-D limit = 6
+		product.TypeLOAN.String():       14,
+		product.TypeDEPOSIT.String():    2,  // Reg-D limit = 6
+		product.TypeCHECKING.String():   72, // Includes debit, credit, or prepaid cards, cash (ATM), paper checks, electronic
+		product.TypeINVESTMENT.String(): 2,  // Same as savings
 	}
 
 	pt, err := a.QueryProduct().Only(ctx)
@@ -72,7 +72,7 @@ func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofa
 		t, err := client.Transaction.
 			Create().
 			SetAccount(a).
-			SetStatus("POSTED").
+			SetStatus(transaction.StatusPOSTED).
 			SetExecutedAmount(math.Abs(amnt)).
 			SetExecutedCurrencyCode(a.CurrencyCode).
 			SetDirection(dir).

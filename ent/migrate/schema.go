@@ -21,7 +21,7 @@ var (
 		{Name: "date_last_updated", Type: field.TypeTime},
 		{Name: "date_closed", Type: field.TypeTime, Nullable: true},
 		{Name: "currency_code", Type: field.TypeString},
-		{Name: "status", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"OPEN", "CLOSED", "BLOCKED"}},
 		{Name: "source", Type: field.TypeString},
 		{Name: "interest_reporting", Type: field.TypeBool},
 		{Name: "current_balance", Type: field.TypeFloat32},

@@ -116,8 +116,8 @@ func (au *AccountUpdate) SetCurrencyCode(s string) *AccountUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (au *AccountUpdate) SetStatus(s string) *AccountUpdate {
-	au.mutation.SetStatus(s)
+func (au *AccountUpdate) SetStatus(a account.Status) *AccountUpdate {
+	au.mutation.SetStatus(a)
 	return au
 }
 
@@ -421,12 +421,18 @@ func (au *AccountUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(au.hooks) == 0 {
+		if err = au.check(); err != nil {
+			return 0, err
+		}
 		affected, err = au.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*AccountMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = au.check(); err != nil {
+				return 0, err
 			}
 			au.mutation = mutation
 			affected, err = au.sqlSave(ctx)
@@ -463,6 +469,16 @@ func (au *AccountUpdate) ExecX(ctx context.Context) {
 	if err := au.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (au *AccountUpdate) check() error {
+	if v, ok := au.mutation.Status(); ok {
+		if err := account.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
+		}
+	}
+	return nil
 }
 
 func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -567,7 +583,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeEnum,
 			Value:  value,
 			Column: account.FieldStatus,
 		})
@@ -1066,8 +1082,8 @@ func (auo *AccountUpdateOne) SetCurrencyCode(s string) *AccountUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (auo *AccountUpdateOne) SetStatus(s string) *AccountUpdateOne {
-	auo.mutation.SetStatus(s)
+func (auo *AccountUpdateOne) SetStatus(a account.Status) *AccountUpdateOne {
+	auo.mutation.SetStatus(a)
 	return auo
 }
 
@@ -1371,12 +1387,18 @@ func (auo *AccountUpdateOne) Save(ctx context.Context) (*Account, error) {
 		node *Account
 	)
 	if len(auo.hooks) == 0 {
+		if err = auo.check(); err != nil {
+			return nil, err
+		}
 		node, err = auo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*AccountMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = auo.check(); err != nil {
+				return nil, err
 			}
 			auo.mutation = mutation
 			node, err = auo.sqlSave(ctx)
@@ -1413,6 +1435,16 @@ func (auo *AccountUpdateOne) ExecX(ctx context.Context) {
 	if err := auo.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (auo *AccountUpdateOne) check() error {
+	if v, ok := auo.mutation.Status(); ok {
+		if err := account.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
+		}
+	}
+	return nil
 }
 
 func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err error) {
@@ -1522,7 +1554,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeEnum,
 			Value:  value,
 			Column: account.FieldStatus,
 		})

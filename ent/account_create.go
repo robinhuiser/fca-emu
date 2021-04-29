@@ -97,8 +97,8 @@ func (ac *AccountCreate) SetCurrencyCode(s string) *AccountCreate {
 }
 
 // SetStatus sets the "status" field.
-func (ac *AccountCreate) SetStatus(s string) *AccountCreate {
-	ac.mutation.SetStatus(s)
+func (ac *AccountCreate) SetStatus(a account.Status) *AccountCreate {
+	ac.mutation.SetStatus(a)
 	return ac
 }
 
@@ -346,6 +346,11 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New("ent: missing required field \"status\"")}
 	}
+	if v, ok := ac.mutation.Status(); ok {
+		if err := account.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
+		}
+	}
 	if _, ok := ac.mutation.Source(); !ok {
 		return &ValidationError{Name: "source", err: errors.New("ent: missing required field \"source\"")}
 	}
@@ -469,7 +474,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeEnum,
 			Value:  value,
 			Column: account.FieldStatus,
 		})

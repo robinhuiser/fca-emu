@@ -317,14 +317,14 @@ func mapAccountDetails(acc *ent.Account, mask bool, ctx context.Context) (Accoun
 		Type:              acc.Type,
 		Number:            isMasked(mask, acc.Number),
 		ParentId:          isValidUUID(acc.ParentId.String()),
-		Name:              ents[0].Fullname, // TODO: get the primary account holder info here
+		Name:              ents[0].Fullname,
 		Title:             acc.Title,
 		DateCreated:       isValidBankDate(acc.DateCreated.Format(util.APIDateFormat)),
 		DateOpened:        isValidBankDate(acc.DateOpened.Format(util.APIDateFormat)),
 		DateLastUpdated:   isValidBankDate(acc.DateLastUpdated.Format(util.APIDateFormat)),
 		DateClosed:        isValidBankDate(acc.DateClosed.Format(util.APIDateFormat)),
 		CurrencyCode:      acc.CurrencyCode,
-		Status:            acc.Status,
+		Status:            acc.Status.String(),
 		Source:            acc.Source,
 		InterestReporting: acc.InterestReporting,
 		Balances: Balances{

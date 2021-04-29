@@ -69,7 +69,7 @@ type AccountMutation struct {
 	dateLastUpdated       *time.Time
 	dateClosed            *time.Time
 	currencyCode          *string
-	status                *string
+	status                *account.Status
 	source                *string
 	interestReporting     *bool
 	currentBalance        *float32
@@ -574,12 +574,12 @@ func (m *AccountMutation) ResetCurrencyCode() {
 }
 
 // SetStatus sets the "status" field.
-func (m *AccountMutation) SetStatus(s string) {
-	m.status = &s
+func (m *AccountMutation) SetStatus(a account.Status) {
+	m.status = &a
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *AccountMutation) Status() (r string, exists bool) {
+func (m *AccountMutation) Status() (r account.Status, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -590,7 +590,7 @@ func (m *AccountMutation) Status() (r string, exists bool) {
 // OldStatus returns the old "status" field's value of the Account entity.
 // If the Account object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldStatus(ctx context.Context) (v string, err error) {
+func (m *AccountMutation) OldStatus(ctx context.Context) (v account.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1409,7 +1409,7 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		m.SetCurrencyCode(v)
 		return nil
 	case account.FieldStatus:
-		v, ok := value.(string)
+		v, ok := value.(account.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -10,6 +10,8 @@ import (
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/entityaddress"
+	"github.com/robinhuiser/fca-emu/ent/entitycontactpoint"
+	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 )
 
 func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (*ent.Entity, error) {
@@ -23,15 +25,15 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 	switch a := f.Number(0, 100); {
 	case a >= 70 && a <= 90:
 		fullname = f.Company() + ", " + f.CompanySuffix()
-		entity_type = "BUSINESS"
+		entity_type = entity.TypeBUSINESS
 	case a >= 90:
 		fullname = f.Company()
-		entity_type = "SYSTEM"
+		entity_type = entity.TypeSYSTEM
 	default:
 		firstname = f.FirstName()
 		lastname = f.LastName()
 		fullname = firstname + " " + lastname
-		entity_type = "PERSON"
+		entity_type = entity.TypePERSON
 	}
 
 	// Create entity
@@ -55,13 +57,13 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 	}
 
 	// Private business or person
-	switch et := entity_type.String(); et {
-	case "BUSINESS":
-		address_type = "BUSINESS"
-	case "SYSTEM":
-		address_type = "POBOX"
+	switch et := entity_type; et {
+	case entity.TypeBUSINESS:
+		address_type = entityaddress.TypeBUSINESS
+	case entity.TypeSYSTEM:
+		address_type = entityaddress.TypePOBOX
 	default:
-		address_type = "RESIDENTIAL"
+		address_type = entityaddress.TypeRESIDENTIAL
 	}
 
 	// Add one or more addresses
@@ -88,7 +90,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 	for i := 0; i < f.Number(1, 2); i++ {
 		t, err := client.EntityTaxInformation.
 			Create().
-			SetType("SSN").
+			SetType(entitytaxinformation.TypeSSN).
 			SetTaxId(f.SSN()).
 			Save(ctx)
 		if err != nil {
@@ -111,14 +113,13 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 	}
 
 	// Add one or more contact points
-	// "SMS", "EMAIL", "PHONE"
 	for i := 0; i < f.Number(1, 2); i++ {
 		switch a := f.Number(0, 2); {
 		case a == 0:
 			c, err := client.EntityContactPoint.
 				Create().
 				SetName("Work mobile").
-				SetType("SMS").
+				SetType(entitycontactpoint.TypeSMS).
 				SetValue(f.Phone()).
 				Save(ctx)
 			if err != nil {
@@ -129,7 +130,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			c, err := client.EntityContactPoint.
 				Create().
 				SetName("Private email").
-				SetType("EMAIL").
+				SetType(entitycontactpoint.TypeEMAIL).
 				SetValue(f.Email()).
 				Save(ctx)
 			if err != nil {
@@ -141,7 +142,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 				Create().
 				SetPrefix(strconv.Itoa(f.Number(1, 9))).
 				SetName("Work phone").
-				SetType("VOICE").
+				SetType(entitycontactpoint.TypeVOICE).
 				SetSuffix(strconv.Itoa(f.Number(111, 999))).
 				SetValue(f.Phone()).
 				Save(ctx)

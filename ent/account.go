@@ -40,7 +40,7 @@ type Account struct {
 	// CurrencyCode holds the value of the "currencyCode" field.
 	CurrencyCode string `json:"currencyCode,omitempty"`
 	// Status holds the value of the "status" field.
-	Status string `json:"status,omitempty"`
+	Status account.Status `json:"status,omitempty"`
 	// Source holds the value of the "source" field.
 	Source string `json:"source,omitempty"`
 	// InterestReporting holds the value of the "interestReporting" field.
@@ -256,7 +256,7 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				a.Status = value.String
+				a.Status = account.Status(value.String)
 			}
 		case account.FieldSource:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -386,7 +386,7 @@ func (a *Account) String() string {
 	builder.WriteString(", currencyCode=")
 	builder.WriteString(a.CurrencyCode)
 	builder.WriteString(", status=")
-	builder.WriteString(a.Status)
+	builder.WriteString(fmt.Sprintf("%v", a.Status))
 	builder.WriteString(", source=")
 	builder.WriteString(a.Source)
 	builder.WriteString(", interestReporting=")

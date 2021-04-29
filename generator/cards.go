@@ -24,8 +24,8 @@ func populateRandomCards(ctx context.Context, client *ent.Client, f *gofakeit.Fa
 		return nil, fmt.Errorf("failed retrieving account owners: %w", err)
 	}
 
-	// Create between 0 and 3 cards for each account
-	for crd := 0; crd < f.Number(0, 3); crd++ {
+	// Create between 1 and 3 cards
+	for crd := 0; crd < f.Number(1, 3); crd++ {
 		cardStartDate := f.DateRange(a.DateOpened, time.Now())
 		cardExpiryDate := f.DateRange(cardStartDate, time.Now().AddDate(2, 0, 0))
 		cardStatus := card.StatusOPERATIONAL

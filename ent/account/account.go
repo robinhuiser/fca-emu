@@ -3,6 +3,8 @@
 package account
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -161,3 +163,27 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// Status values.
+const (
+	StatusOPEN    Status = "OPEN"
+	StatusCLOSED  Status = "CLOSED"
+	StatusBLOCKED Status = "BLOCKED"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusOPEN, StatusCLOSED, StatusBLOCKED:
+		return nil
+	default:
+		return fmt.Errorf("account: invalid enum value for status field: %q", s)
+	}
+}

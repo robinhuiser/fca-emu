@@ -18,16 +18,16 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		productSubType     string
 		productSubTypeName string
 	}{
-		{"SAV01", "SAVING", "Savings Account", "SAV-BASIC", "Basic Savings"},
-		{"SAV02", "SAVING", "Savings Account", "SAV-COL", "College Savings"},
-		{"SAV03", "SAVING", "Savings Account", "SAV-TAX", "Tax Savings"},
-		{"CHK01", "CHECKING", "Checking Account", "CHK-BASIC", "Basic Checking"},
-		{"CHK02", "CHECKING", "Checking Account", "CHK-BRONZE", "Bronze Checking"},
-		{"CHK03", "CHECKING", "Checking Account", "CHK-SILVER", "Silver Checking"},
-		{"CHK04", "CHECKING", "Checking Account", "CHK-GOLD", "Gold Checking"},
-		{"INV01", "INVESTMENT", "Investment Account", "INV-BASIC", "Basic Investments"},
-		{"INV02", "INVESTMENT", "Investment Account", "INV-BUFFET", "Warren's Investments"},
-		{"INV03", "INVESTMENT", "Investment Account", "INV-ACKMAN", "Bill's Investments"},
+		{"SAV01", product.TypeSAVING.String(), "Savings Account", "SAV-BASIC", "Basic Savings"},
+		{"SAV02", product.TypeSAVING.String(), "Savings Account", "SAV-COL", "College Savings"},
+		{"SAV03", product.TypeSAVING.String(), "Savings Account", "SAV-TAX", "Tax Savings"},
+		{"CHK01", product.TypeCHECKING.String(), "Checking Account", "CHK-BASIC", "Basic Checking"},
+		{"CHK02", product.TypeCHECKING.String(), "Checking Account", "CHK-BRONZE", "Bronze Checking"},
+		{"CHK03", product.TypeCHECKING.String(), "Checking Account", "CHK-SILVER", "Silver Checking"},
+		{"CHK04", product.TypeCHECKING.String(), "Checking Account", "CHK-GOLD", "Gold Checking"},
+		{"INV01", product.TypeINVESTMENT.String(), "Investment Account", "INV-BASIC", "Basic Investments"},
+		{"INV02", product.TypeINVESTMENT.String(), "Investment Account", "INV-BUFFET", "Warren's Investments"},
+		{"INV03", product.TypeINVESTMENT.String(), "Investment Account", "INV-ACKMAN", "Bill's Investments"},
 	}
 
 	// Create products

@@ -10,15 +10,16 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/product"
 	"github.com/robinhuiser/fca-emu/ent/routingnumber"
 )
 
 // Account Type to Product map
 var atp = map[string]string{
-	"DDA": "CHECKING",
-	"NOW": "SAVING",
-	"MMA": "INVESTMENT",
+	"DDA": product.TypeCHECKING.String(),
+	"NOW": product.TypeSAVING.String(),
+	"MMA": product.TypeINVESTMENT.String(),
 }
 
 func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.Faker, e *ent.Entity) (*ent.Account, error) {
@@ -35,11 +36,13 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		return nil, fmt.Errorf("failed retrieving available branches: %w", err)
 	}
 
-	// Retrieve available products
-	act := randomAccountType(f)
+	// Get random account type with strong type preference
+	act := randomAccountType(f, "DDA")
+
+	// Retrieve product linked to account type
 	pr, err := client.Product.Query().Where(product.TypeEQ(product.Type(atp[act]))).All(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed retrieving available products: %w", err)
+		return nil, fmt.Errorf("failed retrieving product type: %w", err)
 	}
 
 	a, err := client.Account.
@@ -65,7 +68,7 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 		return nil, fmt.Errorf("failed creating account: %w", err)
 	}
 
-	if as == "CLOSED" {
+	if as == account.StatusCLOSED {
 		a.Update().SetDateClosed(dlc).Save(ctx)
 	}
 
@@ -101,9 +104,16 @@ func populateRandomAccount(ctx context.Context, client *ent.Client, f *gofakeit.
 	return a, nil
 }
 
-func randomAccountType(f *gofakeit.Faker) string {
-	keys := reflect.ValueOf(atp).MapKeys()
-	return keys[rand.Intn(len(keys))].String()
+func randomAccountType(f *gofakeit.Faker, p string) string {
+	at := p
+	// Return in 50% of the times the preferred account type p
+	if f.Bool() {
+		at = p
+	} else {
+		keys := reflect.ValueOf(atp).MapKeys()
+		at = keys[rand.Intn(len(keys))].String()
+	}
+	return at
 }
 
 func randomRoutingNumberType(f *gofakeit.Faker) routingnumber.Type {
@@ -116,8 +126,8 @@ func randomAccountTitle(f *gofakeit.Faker) string {
 	return at[f.Number(0, len(at)-1)]
 }
 
-func randomAccountStatus(f *gofakeit.Faker) string {
-	as := []string{"OPEN", "CLOSED", "BLOCKED"}
+func randomAccountStatus(f *gofakeit.Faker) account.Status {
+	as := []account.Status{account.StatusOPEN, account.StatusCLOSED, account.StatusBLOCKED}
 	return as[f.Number(0, len(as)-1)]
 }
 
@@ -125,7 +135,3 @@ func randomAccountNumber(f *gofakeit.Faker) string {
 	return strconv.Itoa(f.Number(10000, 99999)) +
 		strconv.Itoa(f.Number(100000, 999999))
 }
-
-// func randomAccountProduct(at string) string {
-
-// }
