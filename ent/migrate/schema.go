@@ -125,6 +125,7 @@ var (
 		{Name: "holder_name", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"LOCKED", "OPERATIONAL"}},
 		{Name: "url", Type: field.TypeString},
+		{Name: "account_cards", Type: field.TypeUUID, Nullable: true},
 		{Name: "card_network", Type: field.TypeInt, Nullable: true},
 	}
 	// CardsTable holds the schema information for the "cards" table.
@@ -134,8 +135,14 @@ var (
 		PrimaryKey: []*schema.Column{CardsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "cards_card_networks_network",
+				Symbol:     "cards_accounts_cards",
 				Columns:    []*schema.Column{CardsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "cards_card_networks_network",
+				Columns:    []*schema.Column{CardsColumns[9]},
 				RefColumns: []*schema.Column{CardNetworksColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -412,7 +419,8 @@ func init() {
 	AccountsTable.ForeignKeys[1].RefTable = ProductsTable
 	BinaryItemsTable.ForeignKeys[0].RefTable = TransactionsTable
 	BranchesTable.ForeignKeys[0].RefTable = BanksTable
-	CardsTable.ForeignKeys[0].RefTable = CardNetworksTable
+	CardsTable.ForeignKeys[0].RefTable = AccountsTable
+	CardsTable.ForeignKeys[1].RefTable = CardNetworksTable
 	EntityAddressesTable.ForeignKeys[0].RefTable = EntitiesTable
 	EntityContactPointsTable.ForeignKeys[0].RefTable = EntitiesTable
 	EntityTaxInformationsTable.ForeignKeys[0].RefTable = EntitiesTable

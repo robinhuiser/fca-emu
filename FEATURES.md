@@ -30,16 +30,16 @@
 
 | Method | URL | Status |
 |--- |--- |--- |
-| GET |  `/cloud/v1/account/{accountId}/cards` | Open |
+| GET |  `/cloud/v1/account/{accountId}/cards` | Implemented |
 
 ## Transactions
 
 | Method | URL | Status |
 |--- |--- |--- |
 | GET |  `/cloud/v1/account/{accountId}/transactions` | Implemented |
-| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}` | Next release |
-| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}/images` | Next release |
-| GET | `/cloud/v1/account/{accountId}/image/{itemId}` | Next release |
+| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}` | Implemented |
+| GET | `/cloud/v1/account/{accountId}/transaction/{transactionId}/images` | Implemented |
+| GET | `/cloud/v1/account/{accountId}/image/{itemId}` | Implemented |
 | POST | `/cloud/v1/transactions/search` | Open |
 
 ## Statements

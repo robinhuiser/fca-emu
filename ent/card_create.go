@@ -10,6 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 )
@@ -80,6 +82,25 @@ func (cc *CardCreate) SetNillableNetworkID(id *int) *CardCreate {
 // SetNetwork sets the "network" edge to the CardNetwork entity.
 func (cc *CardCreate) SetNetwork(c *CardNetwork) *CardCreate {
 	return cc.SetNetworkID(c.ID)
+}
+
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (cc *CardCreate) SetAccountID(id uuid.UUID) *CardCreate {
+	cc.mutation.SetAccountID(id)
+	return cc
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (cc *CardCreate) SetNillableAccountID(id *uuid.UUID) *CardCreate {
+	if id != nil {
+		cc = cc.SetAccountID(*id)
+	}
+	return cc
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (cc *CardCreate) SetAccount(a *Account) *CardCreate {
+	return cc.SetAccountID(a.ID)
 }
 
 // Mutation returns the CardMutation object of the builder.
@@ -265,6 +286,26 @@ func (cc *CardCreate) createSpec() (*Card, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.card_network = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   card.AccountTable,
+			Columns: []string{card.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.account_cards = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

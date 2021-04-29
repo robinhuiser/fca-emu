@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
@@ -26,6 +28,7 @@ type CardQuery struct {
 	predicates []predicate.Card
 	// eager-loading edges.
 	withNetwork *CardNetworkQuery
+	withAccount *AccountQuery
 	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -71,6 +74,28 @@ func (cq *CardQuery) QueryNetwork() *CardNetworkQuery {
 			sqlgraph.From(card.Table, card.FieldID, selector),
 			sqlgraph.To(cardnetwork.Table, cardnetwork.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, card.NetworkTable, card.NetworkColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAccount chains the current query on the "account" edge.
+func (cq *CardQuery) QueryAccount() *AccountQuery {
+	query := &AccountQuery{config: cq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(card.Table, card.FieldID, selector),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, card.AccountTable, card.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -260,6 +285,7 @@ func (cq *CardQuery) Clone() *CardQuery {
 		order:       append([]OrderFunc{}, cq.order...),
 		predicates:  append([]predicate.Card{}, cq.predicates...),
 		withNetwork: cq.withNetwork.Clone(),
+		withAccount: cq.withAccount.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -274,6 +300,17 @@ func (cq *CardQuery) WithNetwork(opts ...func(*CardNetworkQuery)) *CardQuery {
 		opt(query)
 	}
 	cq.withNetwork = query
+	return cq
+}
+
+// WithAccount tells the query-builder to eager-load the nodes that are connected to
+// the "account" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CardQuery) WithAccount(opts ...func(*AccountQuery)) *CardQuery {
+	query := &AccountQuery{config: cq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withAccount = query
 	return cq
 }
 
@@ -343,11 +380,12 @@ func (cq *CardQuery) sqlAll(ctx context.Context) ([]*Card, error) {
 		nodes       = []*Card{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			cq.withNetwork != nil,
+			cq.withAccount != nil,
 		}
 	)
-	if cq.withNetwork != nil {
+	if cq.withNetwork != nil || cq.withAccount != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -395,6 +433,32 @@ func (cq *CardQuery) sqlAll(ctx context.Context) ([]*Card, error) {
 			}
 			for i := range nodes {
 				nodes[i].Edges.Network = n
+			}
+		}
+	}
+
+	if query := cq.withAccount; query != nil {
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Card)
+		for i := range nodes {
+			fk := nodes[i].account_cards
+			if fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(account.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_cards" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Account = n
 			}
 		}
 	}

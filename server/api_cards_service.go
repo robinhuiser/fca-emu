@@ -12,8 +12,13 @@ package finite
 
 import (
 	"context"
-	"errors"
-	"net/http"
+	"fmt"
+	"strconv"
+
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent"
+	"github.com/robinhuiser/fca-emu/ent/account"
+	"github.com/robinhuiser/fca-emu/util"
 )
 
 // CardsApiService is a service that implents the logic for the CardsApiServicer
@@ -29,23 +34,73 @@ func NewCardsApiService() CardsApiServicer {
 
 // GetAccountCards - Return a accounts cards
 func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountCards with the required logic for this service method.
-	// Add api_cards_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse("Invalid token")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, CardsList{}) or use other options such as http.Ok ...
-	//return Response(200, CardsList{}), nil
+	// Parse and verify UUID
+	ua, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
+	// Lookup the account
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(ua)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
+	// Retrieve the cards
+	crds, err := rs.QueryCards().All(ctx)
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	if len(crds) == 0 {
+		return Response(404, setErrorResponse("No cards found")), nil
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
+	cards := []Card{}
+	for _, crd := range crds {
+		card, err := mapCard(rs, crd, mask, enhance, ctx)
+		if err != nil {
+			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		}
+		cards = append(cards, card)
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
+	c := CardsList{
+		Status:     true,
+		TotalItems: int32(len(crds)),
+		Cards:      cards,
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountCards method not implemented")
+	return Response(200, c), nil
+}
+
+func mapCard(acct *ent.Account, crd *ent.Card, mask bool, en bool, ctx context.Context) (Card, error) {
+
+	cn, err := crd.QueryNetwork().Only(ctx)
+	if err != nil {
+		return Card{}, fmt.Errorf("%v", err)
+	}
+
+	c := Card{
+		Id:         strconv.Itoa(crd.ID),
+		Type:       crd.Type.String(),
+		Number:     isMasked(mask, crd.Number),
+		StartDate:  isValidBankDate(crd.StartDate.Format(util.APIDateFormat)),
+		ExpiryDate: isValidBankDate(crd.ExpiryDate.Format(util.APIDateFormat)),
+		HolderName: crd.HolderName,
+		Network:    cn.Name,
+		Status:     string(crd.Status),
+		URI: FiniteUri{
+			URL: crd.URL,
+		},
+	}
+
+	return c, nil
 }

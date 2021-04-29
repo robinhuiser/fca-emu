@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/robinhuiser/fca-emu/ent"
 )
 
-func populateCardNetworks(ctx context.Context, client *ent.Client, f *gofakeit.Faker) error {
+func populateCardNetworks(ctx context.Context, client *ent.Client) error {
 
 	c := map[string]string{
 		"VISA":       "VISA",

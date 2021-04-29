@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
@@ -89,6 +91,25 @@ func (cu *CardUpdate) SetNetwork(c *CardNetwork) *CardUpdate {
 	return cu.SetNetworkID(c.ID)
 }
 
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (cu *CardUpdate) SetAccountID(id uuid.UUID) *CardUpdate {
+	cu.mutation.SetAccountID(id)
+	return cu
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (cu *CardUpdate) SetNillableAccountID(id *uuid.UUID) *CardUpdate {
+	if id != nil {
+		cu = cu.SetAccountID(*id)
+	}
+	return cu
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (cu *CardUpdate) SetAccount(a *Account) *CardUpdate {
+	return cu.SetAccountID(a.ID)
+}
+
 // Mutation returns the CardMutation object of the builder.
 func (cu *CardUpdate) Mutation() *CardMutation {
 	return cu.mutation
@@ -97,6 +118,12 @@ func (cu *CardUpdate) Mutation() *CardMutation {
 // ClearNetwork clears the "network" edge to the CardNetwork entity.
 func (cu *CardUpdate) ClearNetwork() *CardUpdate {
 	cu.mutation.ClearNetwork()
+	return cu
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (cu *CardUpdate) ClearAccount() *CardUpdate {
+	cu.mutation.ClearAccount()
 	return cu
 }
 
@@ -274,6 +301,41 @@ func (cu *CardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.AccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   card.AccountTable,
+			Columns: []string{card.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   card.AccountTable,
+			Columns: []string{card.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{card.Label}
@@ -353,6 +415,25 @@ func (cuo *CardUpdateOne) SetNetwork(c *CardNetwork) *CardUpdateOne {
 	return cuo.SetNetworkID(c.ID)
 }
 
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (cuo *CardUpdateOne) SetAccountID(id uuid.UUID) *CardUpdateOne {
+	cuo.mutation.SetAccountID(id)
+	return cuo
+}
+
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (cuo *CardUpdateOne) SetNillableAccountID(id *uuid.UUID) *CardUpdateOne {
+	if id != nil {
+		cuo = cuo.SetAccountID(*id)
+	}
+	return cuo
+}
+
+// SetAccount sets the "account" edge to the Account entity.
+func (cuo *CardUpdateOne) SetAccount(a *Account) *CardUpdateOne {
+	return cuo.SetAccountID(a.ID)
+}
+
 // Mutation returns the CardMutation object of the builder.
 func (cuo *CardUpdateOne) Mutation() *CardMutation {
 	return cuo.mutation
@@ -361,6 +442,12 @@ func (cuo *CardUpdateOne) Mutation() *CardMutation {
 // ClearNetwork clears the "network" edge to the CardNetwork entity.
 func (cuo *CardUpdateOne) ClearNetwork() *CardUpdateOne {
 	cuo.mutation.ClearNetwork()
+	return cuo
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (cuo *CardUpdateOne) ClearAccount() *CardUpdateOne {
+	cuo.mutation.ClearAccount()
 	return cuo
 }
 
@@ -535,6 +622,41 @@ func (cuo *CardUpdateOne) sqlSave(ctx context.Context) (_node *Card, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: cardnetwork.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.AccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   card.AccountTable,
+			Columns: []string{card.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.AccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   card.AccountTable,
+			Columns: []string{card.AccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: account.FieldID,
 				},
 			},
 		}

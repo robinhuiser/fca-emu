@@ -6,3 +6,16 @@ To build CGO cross platform using native components (such as sqlite3):
 Create Docker (no CGO - headaches with )
 
 
+Questions for Rex:
+
+* Why multiple routing numbers for an account?
+* I assume we do not show checks in GetAccountTransactions (only with GetAccountTransaction?inline=true?)
+* Why muliple images while there is only one checkNumber for a transaction?
+* When to throw 500 or 400 (for example: "Image does not belong to account")?
+* Unclear what /cloud/v1/account/{accountId}/image/{itemId} returns (a binary image?)
+* GetCards API inconsistent: payload provides for limit & cursor info... parameters do not
+* Which fields are marked for mask / enchance?
+* When no cards are found for an account, do we return an "empy" CardsList or 404?
+
+Release notes:
+* Issue: /cloud/v1/account/{accountId}/image/{itemId} returns incorrect Content-Type and wrong encoding

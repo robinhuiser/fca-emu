@@ -29,6 +29,10 @@ func (Card) Fields() []ent.Field {
 // Edges of the Card.
 func (Card) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("network", CardNetwork.Type).Unique(),
+		edge.To("network", CardNetwork.Type).
+			Unique(),
+		edge.From("account", Account.Type).
+			Ref("cards").
+			Unique(),
 	}
 }

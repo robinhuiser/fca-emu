@@ -94,6 +94,9 @@ type AccountMutation struct {
 	transactions          map[uuid.UUID]struct{}
 	removedtransactions   map[uuid.UUID]struct{}
 	clearedtransactions   bool
+	cards                 map[int]struct{}
+	removedcards          map[int]struct{}
+	clearedcards          bool
 	done                  bool
 	oldValue              func(context.Context) (*Account, error)
 	predicates            []predicate.Account
@@ -1129,6 +1132,59 @@ func (m *AccountMutation) ResetTransactions() {
 	m.removedtransactions = nil
 }
 
+// AddCardIDs adds the "cards" edge to the Card entity by ids.
+func (m *AccountMutation) AddCardIDs(ids ...int) {
+	if m.cards == nil {
+		m.cards = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.cards[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCards clears the "cards" edge to the Card entity.
+func (m *AccountMutation) ClearCards() {
+	m.clearedcards = true
+}
+
+// CardsCleared returns if the "cards" edge to the Card entity was cleared.
+func (m *AccountMutation) CardsCleared() bool {
+	return m.clearedcards
+}
+
+// RemoveCardIDs removes the "cards" edge to the Card entity by IDs.
+func (m *AccountMutation) RemoveCardIDs(ids ...int) {
+	if m.removedcards == nil {
+		m.removedcards = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedcards[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCards returns the removed IDs of the "cards" edge to the Card entity.
+func (m *AccountMutation) RemovedCardsIDs() (ids []int) {
+	for id := range m.removedcards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CardsIDs returns the "cards" edge IDs in the mutation.
+func (m *AccountMutation) CardsIDs() (ids []int) {
+	for id := range m.cards {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCards resets all changes to the "cards" edge.
+func (m *AccountMutation) ResetCards() {
+	m.cards = nil
+	m.clearedcards = false
+	m.removedcards = nil
+}
+
 // Op returns the operation name.
 func (m *AccountMutation) Op() Op {
 	return m.op
@@ -1545,7 +1601,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.branch != nil {
 		edges = append(edges, account.EdgeBranch)
 	}
@@ -1563,6 +1619,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.transactions != nil {
 		edges = append(edges, account.EdgeTransactions)
+	}
+	if m.cards != nil {
+		edges = append(edges, account.EdgeCards)
 	}
 	return edges
 }
@@ -1603,13 +1662,19 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeCards:
+		ids := make([]ent.Value, 0, len(m.cards))
+		for id := range m.cards {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedowners != nil {
 		edges = append(edges, account.EdgeOwners)
 	}
@@ -1621,6 +1686,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedtransactions != nil {
 		edges = append(edges, account.EdgeTransactions)
+	}
+	if m.removedcards != nil {
+		edges = append(edges, account.EdgeCards)
 	}
 	return edges
 }
@@ -1653,13 +1721,19 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeCards:
+		ids := make([]ent.Value, 0, len(m.removedcards))
+		for id := range m.removedcards {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedbranch {
 		edges = append(edges, account.EdgeBranch)
 	}
@@ -1677,6 +1751,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedtransactions {
 		edges = append(edges, account.EdgeTransactions)
+	}
+	if m.clearedcards {
+		edges = append(edges, account.EdgeCards)
 	}
 	return edges
 }
@@ -1697,6 +1774,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedproduct
 	case account.EdgeTransactions:
 		return m.clearedtransactions
+	case account.EdgeCards:
+		return m.clearedcards
 	}
 	return false
 }
@@ -1736,6 +1815,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeTransactions:
 		m.ResetTransactions()
+		return nil
+	case account.EdgeCards:
+		m.ResetCards()
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
@@ -3697,6 +3779,8 @@ type CardMutation struct {
 	clearedFields  map[string]struct{}
 	network        *int
 	clearednetwork bool
+	account        *uuid.UUID
+	clearedaccount bool
 	done           bool
 	oldValue       func(context.Context) (*Card, error)
 	predicates     []predicate.Card
@@ -4072,6 +4156,45 @@ func (m *CardMutation) ResetNetwork() {
 	m.clearednetwork = false
 }
 
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *CardMutation) SetAccountID(id uuid.UUID) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *CardMutation) ClearAccount() {
+	m.clearedaccount = true
+}
+
+// AccountCleared returns if the "account" edge to the Account entity was cleared.
+func (m *CardMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *CardMutation) AccountID() (id uuid.UUID, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *CardMutation) AccountIDs() (ids []uuid.UUID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *CardMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
 // Op returns the operation name.
 func (m *CardMutation) Op() Op {
 	return m.op
@@ -4287,9 +4410,12 @@ func (m *CardMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CardMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.network != nil {
 		edges = append(edges, card.EdgeNetwork)
+	}
+	if m.account != nil {
+		edges = append(edges, card.EdgeAccount)
 	}
 	return edges
 }
@@ -4302,13 +4428,17 @@ func (m *CardMutation) AddedIDs(name string) []ent.Value {
 		if id := m.network; id != nil {
 			return []ent.Value{*id}
 		}
+	case card.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CardMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -4322,9 +4452,12 @@ func (m *CardMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CardMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearednetwork {
 		edges = append(edges, card.EdgeNetwork)
+	}
+	if m.clearedaccount {
+		edges = append(edges, card.EdgeAccount)
 	}
 	return edges
 }
@@ -4335,6 +4468,8 @@ func (m *CardMutation) EdgeCleared(name string) bool {
 	switch name {
 	case card.EdgeNetwork:
 		return m.clearednetwork
+	case card.EdgeAccount:
+		return m.clearedaccount
 	}
 	return false
 }
@@ -4346,6 +4481,9 @@ func (m *CardMutation) ClearEdge(name string) error {
 	case card.EdgeNetwork:
 		m.ClearNetwork()
 		return nil
+	case card.EdgeAccount:
+		m.ClearAccount()
+		return nil
 	}
 	return fmt.Errorf("unknown Card unique edge %s", name)
 }
@@ -4356,6 +4494,9 @@ func (m *CardMutation) ResetEdge(name string) error {
 	switch name {
 	case card.EdgeNetwork:
 		m.ResetNetwork()
+		return nil
+	case card.EdgeAccount:
+		m.ResetAccount()
 		return nil
 	}
 	return fmt.Errorf("unknown Card edge %s", name)

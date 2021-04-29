@@ -72,9 +72,11 @@ type AccountEdges struct {
 	Product *Product `json:"product,omitempty"`
 	// Transactions holds the value of the transactions edge.
 	Transactions []*Transaction `json:"transactions,omitempty"`
+	// Cards holds the value of the cards edge.
+	Cards []*Card `json:"cards,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // BranchOrErr returns the Branch value or an error if the edge
@@ -139,6 +141,15 @@ func (e AccountEdges) TransactionsOrErr() ([]*Transaction, error) {
 		return e.Transactions, nil
 	}
 	return nil, &NotLoadedError{edge: "transactions"}
+}
+
+// CardsOrErr returns the Cards value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) CardsOrErr() ([]*Card, error) {
+	if e.loadedTypes[6] {
+		return e.Cards, nil
+	}
+	return nil, &NotLoadedError{edge: "cards"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -324,6 +335,11 @@ func (a *Account) QueryProduct() *ProductQuery {
 // QueryTransactions queries the "transactions" edge of the Account entity.
 func (a *Account) QueryTransactions() *TransactionQuery {
 	return (&AccountClient{config: a.config}).QueryTransactions(a)
+}
+
+// QueryCards queries the "cards" edge of the Account entity.
+func (a *Account) QueryCards() *CardQuery {
+	return (&AccountClient{config: a.config}).QueryCards(a)
 }
 
 // Update returns a builder for updating this Account.

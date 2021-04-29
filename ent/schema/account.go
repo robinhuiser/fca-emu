@@ -50,5 +50,6 @@ func (Account) Edges() []ent.Edge {
 		edge.To("product", Product.Type).
 			Unique(),
 		edge.To("transactions", Transaction.Type),
+		edge.To("cards", Card.Type),
 	}
 }

@@ -27,7 +27,7 @@ func Generate(ents int, branches int, c *ent.Client) error {
 	if len(ec) == 0 {
 
 		// Generate static data: card networks, banks with branches & products
-		if err := populateCardNetworks(context.Background(), c, f); err != nil {
+		if err := populateCardNetworks(context.Background(), c); err != nil {
 			return err
 		}
 		if err := populateBanks(branches, context.Background(), c, f); err != nil {
@@ -71,7 +71,16 @@ func Generate(ents int, branches int, c *ent.Client) error {
 				if err != nil {
 					return err
 				}
-				log.Printf("  > added account (%s) with Id %s - %d transactions", a.Type, a.ID, len(t))
+
+				// Generate for each DDA account x number of cards
+				cards := []*ent.Card{}
+				if a.Type == "DDA" {
+					cards, err = populateRandomCards(context.Background(), c, f, a)
+					if err != nil {
+						return err
+					}
+				}
+				log.Printf("  > added account (%s) with Id %s - %d transactions, %d cards", a.Type, a.ID, len(t), len(cards))
 			}
 		}
 	}

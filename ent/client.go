@@ -393,6 +393,22 @@ func (c *AccountClient) QueryTransactions(a *Account) *TransactionQuery {
 	return query
 }
 
+// QueryCards queries the cards edge of a Account.
+func (c *AccountClient) QueryCards(a *Account) *CardQuery {
+	query := &CardQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(card.Table, card.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.CardsTable, account.CardsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
@@ -802,6 +818,22 @@ func (c *CardClient) QueryNetwork(ca *Card) *CardNetworkQuery {
 			sqlgraph.From(card.Table, card.FieldID, id),
 			sqlgraph.To(cardnetwork.Table, cardnetwork.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, card.NetworkTable, card.NetworkColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a Card.
+func (c *CardClient) QueryAccount(ca *Card) *AccountQuery {
+	query := &AccountQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(card.Table, card.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, card.AccountTable, card.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
 		return fromV, nil

@@ -55,6 +55,8 @@ const (
 	EdgeProduct = "product"
 	// EdgeTransactions holds the string denoting the transactions edge name in mutations.
 	EdgeTransactions = "transactions"
+	// EdgeCards holds the string denoting the cards edge name in mutations.
+	EdgeCards = "cards"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// BranchTable is the table the holds the branch relation/edge.
@@ -97,6 +99,13 @@ const (
 	TransactionsInverseTable = "transactions"
 	// TransactionsColumn is the table column denoting the transactions relation/edge.
 	TransactionsColumn = "account_transactions"
+	// CardsTable is the table the holds the cards relation/edge.
+	CardsTable = "cards"
+	// CardsInverseTable is the table name for the Card entity.
+	// It exists in this package in order to avoid circular dependency with the "card" package.
+	CardsInverseTable = "cards"
+	// CardsColumn is the table column denoting the cards relation/edge.
+	CardsColumn = "account_cards"
 )
 
 // Columns holds all SQL columns for account fields.

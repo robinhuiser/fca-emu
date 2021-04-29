@@ -27,6 +27,8 @@ const (
 	FieldURL = "url"
 	// EdgeNetwork holds the string denoting the network edge name in mutations.
 	EdgeNetwork = "network"
+	// EdgeAccount holds the string denoting the account edge name in mutations.
+	EdgeAccount = "account"
 	// Table holds the table name of the card in the database.
 	Table = "cards"
 	// NetworkTable is the table the holds the network relation/edge.
@@ -36,6 +38,13 @@ const (
 	NetworkInverseTable = "card_networks"
 	// NetworkColumn is the table column denoting the network relation/edge.
 	NetworkColumn = "card_network"
+	// AccountTable is the table the holds the account relation/edge.
+	AccountTable = "cards"
+	// AccountInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountInverseTable = "accounts"
+	// AccountColumn is the table column denoting the account relation/edge.
+	AccountColumn = "account_cards"
 )
 
 // Columns holds all SQL columns for card fields.
@@ -53,6 +62,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "cards"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"account_cards",
 	"card_network",
 }
 

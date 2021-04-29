@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/preference"
 	"github.com/robinhuiser/fca-emu/ent/product"
@@ -241,6 +242,21 @@ func (ac *AccountCreate) AddTransactions(t ...*Transaction) *AccountCreate {
 		ids[i] = t[i].ID
 	}
 	return ac.AddTransactionIDs(ids...)
+}
+
+// AddCardIDs adds the "cards" edge to the Card entity by IDs.
+func (ac *AccountCreate) AddCardIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddCardIDs(ids...)
+	return ac
+}
+
+// AddCards adds the "cards" edges to the Card entity.
+func (ac *AccountCreate) AddCards(c ...*Card) *AccountCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ac.AddCardIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -607,6 +623,25 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.CardsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CardsTable,
+			Columns: []string{account.CardsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: card.FieldID,
 				},
 			},
 		}

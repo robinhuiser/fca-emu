@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
+	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/cardnetwork"
 )
@@ -33,17 +35,20 @@ type Card struct {
 	URL string `json:"url,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CardQuery when eager-loading is set.
-	Edges        CardEdges `json:"edges"`
-	card_network *int
+	Edges         CardEdges `json:"edges"`
+	account_cards *uuid.UUID
+	card_network  *int
 }
 
 // CardEdges holds the relations/edges for other nodes in the graph.
 type CardEdges struct {
 	// Network holds the value of the network edge.
 	Network *CardNetwork `json:"network,omitempty"`
+	// Account holds the value of the account edge.
+	Account *Account `json:"account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // NetworkOrErr returns the Network value or an error if the edge
@@ -60,6 +65,20 @@ func (e CardEdges) NetworkOrErr() (*CardNetwork, error) {
 	return nil, &NotLoadedError{edge: "network"}
 }
 
+// AccountOrErr returns the Account value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CardEdges) AccountOrErr() (*Account, error) {
+	if e.loadedTypes[1] {
+		if e.Account == nil {
+			// The edge account was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: account.Label}
+		}
+		return e.Account, nil
+	}
+	return nil, &NotLoadedError{edge: "account"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Card) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
@@ -71,7 +90,9 @@ func (*Card) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullString{}
 		case card.FieldStartDate, card.FieldExpiryDate:
 			values[i] = &sql.NullTime{}
-		case card.ForeignKeys[0]: // card_network
+		case card.ForeignKeys[0]: // account_cards
+			values[i] = &uuid.UUID{}
+		case card.ForeignKeys[1]: // card_network
 			values[i] = &sql.NullInt64{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Card", columns[i])
@@ -137,6 +158,12 @@ func (c *Card) assignValues(columns []string, values []interface{}) error {
 				c.URL = value.String
 			}
 		case card.ForeignKeys[0]:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field account_cards", values[i])
+			} else if value != nil {
+				c.account_cards = value
+			}
+		case card.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field card_network", value)
 			} else if value.Valid {
@@ -151,6 +178,11 @@ func (c *Card) assignValues(columns []string, values []interface{}) error {
 // QueryNetwork queries the "network" edge of the Card entity.
 func (c *Card) QueryNetwork() *CardNetworkQuery {
 	return (&CardClient{config: c.config}).QueryNetwork(c)
+}
+
+// QueryAccount queries the "account" edge of the Card entity.
+func (c *Card) QueryAccount() *AccountQuery {
+	return (&CardClient{config: c.config}).QueryAccount(c)
 }
 
 // Update returns a builder for updating this Card.

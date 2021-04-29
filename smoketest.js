@@ -97,6 +97,19 @@ export default () => {
       "GetAccountBalances: has current balance": (r) => isFloat(getAccountBalancesJSON.currentBalance),
     });
 
+    // Get account cards
+    let getAccountCardsRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/cards?mask=${MASK}&enhance=${ENHANCE}`, authHeaders);
+    let getAccountCardsJSON = JSON.parse(getAccountCardsRes.body);
+    check(getAccountCardsRes, {
+      "GetAccountCards: status is 200 or 404": (r) => r.status === 200 || r.status === 404,
+      "GetAccountCards: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+    });
+    if (getAccountCardsRes.status === 200) {
+      check(getAccountCardsRes, {
+        "GetAccountCards: has one or more cards": (r) => getAccountCardsJSON.totalItems > 0,
+      });
+    }
+    
     // Get transactions for account
     let getAccountTransactionsRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/transactions?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, authHeaders);
     let getAccountTransactionsJSON = JSON.parse(getAccountTransactionsRes.body);

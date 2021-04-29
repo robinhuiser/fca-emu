@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/branch"
+	"github.com/robinhuiser/fca-emu/ent/card"
 	"github.com/robinhuiser/fca-emu/ent/entity"
 	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/preference"
@@ -38,6 +39,7 @@ type AccountQuery struct {
 	withRoutingnumbers *RoutingNumberQuery
 	withProduct        *ProductQuery
 	withTransactions   *TransactionQuery
+	withCards          *CardQuery
 	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -193,6 +195,28 @@ func (aq *AccountQuery) QueryTransactions() *TransactionQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.TransactionsTable, account.TransactionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCards chains the current query on the "cards" edge.
+func (aq *AccountQuery) QueryCards() *CardQuery {
+	query := &CardQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(card.Table, card.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.CardsTable, account.CardsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -387,6 +411,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withRoutingnumbers: aq.withRoutingnumbers.Clone(),
 		withProduct:        aq.withProduct.Clone(),
 		withTransactions:   aq.withTransactions.Clone(),
+		withCards:          aq.withCards.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -459,6 +484,17 @@ func (aq *AccountQuery) WithTransactions(opts ...func(*TransactionQuery)) *Accou
 	return aq
 }
 
+// WithCards tells the query-builder to eager-load the nodes that are connected to
+// the "cards" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithCards(opts ...func(*CardQuery)) *AccountQuery {
+	query := &CardQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withCards = query
+	return aq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -525,13 +561,14 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 		nodes       = []*Account{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [7]bool{
 			aq.withBranch != nil,
 			aq.withOwners != nil,
 			aq.withPreferences != nil,
 			aq.withRoutingnumbers != nil,
 			aq.withProduct != nil,
 			aq.withTransactions != nil,
+			aq.withCards != nil,
 		}
 	)
 	if aq.withBranch != nil || aq.withProduct != nil {
@@ -760,6 +797,35 @@ func (aq *AccountQuery) sqlAll(ctx context.Context) ([]*Account, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "account_transactions" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Transactions = append(node.Edges.Transactions, n)
+		}
+	}
+
+	if query := aq.withCards; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Account)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Cards = []*Card{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Card(func(s *sql.Selector) {
+			s.Where(sql.InValues(account.CardsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.account_cards
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "account_cards" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "account_cards" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Cards = append(node.Edges.Cards, n)
 		}
 	}
 
