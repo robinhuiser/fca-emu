@@ -51,9 +51,8 @@ func main() {
 	// We can ignore if there is no .dotenv (container runtime)
 	godotenv.Load()
 
-	// Display the banner
+	// Display the banner & version
 	banner.Init(os.Stdout, true, true, bytes.NewBufferString(appBanner))
-
 	log.Printf("version %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 
 	// Set application variables
@@ -121,8 +120,10 @@ func main() {
 
 	// Embed the Swagger UI within the Go binary
 	router.PathPrefix("/").Handler(http.FileServer(http.FS(staticFiles)))
-	log.Printf("specs available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
-	log.Printf("mock server listening on %s:%s", appListenAddress, appListenPort)
 
+	// Start server
+	log.Printf("Swagger UI is available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
+	log.Printf("OpenAPI specification is available on http://%s:%s/api/openapi.yaml", appListenAddress, appListenPort)
+	log.Printf("server is listening on %s:%s", appListenAddress, appListenPort)
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
 }
