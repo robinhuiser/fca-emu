@@ -17,6 +17,7 @@ For more information, please visit [https://www.trexis.net](https://www.trexis.n
 * [ent.](https://entgo.io/) - `go get entgo.io/ent/cmd/ent`
 * [GoReleaser](https://github.com/goreleaser/goreleaser) - `brew install goreleaser/tap/goreleaser && brew install goreleaser`
 * [k6](https://k6.io/) 0.31.x - `brew install k6`
+* [go-license]() - `go get github.com/google/go-licenses`
 
 ## Configuration
 
@@ -56,11 +57,14 @@ $ docker-compose up fca-emu
 To create a new release:
 
 ~~~bash
+# Check for license issues before creating a tag
+$ go-licenses check .
+
 # Set the token for the Github repository - see: https://github.com/settings/tokens/new
 $ export GITHUB_TOKEN=""
-$ export TAG=0.0.1
 
-# Tag (example - set to real values!)
+# Create a tag (example - set to real values!)
+$ export TAG=0.0.1
 $ git tag -a v${TAG} -m "initial release"
 $ git push origin main -f --tags
 
