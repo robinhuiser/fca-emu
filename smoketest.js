@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, group, sleep, fail } from 'k6';
+import { check } from 'k6';
 
 export let options = {
   vus: 1, // 1 user looping
@@ -148,7 +148,6 @@ export default () => {
           // Get (first) image based upon account_id and image_id
           let imageId = getAccountTransactionImagesJSON.binaries[0].itemId
           let getAccountTransactionImageRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/image/${imageId}`, authHeaders);
-          let getAccountTransactionImageJSON = JSON.parse(getAccountTransactionImageRes.body);
           check(getAccountTransactionImageRes, {
             "GetAccountTransactionImage: status is 200": (r) => r.status === 200,
             "GetAccountTransactionImage: http version is 1.1": (r) => r.proto === "HTTP/1.1",
