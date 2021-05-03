@@ -33,7 +33,7 @@ func NewProductsApiService() ProductsApiServicer {
 func (s *ProductsApiService) GetProducts(ctx context.Context, productType string, limit int32, cursor string, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Mandatory parameter

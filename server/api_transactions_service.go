@@ -41,7 +41,7 @@ func NewTransactionsApiService() TransactionsApiServicer {
 func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, accountId string, transactionId string, mask bool, inline bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Parse and verify UUID
@@ -83,7 +83,7 @@ func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, acco
 func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context, accountId string, itemId string, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Parse and verify UUID
@@ -138,7 +138,7 @@ func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context,
 func (s *TransactionsApiService) GetAccountTransactionImages(ctx context.Context, accountId string, transactionId string, mask bool, inline bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Parse and verify UUID
@@ -181,7 +181,7 @@ func (s *TransactionsApiService) GetAccountTransactionImages(ctx context.Context
 func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, accountId string, mask bool, startDateTime string, endDateTime string, reversedInRunning bool, limit int32, cursor string, status TransactionStatus, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Parse and verify UUID

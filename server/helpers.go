@@ -21,8 +21,9 @@ import (
 )
 
 const (
-	FCA_SECRET  = "123456789"
-	MASK_SYMBOL = "x"
+	FCA_SECRET        = "123456789"
+	MASK_SYMBOL       = "x"
+	INVALID_TOKEN_MSG = "Invalid token"
 )
 
 //Response return a ImplResponse struct filled

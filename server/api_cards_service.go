@@ -36,7 +36,7 @@ func NewCardsApiService() CardsApiServicer {
 func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
-		return Response(401, setErrorResponse("Invalid token")), nil
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
 	}
 
 	// Parse and verify UUID
