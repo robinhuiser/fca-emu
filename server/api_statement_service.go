@@ -29,92 +29,24 @@ func NewStatementApiService() StatementApiServicer {
 
 // GetAccountStatementItem - Return a binary item for a statement
 func (s *StatementApiService) GetAccountStatementItem(ctx context.Context, accountId string, statementId string, itemId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountStatementItem with the required logic for this service method.
-	// Add api_statement_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountStatementItem method not implemented")
 }
 
 // GetAccountStatementItems - Return the list of content items associated with a statement
 func (s *StatementApiService) GetAccountStatementItems(ctx context.Context, accountId string, statementId string, inline bool, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetAccountStatementItems with the required logic for this service method.
-	// Add api_statement_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, BinaryItemList{}) or use other options such as http.Ok ...
-	//return Response(200, BinaryItemList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetAccountStatementItems method not implemented")
 }
 
 // GetStatementItem - Return a binary item for a statement
 func (s *StatementApiService) GetStatementItem(ctx context.Context, statementId string, itemId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetStatementItem with the required logic for this service method.
-	// Add api_statement_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetStatementItem method not implemented")
 }
 
 // GetStatementItems - Return the list of content items associated with a statement
 func (s *StatementApiService) GetStatementItems(ctx context.Context, statementId string, inline bool, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetStatementItems with the required logic for this service method.
-	// Add api_statement_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, BinaryItemList{}) or use other options such as http.Ok ...
-	//return Response(200, BinaryItemList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetStatementItems method not implemented")
 }

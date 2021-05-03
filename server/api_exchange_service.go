@@ -29,123 +29,36 @@ func NewExchangeApiService() ExchangeApiServicer {
 
 // DeleteExchangeTransaction - Perform exchange delete, for money movement
 func (s *ExchangeApiService) DeleteExchangeTransaction(ctx context.Context, exchangeId string, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update DeleteExchangeTransaction with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, {}) or use other options such as http.Ok ...
-	//return Response(200, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteExchangeTransaction method not implemented")
 }
 
 // GetExchangeTransaction - Return a given exchange transaction
 func (s *ExchangeApiService) GetExchangeTransaction(ctx context.Context, exchangeId string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update GetExchangeTransaction with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ExchangeTransaction{}) or use other options such as http.Ok ...
-	//return Response(200, ExchangeTransaction{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetExchangeTransaction method not implemented")
 }
 
 // ListAccountExchangeTransactions - List of scheduled and past exchange transaction for a given account
 func (s *ExchangeApiService) ListAccountExchangeTransactions(ctx context.Context, accountId string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update ListAccountExchangeTransactions with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ExchangeTransactionsList{}) or use other options such as http.Ok ...
-	//return Response(200, ExchangeTransactionsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListAccountExchangeTransactions method not implemented")
 }
 
 // ListEntityExchangeTransactions - List of scheduled and past exchange transaction for a given entity
 func (s *ExchangeApiService) ListEntityExchangeTransactions(ctx context.Context, entityId string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string) (ImplResponse, error) {
-	// TODO - update ListEntityExchangeTransactions with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ExchangeTransactionsList{}) or use other options such as http.Ok ...
-	//return Response(200, ExchangeTransactionsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListEntityExchangeTransactions method not implemented")
 }
 
 // PerformExchangeTransaction - Perform exchange, for money movement
 func (s *ExchangeApiService) PerformExchangeTransaction(ctx context.Context, xTRACEID string, xTOKEN string, exchangeTransaction ExchangeTransaction) (ImplResponse, error) {
-	// TODO - update PerformExchangeTransaction with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ExchangeTransactionResult{}) or use other options such as http.Ok ...
-	//return Response(200, ExchangeTransactionResult{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PerformExchangeTransaction method not implemented")
 }
 
 // UpdateExchangeTransaction - Perform exchange update, for money movement
 func (s *ExchangeApiService) UpdateExchangeTransaction(ctx context.Context, exchangeId string, xTRACEID string, xTOKEN string, exchangeTransaction ExchangeTransaction) (ImplResponse, error) {
-	// TODO - update UpdateExchangeTransaction with the required logic for this service method.
-	// Add api_exchange_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ExchangeTransactionResult{}) or use other options such as http.Ok ...
-	//return Response(200, ExchangeTransactionResult{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateExchangeTransaction method not implemented")
 }

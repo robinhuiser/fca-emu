@@ -29,100 +29,30 @@ func NewCacheApiService() CacheApiServicer {
 
 // DeleteAllCache - Clear the cache for all Finite types
 func (s *CacheApiService) DeleteAllCache(ctx context.Context, xTRACEID string) (ImplResponse, error) {
-	// TODO - update DeleteAllCache with the required logic for this service method.
-	// Add api_cache_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, CacheStatisticsList{}) or use other options such as http.Ok ...
-	//return Response(200, CacheStatisticsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteAllCache method not implemented")
 }
 
 // DeleteCache - Clear the cache for a given type
 func (s *CacheApiService) DeleteCache(ctx context.Context, finiteType FiniteType, xTRACEID string) (ImplResponse, error) {
-	// TODO - update DeleteCache with the required logic for this service method.
-	// Add api_cache_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, CacheStatistics{}) or use other options such as http.Ok ...
-	//return Response(200, CacheStatistics{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteCache method not implemented")
 }
 
 // GetCache - Get the cache statistics for a given type
 func (s *CacheApiService) GetCache(ctx context.Context, finiteType FiniteType, xTRACEID string) (ImplResponse, error) {
-	// TODO - update GetCache with the required logic for this service method.
-	// Add api_cache_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, CacheStatistics{}) or use other options such as http.Ok ...
-	//return Response(200, CacheStatistics{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetCache method not implemented")
 }
 
 // ListAllCache - List of all cache statistics
 func (s *CacheApiService) ListAllCache(ctx context.Context, xTRACEID string) (ImplResponse, error) {
-	// TODO - update ListAllCache with the required logic for this service method.
-	// Add api_cache_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, CacheStatisticsList{}) or use other options such as http.Ok ...
-	//return Response(200, CacheStatisticsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListAllCache method not implemented")
 }
 
 // RenewCache - Clear and renew the cache
 func (s *CacheApiService) RenewCache(ctx context.Context, finiteType FiniteType, xTRACEID string, cacheReference CacheReference) (ImplResponse, error) {
-	// TODO - update RenewCache with the required logic for this service method.
-	// Add api_cache_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, CacheStatistics{}) or use other options such as http.Ok ...
-	//return Response(200, CacheStatistics{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("RenewCache method not implemented")
 }
