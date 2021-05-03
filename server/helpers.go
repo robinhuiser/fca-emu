@@ -23,6 +23,7 @@ import (
 const (
 	FCA_SECRET        = "123456789"
 	MASK_SYMBOL       = "x"
+	API_DATE_LAYOUT   = time.RFC3339
 	INVALID_TOKEN_MSG = "Invalid token"
 )
 
@@ -64,8 +65,8 @@ func isEnhanced(b bool, s string) string {
 }
 
 func isValidBankDate(d string) string {
-	b, _ := time.Parse(util.APIDateFormat, "1974-01-01T00:00:00")
-	t, err := time.Parse(util.APIDateFormat, d)
+	b, _ := time.Parse(API_DATE_LAYOUT, "1974-01-01T00:00:00+0100")
+	t, err := time.Parse(API_DATE_LAYOUT, d)
 	if err != nil || t.Before(b) {
 		return ""
 	}
