@@ -19,7 +19,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/entity"
-	"github.com/robinhuiser/fca-emu/util"
 )
 
 // EntityApiService is a service that implents the logic for the EntityApiServicer
@@ -116,7 +115,7 @@ func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string
 		Addresses:      addresses,
 		Preferences:    preferences,
 		ContactPoints:  contactpoints,
-		DateOfBirth:    isValidBankDate(rs.DateOfBirth.Format(util.APIDateFormat)),
+		DateOfBirth:    isValidBankDate(rs.DateOfBirth.Format(API_DATE_LAYOUT)),
 		Id:             rs.ID.String(),
 		Fullname:       rs.Fullname,
 		TaxInformation: taxspecifications,
@@ -131,66 +130,18 @@ func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string
 
 // PostEntityProfile - Create entity
 func (s *EntityApiService) PostEntityProfile(ctx context.Context, mask bool, enhance bool, xTRACEID string, xTOKEN string, entityProfile EntityProfile) (ImplResponse, error) {
-	// TODO - update PostEntityProfile with the required logic for this service method.
-	// Add api_entity_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, Entity{}) or use other options such as http.Ok ...
-	//return Response(200, Entity{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PostEntityProfile method not implemented")
 }
 
 // PutEntityProfile - Update entity profile
 func (s *EntityApiService) PutEntityProfile(ctx context.Context, entityId string, mask bool, enhance bool, xTRACEID string, xTOKEN string, entityProfile EntityProfile) (ImplResponse, error) {
-	// TODO - update PutEntityProfile with the required logic for this service method.
-	// Add api_entity_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, EntityProfile{}) or use other options such as http.Ok ...
-	//return Response(200, EntityProfile{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PutEntityProfile method not implemented")
 }
 
 // SearchEntities - Search for entities
 func (s *EntityApiService) SearchEntities(ctx context.Context, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
-	// TODO - update SearchEntities with the required logic for this service method.
-	// Add api_entity_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, EntityList{}) or use other options such as http.Ok ...
-	//return Response(200, EntityList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchEntities method not implemented")
 }
@@ -215,9 +166,9 @@ func mapEntities(owners []*ent.Entity, ctx context.Context) []Entity {
 			Id:          o.ID.String(),
 			Name:        o.Fullname,
 			Active:      o.Active,
-			DateCreated: isValidBankDate(o.DateCreated.Format(util.APIDateFormat)),
+			DateCreated: isValidBankDate(o.DateCreated.Format(API_DATE_LAYOUT)),
 			SecurityInformation: SecurityInformation{
-				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(util.APIDateFormat)),
+				LastLoginDate: isValidBankDate(o.LastLoginDate.Format(API_DATE_LAYOUT)),
 				Username:      o.Username,
 				Token:         o.Token,
 			},

@@ -18,7 +18,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
-	"github.com/robinhuiser/fca-emu/util"
+	"github.com/robinhuiser/fca-emu/ent/card"
 )
 
 // CardsApiService is a service that implents the logic for the CardsApiServicer
@@ -55,7 +55,10 @@ func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string,
 	}
 
 	// Retrieve the cards
-	crds, err := rs.QueryCards().All(ctx)
+	crds, err := rs.
+		QueryCards().
+		Order(ent.Asc(card.FieldStartDate)).
+		All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
@@ -92,8 +95,8 @@ func mapCard(acct *ent.Account, crd *ent.Card, mask bool, en bool, ctx context.C
 		Id:         strconv.Itoa(crd.ID),
 		Type:       crd.Type.String(),
 		Number:     isMasked(mask, crd.Number),
-		StartDate:  isValidBankDate(crd.StartDate.Format(util.APIDateFormat)),
-		ExpiryDate: isValidBankDate(crd.ExpiryDate.Format(util.APIDateFormat)),
+		StartDate:  isValidBankDate(crd.StartDate.Format(API_DATE_LAYOUT)),
+		ExpiryDate: isValidBankDate(crd.ExpiryDate.Format(API_DATE_LAYOUT)),
 		HolderName: crd.HolderName,
 		Network:    cn.Name,
 		Status:     string(crd.Status),

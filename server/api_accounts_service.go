@@ -20,7 +20,6 @@ import (
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/entity"
-	"github.com/robinhuiser/fca-emu/util"
 )
 
 var clt *ent.Client
@@ -156,7 +155,10 @@ func (s *AccountsApiService) GetEntityAccountsList(ctx context.Context, entityId
 	}
 
 	// 2: Find the accounts belonging to this entity
-	accts, err := clt.Entity.QueryOwnsAccount(rs).All(ctx)
+	accts, err := clt.Entity.
+		QueryOwnsAccount(rs).
+		Order(ent.Asc(account.FieldDateCreated)).
+		All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
@@ -183,66 +185,18 @@ func (s *AccountsApiService) GetEntityAccountsList(ctx context.Context, entityId
 
 // PostEntityAccountsList - Return list a of accounts based on a entity search
 func (s *AccountsApiService) PostEntityAccountsList(ctx context.Context, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
-	// TODO - update PostEntityAccountsList with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, AccountsList{}) or use other options such as http.Ok ...
-	//return Response(200, AccountsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PostEntityAccountsList method not implemented")
 }
 
 // PutAccount - Update a account
 func (s *AccountsApiService) PutAccount(ctx context.Context, accountId string, mask bool, enhance bool, xTRACEID string, xTOKEN string, account Account) (ImplResponse, error) {
-	// TODO - update PutAccount with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, Account{}) or use other options such as http.Ok ...
-	//return Response(200, Account{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(404, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PutAccount method not implemented")
 }
 
 // SearchAccounts - Search for accounts
 func (s *AccountsApiService) SearchAccounts(ctx context.Context, fields string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
-	// TODO - update SearchAccounts with the required logic for this service method.
-	// Add api_accounts_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, AccountsList{}) or use other options such as http.Ok ...
-	//return Response(200, AccountsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchAccounts method not implemented")
 }
@@ -319,10 +273,10 @@ func mapAccountDetails(acc *ent.Account, mask bool, ctx context.Context) (Accoun
 		ParentId:          isValidUUID(acc.ParentId.String()),
 		Name:              ents[0].Fullname,
 		Title:             acc.Title,
-		DateCreated:       isValidBankDate(acc.DateCreated.Format(util.APIDateFormat)),
-		DateOpened:        isValidBankDate(acc.DateOpened.Format(util.APIDateFormat)),
-		DateLastUpdated:   isValidBankDate(acc.DateLastUpdated.Format(util.APIDateFormat)),
-		DateClosed:        isValidBankDate(acc.DateClosed.Format(util.APIDateFormat)),
+		DateCreated:       isValidBankDate(acc.DateCreated.Format(API_DATE_LAYOUT)),
+		DateOpened:        isValidBankDate(acc.DateOpened.Format(API_DATE_LAYOUT)),
+		DateLastUpdated:   isValidBankDate(acc.DateLastUpdated.Format(API_DATE_LAYOUT)),
+		DateClosed:        isValidBankDate(acc.DateClosed.Format(API_DATE_LAYOUT)),
 		CurrencyCode:      acc.CurrencyCode,
 		Status:            acc.Status.String(),
 		Source:            acc.Source,
