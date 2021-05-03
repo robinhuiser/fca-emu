@@ -17,13 +17,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
-	"github.com/robinhuiser/fca-emu/util"
 )
 
 // TransactionsApiService is a service that implents the logic for the TransactionsApiServicer
@@ -47,13 +47,13 @@ func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, acco
 	// Parse and verify UUID
 	ua, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Parse and verify UUID
 	ut, err := uuid.Parse(transactionId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Lookup the account
@@ -89,13 +89,13 @@ func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context,
 	// Parse and verify UUID
 	ua, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Parse and validate itemId
 	i, err := strconv.Atoi(itemId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Lookup the account
@@ -128,7 +128,7 @@ func (s *TransactionsApiService) GetAccountTransactionImage(ctx context.Context,
 	}
 
 	if ac.ID != ua {
-		return Response(500, setErrorResponse("Image does not belong to account")), nil
+		return Response(400, setErrorResponse("Image does not belong to account")), nil
 	}
 
 	return Response(200, img.Content), nil
@@ -144,13 +144,13 @@ func (s *TransactionsApiService) GetAccountTransactionImages(ctx context.Context
 	// Parse and verify UUID
 	ua, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Parse and verify UUID
 	ut, err := uuid.Parse(transactionId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Lookup the account
@@ -187,16 +187,7 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 	// Parse and verify UUID
 	u, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Parse limit
-	maxresults := parseLimit(limit)
-
-	// Parse cursor
-	offset, err := parseCursor(cursor)
-	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Lookup the account
@@ -208,8 +199,45 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
+	// Parse limit
+	maxresults := parseLimit(limit)
+
+	// Parse cursor
+	offset, err := parseCursor(cursor)
+	if err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Parse dates
+	sDate, err := parseFilterDate(rs.DateCreated, startDateTime)
+	if err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	eDate, err := parseFilterDate(time.Now(), endDateTime)
+	if err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Parse transaction status
+	stat, err := setTransactionStatusFilter(status)
+	if err != nil {
+		return Response(400, setErrorResponse("Invalid transaction status")), nil
+	}
+
 	// Retrieve the transactions
-	trs, err := rs.QueryTransactions().Offset(offset).Limit(maxresults).All(ctx)
+	trs, err := rs.QueryTransactions().
+		Offset(offset).
+		Limit(maxresults).
+		Where(
+			transaction.And(
+				transaction.CreatedDateGTE(sDate),
+				transaction.CreatedDateLTE(eDate),
+				transaction.StatusIn(stat...),
+			),
+		).Order(ent.Asc(transaction.FieldCreatedDate)).
+		All(ctx)
+
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
@@ -238,20 +266,6 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 
 // SearchTransactions - Search for transactions
 func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
-	// TODO - update SearchTransactions with the required logic for this service method.
-	// Add api_transactions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, TransactionsList{}) or use other options such as http.Ok ...
-	//return Response(200, TransactionsList{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(401, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorResponse{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, ErrorResponse{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorResponse{}), nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("SearchTransactions method not implemented")
 }
@@ -327,10 +341,10 @@ func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, 
 		OriginatingCurrencyCode: tr.OriginatingCurrencyCode,
 		Direction:               tr.Direction.String(),
 		RunningBalance:          float32(tr.RunningBalance),
-		CreatedDate:             isValidBankDate(tr.CreatedDate.Format(util.APIDateFormat)),
-		ExecutedDate:            isValidBankDate(tr.ExecutedDate.Format(util.APIDateFormat)),
-		PostedDate:              isValidBankDate(tr.PostedDate.Format(util.APIDateFormat)),
-		UpdatedDate:             isValidBankDate(tr.UpdatedDate.Format(util.APIDateFormat)),
+		CreatedDate:             isValidBankDate(tr.CreatedDate.Format(API_DATE_LAYOUT)),
+		ExecutedDate:            isValidBankDate(tr.ExecutedDate.Format(API_DATE_LAYOUT)),
+		PostedDate:              isValidBankDate(tr.PostedDate.Format(API_DATE_LAYOUT)),
+		UpdatedDate:             isValidBankDate(tr.UpdatedDate.Format(API_DATE_LAYOUT)),
 		Description:             tr.Description,
 		Memo:                    isEnhanced(en, tr.Memo),
 		Group:                   isEnhanced(en, tr.Group),
@@ -353,4 +367,31 @@ func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, 
 	}
 
 	return t, nil
+}
+
+func setTransactionStatusFilter(status TransactionStatus) ([]transaction.Status, error) {
+	stat := []transaction.Status{transaction.StatusPOSTED, transaction.StatusPENDING}
+	if len(status) > 0 {
+		switch st := status; st {
+		case TransactionStatus(transaction.StatusPOSTED):
+			stat = []transaction.Status{transaction.StatusPOSTED}
+
+		case TransactionStatus(transaction.StatusPENDING):
+			stat = []transaction.Status{transaction.StatusPENDING}
+		default:
+			return []transaction.Status{}, fmt.Errorf("%s", "Invalid transaction status")
+		}
+	}
+	return stat, nil
+}
+
+func parseFilterDate(d time.Time, pd string) (time.Time, error) {
+	if len(pd) > 0 {
+		retDate, err := time.Parse(API_DATE_LAYOUT, pd)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("%v", err)
+		}
+		d = retDate
+	}
+	return d, nil
 }
