@@ -47,7 +47,7 @@ func (s *AccountsApiService) GetAccount(ctx context.Context, accountId string, m
 	// Parse and verify UUID
 	u, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Perform the search
@@ -78,7 +78,7 @@ func (s *AccountsApiService) GetAccountBalances(ctx context.Context, accountId s
 	// Parse and verify UUID
 	u, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Perform the search
@@ -110,7 +110,7 @@ func (s *AccountsApiService) GetAccountDetails(ctx context.Context, accountId st
 	// Parse and verify UUID
 	u, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Perform the search
@@ -142,7 +142,7 @@ func (s *AccountsApiService) GetEntityAccountsList(ctx context.Context, entityId
 	// Parse and verify UUID
 	u, err := uuid.Parse(entityId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// 1: Find the entity

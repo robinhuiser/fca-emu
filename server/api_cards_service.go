@@ -42,7 +42,7 @@ func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string,
 	// Parse and verify UUID
 	ua, err := uuid.Parse(accountId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Lookup the account

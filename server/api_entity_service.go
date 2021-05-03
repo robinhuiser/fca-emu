@@ -43,7 +43,7 @@ func (s *EntityApiService) GetEntity(ctx context.Context, entityId string, mask 
 	// Parse and verify UUID
 	entityUUID, err := uuid.Parse(entityId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Perform the search
@@ -70,7 +70,7 @@ func (s *EntityApiService) GetEntityProfile(ctx context.Context, entityId string
 	// Parse and verify UUID
 	entityUUID, err := uuid.Parse(entityId)
 	if err != nil {
-		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Perform the search
