@@ -13,9 +13,7 @@ package finite
 import (
 	"context"
 	"encoding/base64"
-	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -265,9 +263,69 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 }
 
 // SearchTransactions - Search for transactions
-func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
+func (s *TransactionsApiService) SearchTransactions(ctx context.Context, accountId string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
 
-	return Response(http.StatusNotImplemented, nil), errors.New("SearchTransactions method not implemented")
+	// Validate X-Token
+	if !isValidSecret(xTOKEN) {
+		return Response(401, setErrorResponse(INVALID_TOKEN_MSG)), nil
+	}
+
+	// Parse limit
+	maxresults := parseLimit(limit)
+
+	// Parse cursor
+	offset, err := parseCursor(cursor)
+	if err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Parse and verify UUID
+	u, err := uuid.Parse(accountId)
+	if err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Lookup the account
+	rs, err := clt.Account.
+		Query().
+		Where(account.ID(u)).
+		Only(ctx)
+	if err != nil {
+		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
+	// Retrieve the transactions
+	// CHALLENGE -- construct from searchfilter a WHERE clause
+	trs, err := rs.QueryTransactions().
+		Offset(offset).
+		Limit(maxresults).
+		Order(ent.Asc(transaction.FieldCreatedDate)).
+		All(ctx)
+
+	if err != nil {
+		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+	if len(trs) == 0 {
+		return Response(404, setErrorResponse("No (more) transactions found")), nil
+	}
+
+	transactions := []Transaction{}
+	for _, tr := range trs {
+		tran, err := mapTransaction(rs, tr, mask, enhance, false, ctx)
+		if err != nil {
+			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
+		}
+		transactions = append(transactions, tran)
+	}
+
+	t := TransactionsList{
+		Status:       true,
+		TotalItems:   int32(len(trs)),
+		NextCursor:   base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(len(trs) + offset))),
+		Transactions: transactions,
+	}
+
+	return Response(200, t), nil
 }
 
 // Supporting functions

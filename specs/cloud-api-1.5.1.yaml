@@ -1,0 +1,2648 @@
+openapi: 3.0.3
+info:
+  title: Cloud API
+  description: The public facing API through which connectors are exposed as a single abstract API
+  contact:
+    name: treXis LLC
+    url: https://www.trexis.net
+    email: support@trexis.net
+  version: v1.5.1
+  termsOfService: http://www.trexis.net/termsofservices
+security:
+  - cloudAPI: []
+  - connectorToken: []
+
+paths:
+  ##ENTITIES
+  /cloud/v1/entity/{entityId}:
+    get:
+      summary: Return entity by entityId
+      description: Return a given entity's information
+      tags:
+        - Entity
+      operationId: getEntity
+      parameters:
+        - $ref: '#/components/parameters/entityId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Entity Model
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entity'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/entity/{entityId}/profile:
+    get:
+      summary: Return entity profile
+      description: Return a given entity's profile information
+      tags:
+        - Entity
+      operationId: getEntityProfile
+      parameters:
+        - $ref: '#/components/parameters/entityId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Entity Profile
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityProfile'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update entity profile
+      description: Update a given entity's profile information
+      tags:
+        - Entity
+      operationId: putEntityProfile
+      parameters:
+        - $ref: '#/components/parameters/entityId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Profile to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntityProfile'
+      responses:
+        200:
+          description: Entity Profile
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityProfile'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/entities:
+    post:
+      summary: Create entity
+      description: Create a new entity based on the given profile information
+      tags:
+        - Entity
+      operationId: postEntityProfile
+      parameters:
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Profile to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntityProfile'
+      responses:
+        200:
+          description: Entity Profile
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entity'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/entities/search:
+    post:
+      summary: Search for entities
+      description: Return a paginated list of entities based on a search filter
+      tags:
+        - Entity
+      operationId: searchEntities
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Search for information based on name value pairs with defined opperators
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/SearchFilter'
+      responses:
+        200:
+          description: Entity List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##PRODUCTS
+  /cloud/v1/products:
+    get:
+      summary: Return a list of products
+      description: Return the list of products of a given type
+      tags:
+        - Products
+      operationId: getProducts
+      parameters:
+        - $ref: '#/components/parameters/productType'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: List of Products of the requested type
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##ACCOUNTS
+  /cloud/v1/entity/{entityId}/accounts:
+    get:
+      summary: Return list a of accounts by entity
+      description: Return a given entity's list of accounts
+      tags:
+        - Accounts
+      operationId: getEntityAccountsList
+      parameters:
+        - $ref: '#/components/parameters/entityId'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: List of Accounts
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/entities/accounts:
+    post:
+      deprecated: true
+      summary: Return list a of accounts based on a entity search
+      description: Return a given entity's list of accounts based on a search
+      tags:
+        - Accounts
+      operationId: postEntityAccountsList
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Search for information based on name value pairs with defined opperators
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/SearchFilter'
+      responses:
+        200:
+          description: List of Accounts
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}:
+    get:
+      summary: Return a account
+      description: Return a given account
+      tags:
+        - Accounts
+      operationId: getAccount
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Object
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update a account
+      description: Update a given account
+      tags:
+        - Accounts
+      operationId: putAccount
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Account to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          description: Account Object
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/balances:
+    get:
+      summary: Return a accounts balances
+      description: Return the balances of a given account
+      tags:
+        - Accounts
+      operationId: getAccountBalances
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Accounts Balances
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balances'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/details:
+    get:
+      summary: Return a accounts details
+      description: Return the details of a given account
+      tags:
+        - Accounts
+      operationId: getAccountDetails
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Details of the requested account
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/accounts/search:
+    post:
+      summary: Search for accounts
+      description: Return a paginated list of accounts based on a search filter
+      tags:
+        - Accounts
+      operationId: searchAccounts
+      parameters:
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Search for information based on name value pairs with defined opperators
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/SearchFilter'
+      responses:
+        200:
+          description: Accounts List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##CARDS
+  /cloud/v1/account/{accountId}/cards:
+    get:
+      summary: Return a accounts cards
+      description: Return the list of cards of a given account
+      tags:
+        - Cards
+      operationId: getAccountCards
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Cards of the requested account
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##TRANSACTIONS
+  /cloud/v1/account/{accountId}/transactions:
+    get:
+      summary: Return a accounts transactions
+      description: Return the list of transactions for a given account
+      tags:
+        - Transactions
+      operationId: getAccountTransactions
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/startDateTime'
+        - $ref: '#/components/parameters/endDateTime'
+        - $ref: '#/components/parameters/reversedInRunning'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/transactionStatus'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Transactions
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/transaction/{transactionId}:
+    get:
+      summary: Return a given accounts transaction
+      description: Return the given transaction for the given account
+      tags:
+        - Transactions
+      operationId: getAccountTransaction
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/transactionId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/inline'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Transaction
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/transaction/{transactionId}/images:
+    get:
+      summary: Return the binary images for a given transaction
+      description: Return the binary images for a given transaction
+      tags:
+        - Transactions
+      operationId: getAccountTransactionImages
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/transactionId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/inline'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Transaction Images
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryItemList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/image/{itemId}:
+    get:
+      summary: Return a given image
+      description: Return the image associated with a given account, typically for a transaction
+      tags:
+        - Transactions
+      operationId: getAccountTransactionImage
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/itemId'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Image
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            image/gif:
+              schema:
+                type: string
+                format: byte
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+            image/tiff:
+              schema:
+                type: string
+                format: byte
+            image/png:
+              schema:
+                type: string
+                format: byte
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/statements:
+    get:
+      summary: Return a list of statements for a given account
+      description: Return the statements for a given account
+      tags:
+        - Statements
+      operationId: getAccountStatements
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Statements
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/statement/{statementId}:
+    get:
+      summary: Return the list of content items associated with a statement
+      description: Return the list of content items associated with a given account and statement id.
+      tags:
+        - Statement
+      operationId: getAccountStatementItems
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/statementId'
+        - $ref: '#/components/parameters/inline'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Statement Binary Items
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryItemList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/statement/{statementId}:
+    get:
+      summary: Return the list of content items associated with a statement
+      description: Return the list of content items associated with a unique statement id.
+      tags:
+        - Statement
+      operationId: getStatementItems
+      parameters:
+        - $ref: '#/components/parameters/statementId'
+        - $ref: '#/components/parameters/inline'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Statement Binary Items
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryItemList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/statement/{statementId}/item/{itemId}:
+    get:
+      summary: Return a binary item for a statement
+      description: Return the binary item associated with a given statement.
+      tags:
+        - Statement
+      operationId: getAccountStatementItem
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/statementId'
+        - $ref: '#/components/parameters/itemId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Account Statement Item
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            image/gif:
+              schema:
+                type: string
+                format: byte
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+            image/tiff:
+              schema:
+                type: string
+                format: byte
+            image/png:
+              schema:
+                type: string
+                format: byte
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/statement/{statementId}/item/{itemId}:
+    get:
+      summary: Return a binary item for a statement
+      description: Return the binary item associated with a given statement.
+      tags:
+        - Statement
+      operationId: getStatementItem
+      parameters:
+        - $ref: '#/components/parameters/statementId'
+        - $ref: '#/components/parameters/itemId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Statement Item
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            image/gif:
+              schema:
+                type: string
+                format: byte
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+            image/tiff:
+              schema:
+                type: string
+                format: byte
+            image/png:
+              schema:
+                type: string
+                format: byte
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/transactions/{accountId}/search:
+    post:
+      summary: Search for transactions
+      description: Return a paginated list of transactions based on a search filter
+      tags:
+        - Transactions
+      operationId: searchTransactions
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Search for information based on name value pairs with defined opperators
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/SearchFilter'
+      responses:
+        200:
+          description: Transactions List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##EXCHANGE
+  /cloud/v1/entity/{entityId}/exchanges:
+    get:
+      summary: List of scheduled and past exchange transaction for a given entity
+      description: Return a paginated list of exchange transactions scheduled or cancelled for a given entity
+      tags:
+        - Exchange
+      operationId: listEntityExchangeTransactions
+      parameters:
+        - $ref: '#/components/parameters/entityId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Exchange Transaction List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeTransactionsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/account/{accountId}/exchanges:
+    get:
+      summary: List of scheduled and past exchange transaction for a given account
+      description: Return a paginated list of exchange transactions scheduled or cancelled for a given account
+      tags:
+        - Exchange
+      operationId: listAccountExchangeTransactions
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Exchange Transaction List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeTransactionsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/exchange:
+    post:
+      summary: Perform exchange, for money movement
+      description: Execute a exchange transaction
+      tags:
+        - Exchange
+      operationId: performExchangeTransaction
+      parameters:
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Exchange body content, describing the exchange that should take place
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeTransaction'
+      responses:
+        200:
+          description: Exchange information
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeTransactionResult'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /cloud/v1/exchange/{exchangeId}:
+    get:
+      summary: Return a given exchange transaction
+      description: Return a given exchange transaction by identifier
+      tags:
+        - Exchange
+      operationId: getExchangeTransaction
+      parameters:
+        - $ref: '#/components/parameters/exchangeId'
+        - $ref: '#/components/parameters/mask'
+        - $ref: '#/components/parameters/enhance'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Exchange Transaction
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeTransaction'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Perform exchange update, for money movement
+      description: Update exchange transaction
+      tags:
+        - Exchange
+      operationId: updateExchangeTransaction
+      parameters:
+        - $ref: '#/components/parameters/exchangeId'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        description: Exchange body content, describing the exchange that should be deleted
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeTransaction'
+      responses:
+        200:
+          description: Exchange information
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeTransactionResult'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Perform exchange delete, for money movement
+      description: Delete a specified exchange transaction
+      tags:
+        - Exchange
+      operationId: deleteExchangeTransaction
+      parameters:
+        - $ref: '#/components/parameters/exchangeId'
+        - $ref: '#/components/parameters/traceId'
+        - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Exchange information
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+            X-TOKEN:
+              $ref: '#/components/headers/X-TOKEN'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  ##ADMINISTRATION
+  /cloud/v1/admin/cache:
+    get:
+      summary: List of all cache statistics
+      description: Return a the cache statistics for all Finite types
+      tags:
+        - Cache
+      operationId: listAllCache
+      parameters:
+        - $ref: '#/components/parameters/traceId'
+      responses:
+        200:
+          description: Cache Statistics List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatisticsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Clear the cache for all Finite types
+      description: Clear the cache for all Finite type
+      tags:
+        - Cache
+      operationId: deleteAllCache
+      parameters:
+        - $ref: '#/components/parameters/traceId'
+      responses:
+        200:
+          description: Cache Statistics List
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatisticsList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /cloud/v1/admin/cache/{finiteType}:
+    get:
+      summary: Get the cache statistics for a given type
+      description: Return a the cache statistics for a given Finite type
+      tags:
+        - Cache
+      operationId: getCache
+      parameters:
+        - $ref: '#/components/parameters/finiteType'
+        - $ref: '#/components/parameters/traceId'
+      responses:
+        200:
+          description: Cache Statistics
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatistics'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Clear the cache for a given type
+      description: Clear the cache for a given Finite type
+      tags:
+        - Cache
+      operationId: deleteCache
+      parameters:
+        - $ref: '#/components/parameters/finiteType'
+        - $ref: '#/components/parameters/traceId'
+      responses:
+        200:
+          description: Cache Statistics
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatistics'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Clear and renew the cache
+      description: Clear and renew the cache for a given Finite type
+      tags:
+        - Cache
+      operationId: renewCache
+      parameters:
+        - $ref: '#/components/parameters/finiteType'
+        - $ref: '#/components/parameters/traceId'
+      requestBody:
+        description: Reference to the item cache to clear and renew
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CacheReference'
+      responses:
+        200:
+          description: Cache Statistics
+          headers:
+            X-TRACE-ID:
+              $ref: '#/components/headers/X-TRACE-ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatistics'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  headers:
+    X-TRACE-ID:
+      description: Value used for tracing requests and responses
+      required: false
+      schema:
+        type: string
+        example: 1234
+    X-TOKEN:
+      description: Token to carry/send information between requests. Connectors generate and validate the token content and type.
+      required: false
+      schema:
+        type: string
+        example: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
+  parameters:
+    traceId:
+      in: header
+      name: X-TRACE-ID
+      description: Value used for tracing requests and responses
+      required: false
+      schema:
+        type: string
+        example: 1234
+    token:
+      in: header
+      name: X-TOKEN
+      description: Token to carry/send information between requests. Connectors generate and validate the token content and type.
+      required: false
+      schema:
+        type: string
+        example: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
+    entityId:
+      in: path
+      name: entityId
+      description: Unique Entity Identifier
+      required: true
+      schema:
+        type: string
+    accountId:
+      in: path
+      name: accountId
+      description: Unique Account Identifier
+      required: true
+      schema:
+        type: string
+    statementId:
+      in: path
+      name: statementId
+      description: Unique Statement Identifier
+      required: true
+      schema:
+        type: string
+    transactionId:
+      in: path
+      name: transactionId
+      description: Unique Transaction Identifier
+      required: true
+      schema:
+        type: string
+    itemId:
+      in: path
+      name: itemId
+      description: Unique Binary Item Identifier
+      required: true
+      schema:
+        type: string
+    exchangeId:
+      in: path
+      name: exchangeId
+      description: Unique Exchange transaction Identifier
+      required: true
+      schema:
+        type: string
+    fields:
+      in: query
+      name: fields
+      description: List of first level fields to limit response to.
+      required: false
+      schema:
+        type: string
+    limit:
+      in: query
+      name: limit
+      description: Number of entries to return
+      required: false
+      schema:
+        type: integer
+        default: 20
+    cursor:
+      in: query
+      name: cursor
+      description: Base64 encoded information on how to retrieve the next set of results within the cursor.
+      required: false
+      schema:
+        type: string
+        example: YWNjb3VudE51bWJlcjoxMjM0MTIzNCxhY2NvdW50VHlwZT1EREE=
+    mask:
+      in: query
+      name: mask
+      description: Indicates if data in the response should be masked
+      required: false
+      schema:
+        type: boolean
+        default: true
+    inline:
+      in: query
+      name: inline
+      description: Indicates if optional binary content should be inlined when available.
+      required: false
+      schema:
+        type: boolean
+        default: false
+    startDateTime:
+      in: query
+      name: startDateTime
+      description: Indicates the ISO 8601 formatted start date and time filter of the response elements
+      required: false
+      schema:
+        type: string
+        example: yyyy-DD-mmThh:mm:ssZ
+    endDateTime:
+      in: query
+      name: endDateTime
+      description: Indicates the ISO 8601 formatted end date and time filter of the response elements
+      required: false
+      schema:
+        type: string
+        example: yyyy-DD-mmThh:mm:ssZ
+    enhance:
+      in: query
+      name: enhance
+      description: Indicates if the request should be processed for enhancement after getting data from the connector
+      required: false
+      schema:
+        type: boolean
+        default: false
+    productType:
+      in: query
+      name: productType
+      description: Indicates a the type the request should query on for results.
+      required: true
+      schema:
+        type: string
+        example: DDA
+    finiteType:
+      in: path
+      name: finiteType
+      description: Value indicating the type of Finite schema
+      required: true
+      schema:
+        $ref: '#/components/schemas/FiniteType'
+    transactionStatus:
+      in: query
+      name: status
+      description: Indicates a the status to use as filter on the list of transactions.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TransactionStatus'
+    reversedInRunning:
+      in: query
+      name: reversedInRunning
+      description: Indicates if reversed transactions should be included in running balance calculations.
+      required: false
+      schema:
+        type: boolean
+        default: false
+
+  securitySchemes:
+    cloudAPI:
+      description: The unique tenant API key allowing access to the API and connectors
+      type: apiKey
+      name: X-API-KEY
+      in: header
+    connectorToken:
+      description: The unique key that can be passed to the connector
+      type: apiKey
+      name: X-TOKEN
+      in: header
+
+  responses:
+    ## ERROR RESPONSES
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ## MODELS
+    Entity:
+      type: object
+      description: Entity Object
+      properties:
+        type:
+          type: string
+          description: The type of profile
+          enum: ["PERSON","BUSINESS","SYSTEM"]
+        id:
+          type: string
+          description: Unique identifier of the entity
+        name:
+          type: string
+          description: Name of the entity
+          example: BridgeLine Inc or Luke Skywalker
+        taxInformation:
+          type: array
+          description: Entity tax information
+          items:
+            $ref: '#/components/schemas/TaxInformation'
+        active:
+          type: boolean
+          description: Indicates whether entity is active
+        dateCreated:
+          type: string
+          description: ISO 8601 Date entity got created
+          example: YYYY-MM-DDThh:mm:ssZ
+        securityInformation:
+          $ref: '#/components/schemas/SecurityInformation'
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+      required:
+        - id
+
+    EntityProfile:
+      type: object
+      description: Entity Profile Information
+      properties:
+        type:
+          type: string
+          description: The type of profile
+          enum: [ "PERSON","BUSINESS","SYSTEM" ]
+        id:
+          type: string
+          description: Unique identifier of the entity
+        fullname:
+          type: string
+          description: The fullname of a the entity
+          example: BridgeLine Inc
+        firstname:
+          type: string
+          description: The legal firstname of the person
+          example: Luke
+        lastname:
+          type: string
+          description: The legal lastname/surname of the person
+          example: Skywalker
+        dateOfBirth:
+          type: string
+          description: ISO 8601 Date of Birth
+          example: yyyy-MM-dd
+        addresses:
+          type: array
+          description: Entity addresses
+          items:
+            $ref: '#/components/schemas/Address'
+        contactPoints:
+          type: array
+          description: Entity contact points
+          items:
+            $ref: '#/components/schemas/ContactPoint'
+        preferences:
+          type: array
+          description: Entity preferences
+          items:
+            $ref: '#/components/schemas/Attribute'
+        taxInformation:
+          type: array
+          description: Entity tax information
+          items:
+            $ref: '#/components/schemas/TaxInformation'
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+      required:
+        - id
+
+    Account:
+      type: object
+      description: Account object
+      properties:
+        id:
+          type: string
+          description: Unique composite identifier of the account in the system of record
+          example: 123456-DDA
+        type:
+          type: string
+          description: The type of account as enumerated by the system of record
+          example: DDA
+        number:
+          type: string
+          description: The account number as represented in the system of record (masked if mask=true)
+          example: xxxxxxx1213
+        parentId:
+          type: string
+          description: Unique identifier of the parent account, in the case of a sub account
+          example: 12345ABC
+        entities:
+          type: array
+          description: List of entities this account is associated with
+          items:
+            $ref: '#/components/schemas/Entity'
+        name:
+          type: string
+          description: The name of the primary account holder
+          example: Matt Dollar
+        title:
+          type: string
+          description: The given title of an account
+          example: 401k Plan
+        iban:
+          type: string
+          description: The international bank account number
+          example: GB29NWBK60161331926819
+        routingnumbers:
+          type: array
+          description: The routing numbers of this account
+          items:
+            $ref: '#/components/schemas/RoutingNumber'
+        balances:
+          $ref: '#/components/schemas/Balances'
+        dateCreated:
+          type: string
+          description: ISO 6801 date when the account was created
+          example: YYYY-MM-DDThh:mm:ss
+        dateOpened:
+          type: string
+          description: ISO 6801 date when the account was opened or activated
+          example: YYYY-MM-DDThh:mm:ss
+        dateLastUpdated:
+          type: string
+          description: ISO 6801 date when the account was last updated
+          example: YYYY-MM-DDThh:mm:ss
+        dateClosed:
+          type: string
+          description: ISO 6801 date when the account was closed or deactivated
+          example: YYYY-MM-DDThh:mm:ss
+        currencyCode:
+          type: string
+          description: The currency code of the account
+          example: USD
+        status:
+          type: string
+          description: The current status of the account
+          example: OPEN
+        source:
+          type: string
+          description: The source of the account, where the account is located
+          example: core
+        interestReporting:
+          type: boolean
+          description: Indicates if interest is reportable on this account.
+          example: true
+        creditInformation:
+          $ref: '#/components/schemas/CreditInformation'
+        loanInterest:
+          $ref: '#/components/schemas/Interest'
+        creditInterest:
+          $ref: '#/components/schemas/Interest'
+        preferences:
+          type: array
+          description: Unique preferences of the account
+          items:
+            $ref: '#/components/schemas/Attribute'
+        bank:
+          $ref: '#/components/schemas/Bank'
+        owners:
+          type: array
+          description: List of owners of the account
+          items:
+            $ref: '#/components/schemas/Relationship'
+        product:
+          $ref: '#/components/schemas/Product'
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+      required:
+        - id
+
+    Transaction:
+      type: object
+      description: Transaction object
+      properties:
+        entityId:
+          type: string
+          description: Unique identifier of the entity
+        accountId:
+          type: string
+          description: Unique identifier of the account in the system of record
+          example: 12345ABCSub
+        id:
+          type: string
+          description: Unique identifier of the transaction in the system of record
+          example: 123412349999
+        sequenceInDay:
+          type: integer
+          description: An integer sequence that can be used for ordering transactions within one day.
+          example: 5
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        executedAmount:
+          type: number
+          description: The amount of the transaction when it was executed and booked to the account.
+          example: 9999.99
+        executedCurrencyCode:
+          type: string
+          description: The currency code of the executed amount
+          example: USD
+        exchangeRate:
+          type: number
+          description: The exchange rate used to convert the originating amount to the executing amount
+          example: 1.3
+        originatingAmount:
+          type: number
+          description: The originating amount of the transaction when it was originally submitted to the account.
+          example: 9999.99
+        originatingCurrencyCode:
+          type: string
+          description: The currency code of the originating transaction amount
+          example: EUR
+        direction:
+          type: string
+          enum: ["DEBIT","CREDIT"]
+          example: DEBIT
+        runningBalance:
+          type: number
+          description: The balance of the account at the moment this transaction was executed
+          example: 9999.99
+        createdDate:
+          type: string
+          description: ISO 6801 date of when the transaction was created in the system of record
+          example: YYYY-MM-DDThh:mm:ssZ
+        postedDate:
+          type: string
+          description: ISO 6801 date of when the transaction was posted to the account
+          example: YYYY-MM-DDThh:mm:ssZ
+        executedDate:
+          type: string
+          description: ISO 6801 date of when the transaction was executed and booked to the account
+          example: YYYY-MM-DDThh:mm:ssZ
+        updatedDate:
+          type: string
+          description: ISO 6801 date of when the transaction was updated on the account
+          example: YYYY-MM-DDThh:mm:ssZ
+        description:
+          type: string
+          description: Unique identifier of the transaction in the system of record
+          example: Lightsaber purchased
+        memo:
+          type: string
+          description: Additional information about the transaction
+          example: Purchased from Obi-Wan Kenobi
+        group:
+          type: string
+          description: The grouping of this transaction in the system of record
+          example: Payment
+        type:
+          type: string
+          description: The type of this transaction in the system of record
+          example: Cash
+        mainCategory:
+          type: string
+          description: The main category of the transaction
+          example: Weapons
+        subCategory:
+          type: string
+          description: The sub category of the transaction
+          example: Electronic Weapons
+        checkNumber:
+          type: string
+          description: The check number associated with the transaction in case it was a check
+          example: check1000
+        images:
+          $ref: '#/components/schemas/BinaryItemList'
+        latitude:
+          type: string
+          description: The latitude coordinate where the transaction took place
+          example: 40.516975
+        longitude:
+          type: string
+          description: The longitude coordinate where the transaction took place
+          example: -80.221352
+        merchantCode:
+          type: string
+          description: The code used to identify the merchant for the transaction
+          example: StarWars
+        reversal:
+          type: boolean
+          description: true if this transaction is a reversal, false otherwise.
+          example: false
+        reversalFor:
+          type: string
+          description: The transaction identifier this transaction is reversing
+          example: 84XYZ
+        reversed:
+          type: boolean
+          description: true if this transaction has been reversed, false otherwise.
+          example: true
+        reversedBy:
+          type: string
+          description: The transaction identifier this transaction was reversed by
+          example: 42ABC
+        transactor:
+          $ref: '#/components/schemas/Transactor'
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    Product:
+      type: object
+      description: Product Object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the product
+          example: 12345ABC
+        number:
+          type: string
+          description: Number used to identify the product
+          example: plan401ka
+        type:
+          type: string
+          description: Product type
+          example: INVESTMENT
+        typeName:
+          type: string
+          description: Product type friendly name
+          example: Investment account
+        subType:
+          type: string
+          description: Product sub type
+          example: 401K
+        subTypeName:
+          type: string
+          description: Product sub type friendly name
+          example: 401k Plan
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    Bank:
+      type: object
+      description: Bank object
+      properties:
+        swift:
+          type: string
+          description: Standard format of Business Identifier Codes (bic), unique identification code
+          example: CHASUSU3XXX
+        bankCode:
+          type: string
+          description: A bank code is a code assigned by a central bank, a bank supervisory body or a Bankers Association in a country to all its licensed member banks or financial institutions.
+          example: XXX
+        bankName:
+          type: string
+          description: The financial institution name
+          example: JP Morgan Chase
+        branchCode:
+          type: string
+          description: The branch code of a bank branch helps in distinguishing one branch from another
+          example: atl-100
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    Card:
+      type: object
+      description: Card object
+      properties:
+        type:
+          type: string
+          description: The type of card
+          enum: ["CREDIT","DEBIT","LOYALTY"]
+        id:
+          type: string
+          description: Unique card identifier in the system of record
+          example: 12345ABC
+        number:
+          type: string
+          description: Card number (masked if masked=true)
+          example: xxxx-xxxx-xxxx-1234
+        startDate:
+          type: string
+          description: ISO 6801 date of when the card is started/activated
+          example: YYYY-MM-DDThh:mm:ss
+        expiryDate:
+          type: string
+          description: ISO 6801 date of when the card expires
+          example: YYYY-MM-DDThh:mm:ss
+        holderName:
+          type: string
+          description: The name of the cardholder
+          example: Dr. Luke Skywalker
+        network:
+          type: string
+          description: The card network program
+          example: Mastercard
+        status:
+          type: string
+          description: The status of the card
+          example: LOCKED
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    Balances:
+      type: object
+      description: Account Balances object
+      properties:
+        availableBalance:
+          type: number
+          description: The available balance is your current balance less any outstanding holds or debits that have not yet posted to your account.
+          example: 9999.99
+        currentBalance:
+          type: number
+          description: The current balance is the total amount of funds in your account.
+          example: 9999.99
+        cashBalance:
+          type: number
+          description: The amount of money in an account.  It is calculated by adding the initial deposit to all subsequent deposits and then subtracting all disbursements.
+          example: 9999.99
+        minimumBalance:
+          type: number
+          description: The minimum amount of funds a account may have before indicated as overdrawn.
+          example: 9999.99
+        outstandingBalance:
+          type: number
+          description: The total amount of the loan including interest/fees. The outstanding balance usually implies that extra interest/fees has been accrued.
+          example: 9999.99
+        principalBalance:
+          type: number
+          description: The total loan amount without any added interest/fees
+          example: 9999.99
+        accruedInterest:
+          type: number
+          description:  The accumulated interest charges that have been recognized in the books of accounts but have yet to be paid
+          example: 9999.99
+        investmentBalance:
+          type: number
+          description:  The amounts credited to the Investment, less the amounts debited from the Investment and the amounts redeemed by such Investor from time to time
+          example: 9999.99
+        payOffAmount:
+          type: number
+          description: The total amount needed to pay off the loan.
+          example: 9999.99
+        ledgerBalance:
+          type: number
+          description: A ledger balance is calculated at the end of each business day by a bank and includes all debits and credits.
+          example: 9999.99
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    CreditInformation:
+      type: object
+      description: Account Credit object
+      properties:
+        creditLimit:
+          type: number
+          description: The maximum credit limit amount
+          example: 9999.99
+        creditAvailable:
+          type: number
+          description: The amount of credit available based on limit
+          example: 9999.99
+        creditLimitExpiryDate:
+          type: string
+          description: ISO 8601 date of when the credit limit expires
+          example: YYYY-MM-DDThh:mm:ss
+        loanTermsUnit:
+          type: string
+          description: The measure of terms
+          example: months
+        loanTerms:
+          type: integer
+          description: The number of terms agreed
+          example: 36
+        principalDueAmount:
+          type: number
+          description: The amount of principal within the next due payment
+          example: 9999.99
+        interestDueAmount:
+          type: number
+          description: The amount of interest within the next due payment
+          example: 9999.99
+        paymentDueAmount:
+          type: number
+          description: The amount of the next due payment
+          example: 9999.99
+        paymentDueDate:
+          type: string
+          description: ISO 8601 date of the next due payment
+          example: YYYY-MM-DD
+        paymentDueDay:
+          type: integer
+          description: Day of the month on which payments are due
+          example: 1
+        lastPaymentAmount:
+          type: number
+          description: The amount of the last payment
+          example: 9999.99
+        lastPaymentDate:
+          type: string
+          description: ISO 8601 date of the last payment
+          example: YYYY-MM-DDThh:mm:ss
+        isRevolving:
+          type: boolean
+          description: Indicates Revolving Credit Line
+          example: true
+        maturityDate:
+          type: string
+          description: ISO 8601 formatted maturity date
+          example: YYYY-MM-DDThh:mm:ss
+        maturityAmount:
+          type: number
+          description: The amount due at maturity
+          example: 9999.99
+        initialAmount:
+          type: number
+          description: The original amount of the credit line or loan.
+          example: 9999.99
+        interestEarnedYTD:
+          type: number
+          description: The amount of earning interest, Year To Date.
+          example: 9999.99
+        interestPaidYTD:
+          type: number
+          description: The amount of interest paid, Year To Date.
+          example: 9999.99
+        interestEarnedCTD:
+          type: number
+          description: The amount of earning interest, Calendar To Date.
+          example: 9999.99
+        interestPaidCTD:
+          type: number
+          description: The amount of interest paid, Calendar To Date.
+          example: 9999.99
+        interestEarnedPriorYear:
+          type: number
+          description: The amount of earning interest, Prior Year.
+          example: 9999.99
+        interestPaidPriorYear:
+          type: number
+          description: The amount of interest paid, Prior Year.
+          example: 9999.99
+
+    Statement:
+      type: object
+      description: Account Statement
+      properties:
+        id:
+          type: string
+          description: The ID of this Statement.
+          example: 9876543
+        accountId:
+          type: string
+          description: The ID of the Account for this Statement.
+          example: 123456-CDA
+        name:
+          type: string
+          description: The name of the document for this Statement.
+          example: Statement for month ending 10/31/2019
+        attributes:
+          type: array
+          description: List of attributes for a binary item, e.g description, creation time...
+          items:
+            $ref: '#/components/schemas/Attribute'
+        dateCreated:
+          type: string
+          description: ISO 8601 date of creation
+          example: yyyy-MM-dd'T'HH:mm:ssZ
+        dateRevised:
+          type: string
+          description: ISO 8601 date of revision
+          example: yyyy-MM-dd'T'HH:mm:ssZ
+        items:
+          $ref: '#/components/schemas/BinaryItemList'
+
+    ExchangeTransaction:
+      type: object
+      description: Exchange Transaction
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this exchange transaction
+          example: 123412341234
+        type:
+          type: string
+          description: The type of exchange or money movement
+          enum: ["ACH","WIRE","P2P","A2A"]
+          example: ACH
+        debtor:
+          $ref: '#/components/schemas/Debtor'
+        creditor:
+          $ref: '#/components/schemas/Creditor'
+        intermediateInstitutions:
+          items:
+            $ref: '#/components/schemas/IntermediateInstitution'
+        remittanceInformation:
+          $ref: '#/components/schemas/RemittanceInformation'
+        isBatch:
+          type: boolean
+          description: Indicate if this transaction is part of a batch
+          example: false
+        priority:
+          type: string
+          description: Indicates the priority of this transaction
+          example: HIGH
+        executionDate:
+          type: string
+          description: ISO 8601 date of execution
+          example: 12-02-2020
+        isRecurring:
+          type: boolean
+          description: Indicates if this is a recurring transaction
+          example: true
+        recurringSchedule:
+          $ref: '#/components/schemas/Schedule'
+        amount:
+          type: number
+          description: The amount of the transaction
+          example: 999.99
+        fee:
+          $ref: '#/components/schemas/Fee'
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+    CacheReference:
+      type: object
+      description: Reference to items in cache used to refresh/evict/renew the cache
+      properties:
+        attributes:
+          type: array
+          description: List of attributes to locate and reference items in cache
+          items:
+            $ref: '#/components/schemas/Attribute'
+    CacheStatistics:
+      type: object
+      description: A summary of the caches for a given finite item type
+      properties:
+        finiteType:
+          $ref: '#/components/schemas/FiniteType'
+        finiteReference:
+          type: array
+          description: List of attributes identifying the cache referenced
+          items:
+            $ref: '#/components/schemas/Attribute'
+        cacheSize:
+          type: number
+          description: The memory usage of the cache, in megabytes
+          example: 1024
+        cacheCount:
+          type: number
+          description: The number of items in the cache
+          example: 42
+
+    ## GROUPED MODULES
+    Debtor:
+      type: object
+      discriminator:
+        propertyName: debtorType
+      description: Account or Entity that originates an exchange
+      properties:
+        debtorType:
+          type: string
+      required:
+        - debtorType
+    AccountDebtor:
+      description: An Account That is Debited
+      allOf:
+        - $ref: '#/components/schemas/Debtor'
+        - $ref: '#/components/schemas/Account'
+        - type: object
+    EntityDebtor:
+      description: An Entity That is Debited
+      allOf:
+        - $ref: '#/components/schemas/Debtor'
+        - $ref: '#/components/schemas/Entity'
+        - type: object
+
+    Creditor:
+      type: object
+      discriminator:
+        propertyName: creditorType
+      description: Account or Entity that receives an exchange
+      properties:
+        creditorType:
+          type: string
+        target:
+          type: string
+          description: When crediting a loan-style account, where to target incoming funds.
+          enum: [ "PAYMENT","PRINCIPAL","INTEREST" ]
+      required:
+        - creditorType
+    AccountCreditor:
+      description: An Account That is Credited
+      allOf:
+        - $ref: '#/components/schemas/Creditor'
+        - $ref: '#/components/schemas/Account'
+        - type: object
+    EntityCreditor:
+      description: An Entity That is Credited
+      allOf:
+        - $ref: '#/components/schemas/Creditor'
+        - $ref: '#/components/schemas/Entity'
+        - type: object
+
+    ExchangeTransactionResult:
+      type: object
+      description: The resulting information from attempting to perform an Exchange Transaction
+      properties:
+        status:
+          type: string
+          description: The status of the attempt
+          example: Failed
+        reason:
+          type: string
+          description: A readable reason for the status provided.
+          example: Insufficient Funds
+        exchangeTransactionId:
+          type: string
+          description: The newly created exchange transaction identifier
+          example: 1234-DDA-X-9999
+
+    Transactor:
+      type: object
+      description: Person or Entity that performed a transaction
+      allOf:
+        - $ref: '#/components/schemas/EntityProfile'
+        - $ref: '#/components/schemas/Bank'
+        - properties:
+            accountNumber:
+              type: string
+              description: The account number of the transactor performing the transaction
+              example: 123412345555
+    Relationship:
+      type: object
+      description: Relationship object
+      allOf:
+        - $ref: '#/components/schemas/EntityProfile'
+        - properties:
+            relation:
+              type: string
+              description: The type of relationship between entities
+              example: PRIMARY or BENEFICIARY
+    IntermediateInstitution:
+      type: object
+      description: Intermediate institution for ACH or Wire exchanges
+      allOf:
+        - $ref: '#/components/schemas/Bank'
+        - properties:
+            message:
+              type: string
+              description: Message to the intermediate institution
+              example: Example message to institution
+
+    ## MODULES
+    BinaryItem:
+      type: object
+      description: Binary Item Object
+      properties:
+        format:
+          type: string
+          description: The mime type of the binary content.
+          enum: [ "application/pdf", "image/jpeg", "image/png", "image/svg", "image/gif", "text/html", "text/plain" ]
+          example: application/pdf
+        length:
+          type: integer
+          description: The length of the binary content in bytes.
+          example: 8096
+        attributes:
+          type: array
+          description: List of attributes for a binary item, e.g description, creation time...
+          items:
+            $ref: '#/components/schemas/Attribute'
+        itemId:
+          type: string
+          description: A base64 encoded identifier used by the connectors to locate the binary item
+          example: MzYxOTc5OTQyI3AjMQ
+        content:
+          type: string
+          format: byte
+          description: The optionally inlined base64 encoded content of the item.
+        URI:
+          $ref: '#/components/schemas/FiniteURI'
+
+    Schedule:
+      type: object
+      description: Schedule object
+      properties:
+        strategy:
+          type: string
+          description: The execution strategy of the schedule
+          enum: ["NONE", "BEFORE", "AFTER"]
+        frequency:
+          type: string
+          description: Indicates how frequencly this schedule should execute
+          example: MONTHLY
+        dayOn:
+          type: string
+          description: The day of the month on which a execution should take
+          example: 1
+        startDateTime:
+          type: string
+          description: ISO 6801 formatted date for the schedule to start
+          example: YYYY-MM-DDThh:mm:ss
+        endDateTime:
+          type: string
+          description: ISO 6801 formatted date for the schedule to complete
+          example: YYYY-MM-DDThh:mm:ss
+        nextDateTime:
+          type: string
+          description: ISO 6801 formatted date for the next scheduled execution
+          example: YYYY-MM-DDThh:mm:ss
+        repeatCount:
+          type: integer
+          description: The number of times this schedule should execute
+          example: 54
+        isEveryTime:
+          type: boolean
+          description: Indicates if the execution is even or odd
+          example: true
+    RemittanceInformation:
+      type: object
+      description: Remittance Information
+      properties:
+        type:
+          type: string
+          description: Type of remittance information
+          example: SCOR
+        issuer:
+          type: string
+          description: Issuer information
+          example: Darth Vader
+        reference:
+          type: string
+          description: Reference information/content
+          example: 987654321 transaction data example
+    Fee:
+      type: object
+      description: Fee object
+      properties:
+        amount:
+          type: number
+          description: Fee amount
+          example: 9.99
+        currencyCode:
+          type: string
+          description: Fee currency code
+          example: USD
+        owernship:
+          type: string
+          description: Indicates who is responsible for the fee
+          enum: ["ORIGINATOR", "SHARED", "RECIPIENT"]
+          example: ORIGINATOR
+    Interest:
+      type: object
+      description: Interest object
+      properties:
+        rate:
+          type: number
+          description: The effective interest rate % of a loan or saving account
+          example: 10.2
+        termsUnit:
+          type: string
+          description: The measure of terms
+          example: months
+        terms:
+          type: integer
+          description: The number of terms agreed
+          example: 36
+    RoutingNumber:
+      type: object
+      description: Routing Number object
+      properties:
+        type:
+          type: string
+          description: The type of routing number
+          example: wire or aba
+        number:
+          type: string
+          description: The routing number value
+          example: 322271627
+    Address:
+      type: object
+      description: Address object
+      properties:
+        type:
+          type: string
+          enum: ["BUSINESS","RESIDENTIAL", "POBOX"]
+        line1:
+          type: string
+          description: Address line
+          example: Street Name or PO Box
+        line2:
+          type: string
+          description: Address line
+          example: Department or House Number
+        line3:
+          type: string
+          description: Address line
+          example: Sub Department
+        city:
+          type: string
+          description: Address City or Town
+          example: Alexander City
+        state:
+          type: string
+          description: State or Region
+          example: Alabama
+        postalCode:
+          type: string
+          description: Postal code or Zip code
+          example: 99999
+        country:
+          type: string
+          description: Country
+          example: United States of America
+        primary:
+          type: boolean
+          description: Primary Address
+    ContactPoint:
+      type: object
+      description: Contact Point object
+      properties:
+        type:
+          type: string
+          enum: ["SMS", "EMAIL", "VOICE"]
+        name:
+          type: string
+          description: Name of the contact point
+          example: HOMEPHONE or WORKPHONE
+        prefix:
+          type: string
+          description: Text preceeding contact point
+          example: +1
+        value:
+          type: string
+          description: Contact point value
+          example: 555-555-5555
+        suffix:
+          type: string
+          description: Additional information
+          example: ext 123
+    Attribute:
+      type: object
+      description: Name value pair property
+      properties:
+        name:
+          type: string
+          description: Attribute name
+          example: Language
+        value:
+          type: string
+          description: Attribute value
+          example: English
+    TaxInformation:
+      type: object
+      description: Tax information
+      properties:
+        type:
+          type: string
+          enum: ["SSN", "EIN", "ITIN", "ATIN", "OTHER"]
+        taxId:
+          type: string
+          description: Tax identification value
+    SecurityInformation:
+      type: object
+      description: Security Information
+      properties:
+        username:
+          type: string
+          description: Unique username
+          example: user01
+        token:
+          type: string
+          description: Unique token to identify entity for subsequent requests.  E.g. OAuth access_token
+          example: VXNlclNlc3Npb25Ub2tlbjoxMjM0MTIzNA==
+        lastLoginDate:
+          type: string
+          description: ISO 8601 date the entity last logged in
+          example: YYYY-MM-DDThh:mm:ss
+    SearchFilter:
+      type: object
+      description: Search filter entry
+      properties:
+        field:
+          type: string
+          description: The name of the field of element to query
+          example: username
+        query:
+          type: string
+          description: The value to query for
+          example: lskywalker
+        operator:
+          type: string
+          enum: ["EQUAL", "LIKE", "GREATER", "LESS", "NOT_LIKE", "NOT_EQUAL", "IN", "NOT_IN"]
+    FiniteURI:
+      type: object
+      description: Unique Resource Identifier in the API
+      properties:
+        URL:
+          type: string
+          description: The URL to the URI
+          example: http://host/images/1234.jpg
+
+    ## ENUMS
+    FiniteType:
+      type: string
+      description: Type of schemas supported by Finite
+      enum:
+        - ACCOUNT
+        - BALANCE
+        - BANK
+        - CARD
+        - ENTITY
+        - EXCHANGE
+        - FILE
+        - PRODUCT
+        - STATEMENT
+        - TRANSACTION
+    FiniteEvent:
+      type: string
+      description: Type of events supported by Finite
+      enum:
+        - CacheDelete
+        - CacheUpdate
+        - CacheRead
+        - ItemUpdate
+        - ItemRead
+        - ItemDelete
+        - ListRead
+    TransactionStatus:
+      type: string
+      description: The status of the transaction
+      enum: [ "PENDING", "POSTED" ]
+      example: PENDING
+
+    ## LISTS
+    BaseListProperties:
+      type: object
+      description: Base properties for all lists object
+      properties:
+        status:
+          type: boolean
+          description: Indicates whether a operation was successful
+        messages:
+          type: array
+          description: Potential information or errror messages
+          items:
+            type: string
+            description: Potential information or error messages
+        totalItems:
+          type: integer
+          description: The total number of list items that exist for the list or query
+          example: 200
+        nextCursor:
+          type: string
+          description: The Base64 encoded value that indicates the next cursor. The cursor will be decoded to use as the starting point to fetch the next set of results.
+          example: YWNjb3VudE51bWJlcjoxMjM0MTIzNCxhY2NvdW50VHlwZT1EREE=
+
+    EntityList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            entities:
+              type: array
+              description: The list of entities
+              items:
+                $ref: '#/components/schemas/Entity'
+
+    ProductsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            products:
+              type: array
+              description: The list of products
+              items:
+                $ref: '#/components/schemas/Product'
+
+    AccountsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            accounts:
+              type: array
+              description: The list of accounts
+              items:
+                $ref: '#/components/schemas/Account'
+
+    TransactionsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            transactions:
+              type: array
+              description: The list of transactions
+              items:
+                $ref: '#/components/schemas/Transaction'
+
+    BinaryItemList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            binaries:
+              type: array
+              description: The list of binary items
+              items:
+                $ref: '#/components/schemas/BinaryItem'
+
+    CardsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            cards:
+              type: array
+              description: The list of cards
+              items:
+                $ref: '#/components/schemas/Card'
+
+    StatementsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            statements:
+              type: array
+              description: The list of statements
+              items:
+                $ref: '#/components/schemas/Statement'
+
+    ExchangeTransactionsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            exchanges:
+              type: array
+              description: The list of exchange transactions
+              items:
+                $ref: '#/components/schemas/ExchangeTransaction'
+
+    CacheStatisticsList:
+      allOf:
+        - $ref: '#/components/schemas/BaseListProperties'
+        - properties:
+            caches:
+              type: array
+              description: The list of cache statistics
+              items:
+                $ref: '#/components/schemas/CacheStatistics'
+
+    ## ERROR SCHEMAS
+    BaseErrorProperties:
+      type: object
+      description: Base properties for all lists object
+      properties:
+        status:
+          type: boolean
+          description: Indicates whether a operation was successful
+        messages:
+          type: array
+          description: Potential information or errror messages
+          items:
+            type: string
+            description: Potential information or error messages
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseErrorProperties'
