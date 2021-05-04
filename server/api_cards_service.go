@@ -57,7 +57,7 @@ func (s *CardsApiService) GetAccountCards(ctx context.Context, accountId string,
 	// Retrieve the cards
 	crds, err := rs.
 		QueryCards().
-		Order(ent.Asc(card.FieldStartDate)).
+		Order(ent.Desc(card.FieldStartDate)).
 		All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil

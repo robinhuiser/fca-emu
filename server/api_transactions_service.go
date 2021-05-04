@@ -233,7 +233,7 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 				transaction.CreatedDateLTE(eDate),
 				transaction.StatusIn(stat...),
 			),
-		).Order(ent.Asc(transaction.FieldCreatedDate)).
+		).Order(ent.Desc(transaction.FieldCreatedDate)).
 		All(ctx)
 
 	if err != nil {
@@ -285,6 +285,11 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, account
 		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
+	// Validate searchFilter
+	if err := validatePredicate(searchFilter); err != nil {
+		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
+	}
+
 	// Lookup the account
 	rs, err := clt.Account.
 		Query().
@@ -299,7 +304,7 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, account
 	trs, err := rs.QueryTransactions().
 		Offset(offset).
 		Limit(maxresults).
-		Order(ent.Asc(transaction.FieldCreatedDate)).
+		Order(ent.Desc(transaction.FieldCreatedDate)).
 		All(ctx)
 
 	if err != nil {
@@ -452,4 +457,9 @@ func parseFilterDate(d time.Time, pd string) (time.Time, error) {
 		d = retDate
 	}
 	return d, nil
+}
+
+func validatePredicate(s []SearchFilter) error {
+
+	return nil
 }

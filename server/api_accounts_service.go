@@ -157,7 +157,7 @@ func (s *AccountsApiService) GetEntityAccountsList(ctx context.Context, entityId
 	// 2: Find the accounts belonging to this entity
 	accts, err := clt.Entity.
 		QueryOwnsAccount(rs).
-		Order(ent.Asc(account.FieldDateCreated)).
+		Order(ent.Desc(account.FieldDateCreated)).
 		All(ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
