@@ -18,8 +18,6 @@ archives:
 dockers:
   - 
     image_templates:
-      # - "docker.io/rdclda/fca-emu:{{ .Tag }}"
-      # - "docker.io/rdclda/fca-emu:latest"
       - "tecdigitalacr.azurecr.io/utils/fca-emu:{{ .Tag }}"
       - "tecdigitalacr.azurecr.io/utils/fca-emu:latest"
     build_flag_templates:
@@ -44,6 +42,22 @@ dockers:
       - go.sum
       - go.mod
       - banner.txt
+
+publishers:
+  - name: docker-export
+    cmd: |
+      docker save -o {{ abs .ArtifactPath }}/dist/{{ .ArtifactName }}_{{ .Version }}_Docker_x86_64.tar \
+        tecdigitalacr.azurecr.io/utils/{{ .ArtifactName }}:v{{ .Version }} && \
+        gzip {{ .ArtifactName }}_{{ .Version }}_Docker_x86_64.tar
+
+  - name: code-statistics
+    cmd: |
+      OUTPUT={{ abs .ArtifactPath }}/dist/source_stats-{{ .Version }}.txt \
+        echo "Lines of written code:" > $OUTPUT && \
+        gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> $OUTPUT && \
+        echo >> $OUTPUT && \
+        echo "Total lines of code (incl. generated):" >> $OUTPUT && \
+        gocloc . >> $OUTPUT
 
 checksum:
   name_template: 'checksums.txt'
