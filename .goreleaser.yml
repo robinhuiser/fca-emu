@@ -43,21 +43,21 @@ dockers:
       - go.mod
       - banner.txt
 
-publishers:
-  - name: docker-export
-    cmd: |
-      docker save -o dist/fca-emu_{{ .Version }}_Docker_x86_64.tar \
-        tecdigitalacr.azurecr.io/utils/fca-emu:v{{ .Version }} && \
-        gzip dist/fca-emu_{{ .Version }}_Docker_x86_64.tar
+# publishers:
+#   - name: docker-export
+#     cmd: |
+#       docker save -o dist/fca-emu_{{ .Version }}_Docker_x86_64.tar \
+#         tecdigitalacr.azurecr.io/utils/fca-emu:v{{ .Version }} && \
+#         gzip dist/fca-emu_{{ .Version }}_Docker_x86_64.tar
 
-  - name: code-statistics
-    cmd: |
-      OUTPUT=dist/source_stats-{{ .Version }}.txt \
-        echo "Lines of written code:" > $OUTPUT && \
-        gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> $OUTPUT && \
-        echo >> $OUTPUT && \
-        echo "Total lines of code (incl. generated):" >> $OUTPUT && \
-        gocloc . >> $OUTPUT
+#   - name: code-statistics
+#     cmd: |
+#       OUTPUT=dist/source_stats-{{ .Version }}.txt \
+#         echo "Lines of written code:" > $OUTPUT && \
+#         gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> $OUTPUT && \
+#         echo >> $OUTPUT && \
+#         echo "Total lines of code (incl. generated):" >> $OUTPUT && \
+#         gocloc . >> $OUTPUT
 
 checksum:
   name_template: 'checksums.txt'
