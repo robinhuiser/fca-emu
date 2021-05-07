@@ -76,17 +76,17 @@ $ az acr login --name tecdigitalacr
 $ goreleaser --rm-dist
 
 # Create Docker archive
-$ docker save -o fca-emu_${TAG}_Docker_x86_64.tar \
+$ docker save -o dist/fca-emu_${TAG}_Docker_x86_64.tar \
     tecdigitalacr.azurecr.io/utils/fca-emu:v${TAG} && \
-    gzip fca-emu_${TAG}_Docker_x86_64.tar
+    gzip dist/fca-emu_${TAG}_Docker_x86_64.tar
 
 # Lines of code written
-$ echo "Lines of written code:" > source_stats-${TAG}.txt && \
-   gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> source_stats-${TAG}.txt && \
-   echo >> source_stats-${TAG}.txt && \
-   echo "Total lines of code (incl. generated):" >> source_stats-${TAG}.txt && \
-   gocloc . >> source_stats-${TAG}.txt
+$ echo "Lines of written code:" > dist/source_stats-${TAG}.txt && \
+   gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> dist/source_stats-${TAG}.txt && \
+   echo >> dist/source_stats-${TAG}.txt && \
+   echo "Total lines of code (incl. generated):" >> dist/source_stats-${TAG}.txt && \
+   gocloc . >> dist/source_stats-${TAG}.txt
 
 # Smoke tests
-$ task smoke-test ENTITY_ID=<id> > smoke_tests-${TAG}.txt 
+$ task smoke-test ENTITY_ID=<id> > dist/smoke_tests-${TAG}.txt 
 ~~~
