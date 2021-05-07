@@ -9,6 +9,12 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/product"
 )
 
+const (
+	SAVINGS_ACCOUNT_TYPE_NAME    = "Savings Account"
+	CHECKING_ACCOUNT_TYPE_NAME   = "Checking Account"
+	INVESTMENT_ACCOUNT_TYPE_NAME = "Investment Account"
+)
+
 func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (map[string]int, error) {
 
 	products := []struct {
@@ -18,16 +24,16 @@ func populateProducts(ctx context.Context, client *ent.Client, f *gofakeit.Faker
 		productSubType     string
 		productSubTypeName string
 	}{
-		{"SAV01", product.TypeSAVING.String(), "Savings Account", "SAV-BASIC", "Basic Savings"},
-		{"SAV02", product.TypeSAVING.String(), "Savings Account", "SAV-COL", "College Savings"},
-		{"SAV03", product.TypeSAVING.String(), "Savings Account", "SAV-TAX", "Tax Savings"},
-		{"CHK01", product.TypeCHECKING.String(), "Checking Account", "CHK-BASIC", "Basic Checking"},
-		{"CHK02", product.TypeCHECKING.String(), "Checking Account", "CHK-BRONZE", "Bronze Checking"},
-		{"CHK03", product.TypeCHECKING.String(), "Checking Account", "CHK-SILVER", "Silver Checking"},
-		{"CHK04", product.TypeCHECKING.String(), "Checking Account", "CHK-GOLD", "Gold Checking"},
-		{"INV01", product.TypeINVESTMENT.String(), "Investment Account", "INV-BASIC", "Basic Investments"},
-		{"INV02", product.TypeINVESTMENT.String(), "Investment Account", "INV-BUFFET", "Warren's Investments"},
-		{"INV03", product.TypeINVESTMENT.String(), "Investment Account", "INV-ACKMAN", "Bill's Investments"},
+		{"SAV01", product.TypeSAVING.String(), SAVINGS_ACCOUNT_TYPE_NAME, "SAV-BASIC", "Basic Savings"},
+		{"SAV02", product.TypeSAVING.String(), SAVINGS_ACCOUNT_TYPE_NAME, "SAV-COL", "College Savings"},
+		{"SAV03", product.TypeSAVING.String(), SAVINGS_ACCOUNT_TYPE_NAME, "SAV-TAX", "Tax Savings"},
+		{"CHK01", product.TypeCHECKING.String(), CHECKING_ACCOUNT_TYPE_NAME, "CHK-BASIC", "Basic Checking"},
+		{"CHK02", product.TypeCHECKING.String(), CHECKING_ACCOUNT_TYPE_NAME, "CHK-BRONZE", "Bronze Checking"},
+		{"CHK03", product.TypeCHECKING.String(), CHECKING_ACCOUNT_TYPE_NAME, "CHK-SILVER", "Silver Checking"},
+		{"CHK04", product.TypeCHECKING.String(), CHECKING_ACCOUNT_TYPE_NAME, "CHK-GOLD", "Gold Checking"},
+		{"INV01", product.TypeINVESTMENT.String(), INVESTMENT_ACCOUNT_TYPE_NAME, "INV-BASIC", "Basic Investments"},
+		{"INV02", product.TypeINVESTMENT.String(), INVESTMENT_ACCOUNT_TYPE_NAME, "INV-BUFFET", "Warren's Investments"},
+		{"INV03", product.TypeINVESTMENT.String(), INVESTMENT_ACCOUNT_TYPE_NAME, "INV-ACKMAN", "Bill's Investments"},
 	}
 
 	// Create products

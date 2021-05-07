@@ -14,26 +14,34 @@ import (
 	"github.com/robinhuiser/fca-emu/ent/entitytaxinformation"
 )
 
+const (
+	ENTITY_CREATE_ERROR            = "failed creating entity"
+	ENTITY_CONTACT_POINT_ERROR     = "failed creating entity contact point"
+	ENTITY_PREFERENCE_ERROR        = "failed creating preference"
+	ENTITY_TAX_SPECIFICATION_ERROR = "failed creating entity tax specification"
+	ENTITY_ADDRESS_ERROR           = "failed creating entity address"
+)
+
 func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) (*ent.Entity, error) {
 
 	dco := f.DateRange(time.Now().AddDate(-5, 0, -1), time.Now()) // random date create entity
 	var firstname, lastname, fullname string
-	var entity_type entity.Type
-	var address_type entityaddress.Type
+	var entityType entity.Type
+	var addressType entityaddress.Type
 
 	// Person 70%, organization 10% or corporate 20%
 	switch a := f.Number(0, 100); {
 	case a >= 70 && a <= 90:
 		fullname = f.Company() + ", " + f.CompanySuffix()
-		entity_type = entity.TypeBUSINESS
+		entityType = entity.TypeBUSINESS
 	case a >= 90:
 		fullname = f.Company()
-		entity_type = entity.TypeSYSTEM
+		entityType = entity.TypeSYSTEM
 	default:
 		firstname = f.FirstName()
 		lastname = f.LastName()
 		fullname = firstname + " " + lastname
-		entity_type = entity.TypePERSON
+		entityType = entity.TypePERSON
 	}
 
 	// Create entity
@@ -43,7 +51,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		SetFirstname(firstname).
 		SetLastname(lastname).
 		SetFullname(fullname).
-		SetType(entity_type).
+		SetType(entityType).
 		SetDateOfBirth(f.DateRange(
 			time.Now().AddDate(-60, 0, -1),
 			time.Now().AddDate(-18, 0, -1))).
@@ -53,21 +61,21 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 		SetURL("https://my.cdn.com/imgs/entity/" + f.DigitN(18) + ".jpg").
 		Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating entity: %w", err)
+		return nil, fmt.Errorf("%s: %w", ENTITY_CREATE_ERROR, err)
 	}
 
 	// Private business or person
-	switch et := entity_type; et {
+	switch et := entityType; et {
 	case entity.TypeBUSINESS:
-		address_type = entityaddress.TypeBUSINESS
+		addressType = entityaddress.TypeBUSINESS
 	case entity.TypeSYSTEM:
-		address_type = entityaddress.TypePOBOX
+		addressType = entityaddress.TypePOBOX
 	default:
-		address_type = entityaddress.TypeRESIDENTIAL
+		addressType = entityaddress.TypeRESIDENTIAL
 	}
 
 	// Add one or more addresses
-	primary_address := true
+	primaryAddress := true
 	for i := 0; i < f.Number(1, 2); i++ {
 		a, err := client.EntityAddress.
 			Create().
@@ -76,14 +84,14 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			SetPostalCode(f.Zip()).
 			SetState(f.StateAbr()).
 			SetLine1((f.StreetNumber()) + " " + f.StreetName() + " " + f.StreetSuffix()).
-			SetType(address_type).
-			SetPrimary(primary_address).
+			SetType(addressType).
+			SetPrimary(primaryAddress).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating entity address: %w", err)
+			return nil, fmt.Errorf("%s: %w", ENTITY_ADDRESS_ERROR, err)
 		}
 		e.Update().AddAddresses(a).Save(ctx)
-		primary_address = false
+		primaryAddress = false
 	}
 
 	// Add one or more tax information records
@@ -94,7 +102,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			SetTaxId(f.SSN()).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating entity tax specification: %w", err)
+			return nil, fmt.Errorf("%s: %w", ENTITY_TAX_SPECIFICATION_ERROR, err)
 		}
 		e.Update().AddTaxSpecifications(t).Save(ctx)
 	}
@@ -107,7 +115,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 			SetValue(f.Word()).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating preference: %w", err)
+			return nil, fmt.Errorf("%s: %w", ENTITY_PREFERENCE_ERROR, err)
 		}
 		e.Update().AddPreferences(p).Save(ctx)
 	}
@@ -123,7 +131,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 				SetValue(f.Phone()).
 				Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed creating entity contact point: %w", err)
+				return nil, fmt.Errorf("%s: %w", ENTITY_CONTACT_POINT_ERROR, err)
 			}
 			e.Update().AddContactPoints(c).Save(ctx)
 		case a == 1:
@@ -134,7 +142,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 				SetValue(f.Email()).
 				Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed creating entity contact point: %w", err)
+				return nil, fmt.Errorf("%s: %w", ENTITY_CONTACT_POINT_ERROR, err)
 			}
 			e.Update().AddContactPoints(c).Save(ctx)
 		case a == 2:
@@ -147,7 +155,7 @@ func populateEntity(ctx context.Context, client *ent.Client, f *gofakeit.Faker) 
 				SetValue(f.Phone()).
 				Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed creating entity contact point: %w", err)
+				return nil, fmt.Errorf("%s: %w", ENTITY_CONTACT_POINT_ERROR, err)
 			}
 			e.Update().AddContactPoints(c).Save(ctx)
 		}

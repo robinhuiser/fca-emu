@@ -15,6 +15,14 @@ import (
 	"github.com/robinhuiser/fca-emu/util"
 )
 
+const (
+	CHECK_IMAGE_CREATE_ERROR         = "failed creating check image"
+	TRANSACTION_CREATE_ERROR         = "failed creating transaction"
+	ACCOUNT_OWNER_ADDRESS_ERROR      = "failed retrieving account owners address"
+	ACCOUNT_OWNER_TYPE_ERROR         = "failed retrieving account owners type"
+	ACCOUNT_OWNER_PRODUCT_TYPE_ERROR = "failed retrieving account product type"
+)
+
 func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofakeit.Faker, a *ent.Account) ([]*ent.Transaction, error) {
 
 	trns := []*ent.Transaction{}
@@ -30,17 +38,17 @@ func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofa
 
 	pt, err := a.QueryProduct().Only(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed retrieving account product type: %w", err)
+		return nil, fmt.Errorf("%s: %w", ACCOUNT_OWNER_PRODUCT_TYPE_ERROR, err)
 	}
 
 	acco, err := a.QueryOwners().First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed retrieving account owners type: %w", err)
+		return nil, fmt.Errorf("%s: %w", ACCOUNT_OWNER_TYPE_ERROR, err)
 	}
 
 	acca, err := acco.QueryAddresses().First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed retrieving account owners address: %w", err)
+		return nil, fmt.Errorf("%s: %w", ACCOUNT_OWNER_ADDRESS_ERROR, err)
 	}
 
 	// Calculate the number of transactions to generate
@@ -85,13 +93,13 @@ func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofa
 			// SetLongitude(f.Longitude()).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed creating transaction: %w", err)
+			return nil, fmt.Errorf("%s: %w", TRANSACTION_CREATE_ERROR, err)
 		}
 
 		if hasCheck {
 			checkImage, checkNumber, err := renderCheck(f, dir, acco, acca, tranCreatedDate, amnt, trdesc)
 			if err != nil {
-				return nil, fmt.Errorf("failed creating check image: %w", err)
+				return nil, fmt.Errorf("%s: %w", CHECK_IMAGE_CREATE_ERROR, err)
 			}
 
 			_, err = client.BinaryItem.
@@ -103,7 +111,7 @@ func populateRandomTransactions(ctx context.Context, client *ent.Client, f *gofa
 				SetURL("https://my.cdn.com/imgs/check/" + f.DigitN(18) + ".pdf").
 				Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("failed creating check image: %w", err)
+				return nil, fmt.Errorf("%s: %w", CHECK_IMAGE_CREATE_ERROR, err)
 			}
 
 			t.Update().SetCheckNumber(checkNumber).Save(ctx)
@@ -139,12 +147,12 @@ func renderCheck(f *gofakeit.Faker, dir transaction.Direction, acco *ent.Entity,
 	if dir == transaction.DirectionDEBIT {
 		checkImage, checkNumber, err = renderCheckAsPDF(f, tranCreatedDate, acco.Fullname, acca.Line1, acca.City, acca.PostalCode, acca.State, amnt, trdesc, f.Sentence(4))
 		if err != nil {
-			return bytes.Buffer{}, "", fmt.Errorf("failed creating check image: %w", err)
+			return bytes.Buffer{}, "", fmt.Errorf("%s: %w", CHECK_IMAGE_CREATE_ERROR, err)
 		}
 	} else {
 		checkImage, checkNumber, err = renderCheckAsPDF(f, tranCreatedDate, f.FirstName()+" "+f.LastName(), f.StreetNumber()+" "+f.Street(), f.City(), f.Zip(), f.StateAbr(), amnt, acco.Fullname, trdesc)
 		if err != nil {
-			return bytes.Buffer{}, "", fmt.Errorf("failed creating check image: %w", err)
+			return bytes.Buffer{}, "", fmt.Errorf("%s: %w", CHECK_IMAGE_CREATE_ERROR, err)
 		}
 	}
 	return checkImage, checkNumber, nil
