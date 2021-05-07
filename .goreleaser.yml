@@ -46,13 +46,13 @@ dockers:
 publishers:
   - name: docker-export
     cmd: |
-      docker save -o {{ abs .ArtifactPath }}/dist/{{ .ArtifactName }}_{{ .Version }}_Docker_x86_64.tar \
-        tecdigitalacr.azurecr.io/utils/{{ .ArtifactName }}:v{{ .Version }} && \
-        gzip {{ .ArtifactName }}_{{ .Version }}_Docker_x86_64.tar
+      docker save -o dist/fca-emu_{{ .Version }}_Docker_x86_64.tar \
+        tecdigitalacr.azurecr.io/utils/fca-emu:v{{ .Version }} && \
+        gzip dist/fca-emu_{{ .Version }}_Docker_x86_64.tar
 
   - name: code-statistics
     cmd: |
-      OUTPUT={{ abs .ArtifactPath }}/dist/source_stats-{{ .Version }}.txt \
+      OUTPUT=dist/source_stats-{{ .Version }}.txt \
         echo "Lines of written code:" > $OUTPUT && \
         gocloc ./generator ./ent/schema ./server/*service*.go ./util ./server/helpers.go >> $OUTPUT && \
         echo >> $OUTPUT && \
