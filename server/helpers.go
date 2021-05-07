@@ -21,10 +21,11 @@ import (
 )
 
 const (
-	FCA_SECRET        = "123456789"
-	MASK_SYMBOL       = "x"
-	API_DATE_LAYOUT   = time.RFC3339
-	INVALID_TOKEN_MSG = "Invalid token"
+	FCA_SECRET               = "123456789"
+	MASK_SYMBOL              = "x"
+	API_DATE_LAYOUT          = time.RFC3339
+	INVALID_TOKEN_MSG        = "Invalid token"
+	OPERATOR_NOT_IMPLEMENTED = "operator not implemented"
 )
 
 //Response return a ImplResponse struct filled

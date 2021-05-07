@@ -15,12 +15,14 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/robinhuiser/fca-emu/ent"
 	"github.com/robinhuiser/fca-emu/ent/account"
 	"github.com/robinhuiser/fca-emu/ent/binaryitem"
+	"github.com/robinhuiser/fca-emu/ent/predicate"
 	"github.com/robinhuiser/fca-emu/ent/transaction"
 )
 
@@ -69,7 +71,7 @@ func (s *TransactionsApiService) GetAccountTransaction(ctx context.Context, acco
 		return Response(404, setErrorResponse("Transaction not found")), nil
 	}
 
-	tran, err := mapTransaction(rs, tr, mask, enhance, inline, ctx)
+	tran, err := mapTransaction(tr, mask, enhance, inline, ctx)
 	if err != nil {
 		return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
@@ -245,7 +247,7 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 
 	transactions := []Transaction{}
 	for _, tr := range trs {
-		tran, err := mapTransaction(rs, tr, mask, enhance, false, ctx)
+		tran, err := mapTransaction(tr, mask, enhance, false, ctx)
 		if err != nil {
 			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 		}
@@ -263,7 +265,7 @@ func (s *TransactionsApiService) GetAccountTransactions(ctx context.Context, acc
 }
 
 // SearchTransactions - Search for transactions
-func (s *TransactionsApiService) SearchTransactions(ctx context.Context, accountId string, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
+func (s *TransactionsApiService) SearchTransactions(ctx context.Context, limit int32, cursor string, mask bool, enhance bool, xTRACEID string, xTOKEN string, searchFilter []SearchFilter) (ImplResponse, error) {
 
 	// Validate X-Token
 	if !isValidSecret(xTOKEN) {
@@ -279,31 +281,18 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, account
 		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
-	// Parse and verify UUID
-	u, err := uuid.Parse(accountId)
+	// Parse searchFilter
+	sf, err := parseSearchFilter(searchFilter)
 	if err != nil {
 		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Validate searchFilter
-	if err := validatePredicate(searchFilter); err != nil {
-		return Response(400, setErrorResponse(fmt.Sprintf("%v", err))), nil
-	}
-
-	// Lookup the account
-	rs, err := clt.Account.
-		Query().
-		Where(account.ID(u)).
-		Only(ctx)
-	if err != nil {
-		return Response(404, setErrorResponse(fmt.Sprintf("%v", err))), nil
 	}
 
 	// Retrieve the transactions
-	// CHALLENGE -- construct from searchfilter a WHERE clause
-	trs, err := rs.QueryTransactions().
+	trs, err := clt.Transaction.
+		Query().
 		Offset(offset).
 		Limit(maxresults).
+		Where(sf).
 		Order(ent.Desc(transaction.FieldCreatedDate)).
 		All(ctx)
 
@@ -316,7 +305,7 @@ func (s *TransactionsApiService) SearchTransactions(ctx context.Context, account
 
 	transactions := []Transaction{}
 	for _, tr := range trs {
-		tran, err := mapTransaction(rs, tr, mask, enhance, false, ctx)
+		tran, err := mapTransaction(tr, mask, enhance, false, ctx)
 		if err != nil {
 			return Response(500, setErrorResponse(fmt.Sprintf("%v", err))), nil
 		}
@@ -376,10 +365,16 @@ func getTransactionImages(imgs []*ent.BinaryItem, inline bool) BinaryItemList {
 	return imageList
 }
 
-func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, inline bool, ctx context.Context) (Transaction, error) {
+func mapTransaction(tr *ent.Transaction, mask bool, en bool, inline bool, ctx context.Context) (Transaction, error) {
 
-	// Get the entity related to the account
-	e, err := acct.QueryOwners().Only(ctx)
+	// Get the account information
+	acct, err := tr.QueryAccount().Only(ctx)
+	if err != nil {
+		return Transaction{}, fmt.Errorf("%v", err)
+	}
+
+	// Get the owner information
+	ent, err := acct.QueryOwners().All(ctx)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("%v", err)
 	}
@@ -392,7 +387,7 @@ func mapTransaction(acct *ent.Account, tr *ent.Transaction, mask bool, en bool, 
 	imageList := getTransactionImages(imgs, inline)
 
 	t := Transaction{
-		EntityId:                e.ID.String(),
+		EntityId:                ent[0].ID.String(),
 		AccountId:               acct.ID.String(),
 		Id:                      tr.ID.String(),
 		SequenceInDay:           int32(tr.SequenceInDay),
@@ -459,7 +454,48 @@ func parseFilterDate(d time.Time, pd string) (time.Time, error) {
 	return d, nil
 }
 
-func validatePredicate(s []SearchFilter) error {
+func parseSearchFilter(sfs []SearchFilter) (predicate.Transaction, error) {
+	p := predicate.Transaction(nil)
 
-	return nil
+	for _, sf := range sfs {
+		switch operator := sf.Operator; strings.ToUpper(operator) {
+		case "EQUAL":
+			pf, err := filterEqual(sf)
+			if err != nil {
+				return predicate.Transaction(nil), fmt.Errorf("%v", err)
+			}
+			if p != nil {
+				p = transaction.And(p, pf)
+			} else {
+				p = pf
+			}
+		default:
+			return predicate.Transaction(nil), fmt.Errorf("%s: %s", OPERATOR_NOT_IMPLEMENTED, sf.Operator)
+		}
+	}
+	return p, nil
+}
+
+func filterEqual(sf SearchFilter) (predicate.Transaction, error) {
+	p := predicate.Transaction(nil)
+	switch field := sf.Field; strings.ToUpper(field) {
+	case "DIRECTION":
+		switch query := sf.Query; strings.ToUpper(query) {
+		case "CREDIT":
+			p = transaction.DirectionEQ(transaction.DirectionCREDIT)
+		case "DEBIT":
+			p = transaction.DirectionEQ(transaction.DirectionDEBIT)
+		default:
+			return predicate.Transaction(nil), fmt.Errorf("unsupported direction %s provided", sf.Query)
+		}
+	case "ACCOUNTID":
+		u, err := uuid.Parse(sf.Query)
+		if err != nil {
+			return predicate.Transaction(nil), fmt.Errorf("%v", err)
+		}
+		p = predicate.Transaction(transaction.HasAccountWith(account.ID(u)))
+	default:
+		return predicate.Transaction(nil), fmt.Errorf("%s %s", "unsupported operator for field", field)
+	}
+	return p, nil
 }

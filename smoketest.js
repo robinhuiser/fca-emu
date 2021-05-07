@@ -110,6 +110,33 @@ export default () => {
       });
     }
     
+    // Search for transactions by status == CREDIT for account
+    let searchByStatusQuery = 
+      [
+        {
+          "field": "accountId",
+          "query": `${accountItem.id}`,
+          "operator": "EQUAL",
+        },
+        {
+          "field": "direction",
+          "query": "credit",
+          "operator": "EQUAL" ,     
+        },
+      ];
+    let searchAccountTransactionsByStatusRes = http.post(`${BASE_URL}/v1/transactions/search?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, JSON.stringify(searchByStatusQuery), authHeaders);
+    let searchAccountTransactionsByStatusJSON = JSON.parse(searchAccountTransactionsByStatusRes.body);
+    check(searchAccountTransactionsByStatusRes, {
+      "SearchAccountTransactionsByStatus: status is 200 or 404": (r) => r.status === 200 || r.status === 404,
+      "SearchAccountTransactionsByStatus: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+    });
+
+    if (searchAccountTransactionsByStatusRes.status === 200) {
+      check(searchAccountTransactionsByStatusRes, {
+        "SearchAccountTransactionsByStatus: has one or more transactions": (r) => searchAccountTransactionsByStatusJSON.totalItems > 0,
+      });
+    }
+
     // Get transactions for account
     let getAccountTransactionsRes = http.get(`${BASE_URL}/v1/account/${accountItem.id}/transactions?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, authHeaders);
     let getAccountTransactionsJSON = JSON.parse(getAccountTransactionsRes.body);
@@ -120,7 +147,7 @@ export default () => {
 
     if (getAccountTransactionsRes.status === 200) {
       check(getAccountTransactionsRes, {
-        "GetEntityAccountsList: has one or more transactions": (r) => getAccountTransactionsJSON.totalItems > 0,
+        "GetAccountTransactions: has one or more transactions": (r) => getAccountTransactionsJSON.totalItems > 0,
       });
 
       getAccountTransactionsJSON.transactions.forEach(function (transactionItem){

@@ -8,7 +8,7 @@ info:
     abstract API
   termsOfService: http://www.trexis.net/termsofservices
   title: Cloud API
-  version: v1.5.1
+  version: v1.5
 servers:
 - url: /
 security:
@@ -2356,19 +2356,11 @@ paths:
       summary: Return a binary item for a statement
       tags:
       - Statement
-  /cloud/v1/transactions/{accountId}/search:
+  /cloud/v1/transactions/search:
     post:
       description: Return a paginated list of transactions based on a search filter
       operationId: searchTransactions
       parameters:
-      - description: Unique Account Identifier
-        explode: false
-        in: path
-        name: accountId
-        required: true
-        schema:
-          type: string
-        style: simple
       - description: Number of entries to return
         explode: true
         in: query
