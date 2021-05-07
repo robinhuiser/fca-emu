@@ -111,7 +111,7 @@ export default () => {
     }
     
     // Search for transactions by status == CREDIT for account
-    let searchByStatusQuery = 
+    let searchByDirectionQuery = 
       [
         {
           "field": "accountId",
@@ -124,16 +124,16 @@ export default () => {
           "operator": "EQUAL" ,     
         },
       ];
-    let searchAccountTransactionsByStatusRes = http.post(`${BASE_URL}/v1/transactions/search?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, JSON.stringify(searchByStatusQuery), authHeaders);
-    let searchAccountTransactionsByStatusJSON = JSON.parse(searchAccountTransactionsByStatusRes.body);
-    check(searchAccountTransactionsByStatusRes, {
-      "SearchAccountTransactionsByStatus: status is 200 or 404": (r) => r.status === 200 || r.status === 404,
-      "SearchAccountTransactionsByStatus: http version is 1.1": (r) => r.proto === "HTTP/1.1",
+    let searchAccountTransactionsByDirectionRes = http.post(`${BASE_URL}/v1/transactions/search?mask=${MASK}&enhance=${ENHANCE}&limit=${LIMIT}`, JSON.stringify(searchByDirectionQuery), authHeaders);
+    let searchAccountTransactionsByDirectionJSON = JSON.parse(searchAccountTransactionsByDirectionRes.body);
+    check(searchAccountTransactionsByDirectionRes, {
+      "SearchAccountTransactionsByDirection: status is 200 or 404": (r) => r.status === 200 || r.status === 404,
+      "SearchAccountTransactionsByDirection: http version is 1.1": (r) => r.proto === "HTTP/1.1",
     });
 
-    if (searchAccountTransactionsByStatusRes.status === 200) {
-      check(searchAccountTransactionsByStatusRes, {
-        "SearchAccountTransactionsByStatus: has one or more transactions": (r) => searchAccountTransactionsByStatusJSON.totalItems > 0,
+    if (searchAccountTransactionsByDirectionRes.status === 200) {
+      check(searchAccountTransactionsByDirectionRes, {
+        "SearchAccountTransactionsByDirection: has one or more transactions": (r) => searchAccountTransactionsByDirectionJSON.totalItems > 0,
       });
     }
 
