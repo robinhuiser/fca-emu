@@ -39,7 +39,7 @@ The emulator can be configured using environment variables below - when using th
 | FCA_SECRET | 123456789 | The (static) token used to secure the API; you need to pass this via the HTTP header `X-TOKEN`. |
 | EMULATOR_LISTEN_ADDRESS | 0.0.0.0 | The network address the server listens on |
 | EMULATOR_LISTEN_PORT | 8080 | The TCP network port the server listens on |
-| NUMBER_OF_ENTITIES | 20 | The number of entities (persons, organizations and corporates) generated during startup. Each entity will be assigned an n number of accounts by default|
+| NUMBER_OF_ENTITIES | 3 | The number of entities (persons, organizations and corporates) generated during startup. Each entity will be assigned an n number of accounts by default|
 | BRANCHES_PER_BANK | 50 | Number of branches generated for each of the banks |
 | DB_VENDOR | sqlite3 | By default, an in-memory database is used; supported values: `postgres` / `mysql` |
 | DB_HOST | - | Database hostname or IP address |
