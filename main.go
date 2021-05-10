@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dimiro1/banner"
 	"github.com/joho/godotenv"
@@ -48,6 +49,9 @@ const (
 )
 
 func main() {
+	// Start timer
+	start := time.Now()
+
 	// We can ignore if there is no .dotenv (container runtime)
 	godotenv.Load()
 
@@ -125,5 +129,6 @@ func main() {
 	log.Printf("Swagger UI is available on http://%s:%s/swagger-ui", appListenAddress, appListenPort)
 	log.Printf("OpenAPI specification is available on http://%s:%s/api/openapi.yaml", appListenAddress, appListenPort)
 	log.Printf("server is listening on %s:%s", appListenAddress, appListenPort)
+	log.Printf("started in %s", time.Since(start))
 	log.Fatal(http.ListenAndServe(appListenAddress+":"+appListenPort, router))
 }
